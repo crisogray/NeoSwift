@@ -1,0 +1,41 @@
+{
+  "pins" : [
+    {
+      "identity" : "asn1",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leif-ibsen/ASN1",
+      "state" : {
+        "revision" : "e7d46dcd18ce08900655b3fe69bdbffe9abcd7e7",
+        "version" : "2.0.2"
+      }
+    },
+    {
+      "identity" : "bigint",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leif-ibsen/BigInt",
+      "state" : {
+        "revision" : "452076c662f9c0c552705c3697d370d35f924f5a",
+        "version" : "1.6.0"
+      }
+    },
+    {
+      "identity" : "cryptoswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/CryptoSwift.git",
+      "state" : {
+        "revision" : "19b3c3ceed117c5cc883517c4e658548315ba70b",
+        "version" : "1.6.0"
+      }
+    },
+    {
+      "identity" : "swiftecc",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leif-ibsen/SwiftECC",
+      "state" : {
+        "revision" : "d9555d57b0b08899e59748dcd05e796874a440ba",
+        "version" : "3.4.1"
+      }
+    }
+  ],
+  "version" : 2
+}
