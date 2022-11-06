@@ -50,7 +50,7 @@ class ECKeyPairTests: XCTestCase {
     public func testPublicKeyComparable() {
         let encodedKey2 = "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296"
         let encodedKey1Uncompressed =
-        "04b4af8d061b6b320cce6c63bc4ec7894dce107bfc5f5ef5c68a93b4ad1e1368165f4f7fb1c5862465543c06dd5a2aa414f6583f92a5cc3e1d4259df79bf6839c9";
+        "04b4af8d061b6b320cce6c63bc4ec7894dce107bfc5f5ef5c68a93b4ad1e1368165f4f7fb1c5862465543c06dd5a2aa414f6583f92a5cc3e1d4259df79bf6839c9"
 
         let key1 = try! ECPublicKey(publicKey: encodedPoint)
         let key2 = try! ECPublicKey(publicKey: encodedKey2)

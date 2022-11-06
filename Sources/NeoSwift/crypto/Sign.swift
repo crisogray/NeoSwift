@@ -19,7 +19,7 @@ public enum Sign {
         for i in 0...3 {
             if let k = try recoverFromSignature(recId: i, sig: sig, message: message.sha256()),
                k == keyPair.publicKey {
-                recId = i;
+                recId = i
                 break
             }
         }

@@ -17,3 +17,12 @@ extension BInt {
     }
     
 }
+
+extension Int {
+    
+    var bytes: Bytes {
+        var int = self
+        return Data(bytes: &int, count: 4).reversed()
+    }
+    
+}
