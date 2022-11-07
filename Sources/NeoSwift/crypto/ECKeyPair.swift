@@ -127,11 +127,11 @@ extension ECPublicKey {
 
 extension ECPublicKey: NeoSerializable {
     
-    func deserialize(_ reader: BinaryReader) throws {
+    func deserialize(_ reader: BinaryReader) {
         
     }
     
-    func serialize(_ writer: BinaryWriter) throws {
+    func serialize(_ writer: BinaryWriter) {
         
     }
     

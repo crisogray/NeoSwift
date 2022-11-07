@@ -118,7 +118,7 @@ class Bip32ECKeyPairTests: XCTestCase {
     }
     
     private func generateAndTest(_ seed: String, _ expectedPrivateKey: String,
-                                 _ expectedPublicKey: String, _ path: [Int]) {
+                                 _ expectedPublicKey: String, _ path: [Int32]) {
         guard let keyPair = try? Bip32ECKeyPair.generateKeyPair(seed: seed.bytesFromHex) else {
             XCTFail()
             return
@@ -150,7 +150,7 @@ class Bip32ECKeyPairTests: XCTestCase {
         return serialize(pair: pair, header: 0x0488ADE4, pub: false)
     }
     
-    private func serialize(pair: Bip32ECKeyPair, header: Int, pub: Bool) -> Bytes {
+    private func serialize(pair: Bip32ECKeyPair, header: Int32, pub: Bool) -> Bytes {
         var buffer: Bytes = header.bytes + Byte(pair.depth)
         buffer += pair.parentFingerprint.bytes + pair.childNumber.bytes + pair.chainCode
         buffer +=  pub ? try! pair.publicKeyPoint!.getEncoded(true) : pair.privateKey.int.toBytesPadded(length: 33)

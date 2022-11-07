@@ -7,7 +7,7 @@ struct NeoConstants {
     
     // MARK: Cryptography
     
-    private(set) public static var SECP256R1_DOMAIN: Domain = Domain.instance(curve: .EC256r1)
+    private(set) public static var SECP256R1_DOMAIN: Domain = .instance(curve: .EC256r1)
     static let SECP256R1_HALF_CURVE_ORDER: BInt = SECP256R1_DOMAIN.order >> 1
 
     // MARK: Accounts, Addresses, Keys
@@ -29,11 +29,11 @@ struct NeoConstants {
     public static let MAX_MANIFEST_SIZE: Int = 0xFFFF
     
     public static func startUsingK1CurveForTests() {
-        SECP256R1_DOMAIN = Domain.instance(curve: .EC256k1)
+        SECP256R1_DOMAIN = .instance(curve: .EC256k1)
     }
     
     public static func stopUsingK1CurveForTests() {
-        SECP256R1_DOMAIN = Domain.instance(curve: .EC256r1)
+        SECP256R1_DOMAIN = .instance(curve: .EC256r1)
     }
     
 }

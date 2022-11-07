@@ -11,12 +11,12 @@ import SwiftECC
 
 public class Bip32ECKeyPair: ECKeyPair {
     
-    public static let HARDENED_BIT: Int = -2147483648
+    public static let HARDENED_BIT: Int32 = -2147483648
     public let parentHasPrivate: Bool
-    public let childNumber: Int
-    public let depth: Int
+    public let childNumber: Int32
+    public let depth: Int32
     public let chainCode: Bytes
-    public var parentFingerprint: Int
+    public var parentFingerprint: Int32
     public var publicKeyPoint: ECPoint? {
         return try? Sign.publicPointFromPrivateKey(privKey: privateKey)
     }
@@ -24,16 +24,16 @@ public class Bip32ECKeyPair: ECKeyPair {
         let id = try? publicKeyPoint?.getEncoded(true).sha256ThenRipemd160()
         return id
     }
-    public var fingerprint: Int? {
+    public var fingerprint: Int32? {
         guard let id = identifier else {
             return nil
         }
-        let a = Int(id[3] & 0xFF), b = Int(id[2] & 0xFF) << 8
-        let c = Int(id[1] & 0xFF) << 16, d = Int(id[0] & 0xFF) << 24
+        let a = Int32(id[3] & 0xFF), b = Int32(id[2] & 0xFF) << 8
+        let c = Int32(id[1] & 0xFF) << 16, d = Int32(id[0] & 0xFF) << 24
         return a | b | c | d
     }
     
-    init(privateKey: ECPrivateKey, publicKey: ECPublicKey, childNumber: Int, chainCode: Bytes, parent: Bip32ECKeyPair?) {
+    init(privateKey: ECPrivateKey, publicKey: ECPublicKey, childNumber: Int32, chainCode: Bytes, parent: Bip32ECKeyPair?) {
         self.parentHasPrivate = parent != nil
         self.childNumber = childNumber
         self.depth = parent != nil ? parent!.depth + 1 : 0
@@ -63,7 +63,7 @@ public class Bip32ECKeyPair: ECKeyPair {
         return try create(privateKey: Bytes(i[0..<32]), chainCode: Bytes(i[32..<64]))
     }
     
-    public static func deriveKeyPair(master: Bip32ECKeyPair, path: [Int]) throws -> Bip32ECKeyPair {
+    public static func deriveKeyPair(master: Bip32ECKeyPair, path: [Int32]) throws -> Bip32ECKeyPair {
         var currentKeyPair = master
         for childNumber in path {
             currentKeyPair = try currentKeyPair.deriveChildKey(childNumber)
@@ -71,7 +71,7 @@ public class Bip32ECKeyPair: ECKeyPair {
         return currentKeyPair
     }
     
-    private func deriveChildKey(_ childNumber: Int) throws -> Bip32ECKeyPair {
+    private func deriveChildKey(_ childNumber: Int32) throws -> Bip32ECKeyPair {
         var data: Bytes = []
         if Self.isHardened(childNumber) {
             data = privateKey.int.toBytesPadded(length: 33)
@@ -90,7 +90,7 @@ public class Bip32ECKeyPair: ECKeyPair {
                               childNumber: childNumber, chainCode: chainCode, parent: self)
     }
     
-    public static func isHardened(_ a: Int) -> Bool {
+    public static func isHardened(_ a: Int32) -> Bool {
         return (a & HARDENED_BIT) != 0
     }
     
