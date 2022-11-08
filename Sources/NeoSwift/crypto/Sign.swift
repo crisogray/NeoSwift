@@ -116,8 +116,6 @@ public enum Sign {
         return pubKey.verify(signature: ECDSASignature(r: sig.r.bInt, s: sig.s.bInt).signature, msg: message)
     }
     
-    
-    
     public class SignatureData: Equatable {
         
         let v: Byte

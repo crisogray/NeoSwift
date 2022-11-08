@@ -20,6 +20,10 @@ extension Bytes {
         return Base58.base58CheckEncode(self)
     }
     
+    var varSize: Int {
+        return count.varSize + count
+    }
+    
     func toPadded(length: Int, trailing: Bool = false) -> Bytes {
         let firstZero = self.first == 0
         let srcOffset = firstZero ? 1 : 0
@@ -34,4 +38,16 @@ extension Bytes {
         return Bytes(repeating: 0, count: length - bytesLength) + self[srcOffset..<bytesLength]
     }
     
+    func toNumeric<T: Numeric>(littleEndian: Bool = false) -> T {
+        let b = littleEndian ? reversed() : self
+        return Data(bytes: b, count: count)
+            .withUnsafeBytes { return $0.load(as: T.self) }
+    }
+    
+}
+
+extension Byte {
+    func isBetween(_ opCode1: OpCode, _ opCode2: OpCode) -> Bool {
+        return self >= opCode1.opcode && self <= opCode2.opcode
+    }
 }

@@ -17,6 +17,13 @@ extension Int {
         return Self(pow(Double(self), Double(p)))
     }
     
+    var varSize: Int {
+        if self < 0xFD { return 1 }
+        else if self <= 0xFFFF { return 3 }
+        else if self <= 0xFFFFFFFF { return 5 }
+        else { return 9 }
+    }
+    
 }
 
 extension Numeric {
@@ -29,4 +36,5 @@ extension Numeric {
         var int = self
         return Data(bytes: &int, count: MemoryLayout.size(ofValue: self)).bytes
     }
+    
 }

@@ -153,7 +153,7 @@ class Bip32ECKeyPairTests: XCTestCase {
     private func serialize(pair: Bip32ECKeyPair, header: Int32, pub: Bool) -> Bytes {
         var buffer: Bytes = header.bytes + Byte(pair.depth)
         buffer += pair.parentFingerprint.bytes + pair.childNumber.bytes + pair.chainCode
-        buffer +=  pub ? try! pair.publicKeyPoint!.getEncoded(true) : pair.privateKey.int.toBytesPadded(length: 33)
+        buffer +=  pub ? try! pair.publicKeyPoint.getEncoded(true) : pair.privateKey.int.toBytesPadded(length: 33)
         return buffer
     }
     

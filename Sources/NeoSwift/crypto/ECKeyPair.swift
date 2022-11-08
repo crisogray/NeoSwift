@@ -127,12 +127,16 @@ extension ECPublicKey {
 
 extension ECPublicKey: NeoSerializable {
     
-    func deserialize(_ reader: BinaryReader) {
-        
+    static func deserialize(_ reader: BinaryReader) -> Self? {
+        if let bytes = try? reader.readBytes(NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED) {
+            return try? ECPublicKey(NeoConstants.SECP256R1_DOMAIN.decodePoint(bytes)) as? Self
+        }
+        return nil
     }
     
     func serialize(_ writer: BinaryWriter) {
-        
+        do { writer.write(try getEncoded(compressed: true)) }
+        catch {}
     }
     
     var size: Int {

@@ -32,6 +32,23 @@ class ECKeyPairTests: XCTestCase {
         XCTAssertEqual(try? ECPublicKey(publicKey: prefixed).getEncodedCompressedHex(), encodedPoint)
     }
 
+    public func testSerializePublicKey() {
+        guard let publicKey = try? ECPublicKey(publicKey: encodedPoint) else {
+            XCTFail()
+            return
+        }
+        XCTAssertEqual(publicKey.toArray(), encodedPoint.bytesFromHex)
+    }
+    
+    public func testDeserializePublicKey() {
+        let data = "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296".bytesFromHex
+        guard let publicKey = ECPublicKey.from(data) else {
+            XCTFail()
+            return
+        }
+        XCTAssertEqual(NeoConstants.SECP256R1_DOMAIN.g, publicKey.ecPoint)
+    }
+    
     public func testPublicKeySize() {
         let key = try! ECPublicKey(publicKey: "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296")
         XCTAssertEqual(key.size, 33)
@@ -43,8 +60,7 @@ class ECKeyPairTests: XCTestCase {
             XCTFail()
             return
         }
-        XCTAssertEqual(try? keyPair.exportAsWif(),
-                       "L3tgppXLgdaeqSGSFw1Go3skBiy8vQAM7YMXvTHsKQtE16PBncSU")
+        XCTAssertEqual(try? keyPair.exportAsWif(), "L3tgppXLgdaeqSGSFw1Go3skBiy8vQAM7YMXvTHsKQtE16PBncSU")
     }
     
     public func testPublicKeyComparable() {

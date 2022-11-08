@@ -31,6 +31,10 @@ extension String {
         return bytes.base58Encoded
     }
     
+    var varSize: Int {
+        bytes.varSize
+    }
+    
 }
 
 extension String: LocalizedError {
