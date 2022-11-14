@@ -1,7 +1,7 @@
 
 import Foundation
 
-extension Bytes {
+public extension Bytes {
     
     func wifFromPrivateKey() throws -> String {
         guard count == NeoConstants.PRIVATE_KEY_SIZE else {
@@ -15,7 +15,7 @@ extension Bytes {
     
 }
 
-extension String {
+public extension String {
     
     func privateKeyFromWIF() throws -> Bytes {
         guard let data = base58Decoded, data.count == 38, data.first == 0x80, data[33] == 0x01 else {

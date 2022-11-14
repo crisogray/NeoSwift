@@ -2,7 +2,7 @@
 import BigInt
 import Foundation
 
-extension BInt {
+public extension BInt {
     
     func toBytesPadded(length: Int) -> Bytes {
         let bytes = asMagnitudeBytes()
@@ -11,7 +11,7 @@ extension BInt {
     
 }
 
-extension Int {
+public extension Int {
     
     func toPowerOf(_ p: Self) -> Self {
         return Self(pow(Double(self), Double(p)))
@@ -26,7 +26,7 @@ extension Int {
     
 }
 
-extension Numeric {
+public extension Numeric {
     
     var bytes: Bytes {
         return bigEndianBytes.reversed()

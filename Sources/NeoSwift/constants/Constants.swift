@@ -28,8 +28,8 @@ struct NeoConstants {
     public static let MAX_SIGNER_SUBITEMS: Int = 16
     public static let MAX_MANIFEST_SIZE: Int = 0xFFFF
     
-    public static func startUsingK1CurveForTests() {
-        SECP256R1_DOMAIN = .instance(curve: .EC256k1)
+    public static func startUsingCurveForTests(_ instance: ECCurve) {
+        SECP256R1_DOMAIN = .instance(curve: instance)
     }
     
     public static func stopUsingK1CurveForTests() {

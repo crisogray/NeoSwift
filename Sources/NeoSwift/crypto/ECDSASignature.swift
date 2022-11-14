@@ -5,25 +5,25 @@ import SwiftECC
 
 public class ECDSASignature {
     
-    let signature: ECSignature
+    public let signature: ECSignature
     
-    var r: BInt {
+    public var r: BInt {
         return signature.r.bInt
     }
     
-    var s: BInt {
+    public var s: BInt {
         return signature.s.bInt
     }
     
-    var isCanonical: Bool {
+    public var isCanonical: Bool {
         return s <= NeoConstants.SECP256R1_HALF_CURVE_ORDER
     }
     
-    init (r: BInt, s: BInt) {
+    public init (r: BInt, s: BInt) {
         signature = ECSignature(domain: NeoConstants.SECP256R1_DOMAIN, r: r.asMagnitudeBytes(), s: s.asMagnitudeBytes())
     }
     
-    init (signature: ECSignature) {
+    public init (signature: ECSignature) {
         self.signature = signature
     }
     

@@ -84,15 +84,14 @@ public enum OpCode: Byte, CaseIterable {
             return 1
         case .pushInt128, .pushInt256, .pushA, ._try,
                 .endTry, .endTry_l, .endFinally, .invert,
-                .sign, .abs, .negate, .inc, .dec, .not, .nz,
-                .size:
+                .sign, .abs, .negate, .inc, .dec, .not, .nz, .size:
             return 1 << 2
         case .pushData1, .and, .or, .xor, .add, .sub, .mul, .div, .mod,
                 .shL, .shR, .boolAnd, .boolOr, .numEqual, .numNotEqual,
                 .lt, .le, .gt, .ge, .min, .max, .within, .newMap:
             return 1 << 3
-        case .xdrop, .clear, .roll, .reverseN, .initSSlot,
-                .newArray0, .newStruct0, .keys, .remove, .clearItems:
+        case .xdrop, .clear, .roll, .reverseN, .initSSlot, .newArray0,
+                .newStruct0, .keys, .remove, .clearItems:
             return 1 << 4
         case .equal, .notEqual, .modMul:
             return 1 << 5
@@ -120,31 +119,23 @@ public enum OpCode: Byte, CaseIterable {
     
     public var operandSize: OperandSize? {
         switch self {
-        case .pushInt8,
-                .jmp, .jmpIf, .jmpIfNot, .jmpEq, .jmpNe,
+        case .pushInt8, .jmp, .jmpIf, .jmpIfNot, .jmpEq, .jmpNe,
                 .jmpGt, .jmpGe, .jmpLt, .jmpLe, .call, .endTry,
-                .initSSlot, .ldSFld, .stSFld, .ldLoc, .stLoc, .ldArg, .stArg,
-                .newArray_t, .isType, .convert:
+                .initSSlot, .ldSFld, .stSFld, .ldLoc, .stLoc,
+                .ldArg, .stArg, .newArray_t, .isType, .convert:
             return .withSize(1)
         case .pushInt16, .callT, ._try, .initSlot:
             return .withSize(2)
-        case .pushInt32, .pushA,
-                .jmp_l, .jmpIf_l, .jmpIfNot_l, .jmpEq_l, .jmpNe_l,
-                .jmpGt_l, .jmpGe_l, .jmpLt_l, .jmpLe_l, .call_l,
-                .endTry_l, .syscall:
+        case .pushInt32, .pushA, .jmp_l, .jmpIf_l, .jmpIfNot_l,
+                .jmpEq_l, .jmpNe_l, .jmpGt_l, .jmpGe_l, .jmpLt_l,
+                .jmpLe_l, .call_l, .endTry_l, .syscall:
             return .withSize(4)
-        case .pushInt64, .try_l:
-            return .withSize(8)
-        case .pushInt128:
-            return .withSize(16)
-        case .pushInt256:
-            return .withSize(32)
-        case .pushData1:
-            return .withPrefixSize(1)
-        case .pushData2:
-            return .withPrefixSize(2)
-        case .pushData4:
-            return .withPrefixSize(4)
+        case .pushInt64, .try_l: return .withSize(8)
+        case .pushInt128: return .withSize(16)
+        case .pushInt256: return .withSize(32)
+        case .pushData1: return .withPrefixSize(1)
+        case .pushData2: return .withPrefixSize(2)
+        case .pushData4: return .withPrefixSize(4)
         default: return nil
         }
     }

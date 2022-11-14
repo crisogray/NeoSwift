@@ -5,10 +5,10 @@ import SwiftECC
 
 public class ECKeyPair {
     
-    let privateKey: ECPrivateKey
-    let publicKey: ECPublicKey
+    public let privateKey: ECPrivateKey
+    public let publicKey: ECPublicKey
     
-    init(privateKey: ECPrivateKey, publicKey: ECPublicKey) {
+    public init(privateKey: ECPrivateKey, publicKey: ECPublicKey) {
         self.privateKey = privateKey
         self.publicKey = publicKey
     }
@@ -18,7 +18,7 @@ public class ECKeyPair {
         return [signature.r, signature.s]
     }
     
-    func signAndGetECDSASignature(messageHash: Bytes) -> ECDSASignature {
+    public func signAndGetECDSASignature(messageHash: Bytes) -> ECDSASignature {
         return ECDSASignature(signature: privateKey.sign(msg: messageHash, deterministic: true))
     }
     
@@ -53,7 +53,7 @@ extension ECKeyPair: Equatable {
     
 }
 
-extension ECPrivateKey {
+public extension ECPrivateKey {
     
     var bytes: Bytes {
         return s.toBytesPadded(length: NeoConstants.PRIVATE_KEY_SIZE)
@@ -88,7 +88,7 @@ extension ECPrivateKey: Equatable {
 
 }
 
-extension ECPublicKey {
+public extension ECPublicKey {
     
     var ecPoint: ECPoint {
         return w
@@ -115,11 +115,11 @@ extension ECPublicKey {
         try self.init(domain: NeoConstants.SECP256R1_DOMAIN, w: point)
     }
     
-    public func getEncoded(compressed: Bool) throws -> Bytes {
+    func getEncoded(compressed: Bool) throws -> Bytes {
         return try NeoConstants.SECP256R1_DOMAIN.encodePoint(ecPoint, compressed)
     }
     
-    public func getEncodedCompressedHex() throws -> String {
+    func getEncodedCompressedHex() throws -> String {
         return try getEncoded(compressed: true).toHexString()
     }
     
@@ -127,22 +127,21 @@ extension ECPublicKey {
 
 extension ECPublicKey: NeoSerializable {
     
-    static func deserialize(_ reader: BinaryReader) -> Self? {
+    public var size: Int {
+        return w.infinity ? 1 : NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED
+    }
+    
+    public func serialize(_ writer: BinaryWriter) {
+        do { writer.write(try getEncoded(compressed: true)) }
+        catch {}
+    }
+    
+    public static func deserialize(_ reader: BinaryReader) -> Self? {
         if let bytes = try? reader.readBytes(NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED) {
             return try? ECPublicKey(NeoConstants.SECP256R1_DOMAIN.decodePoint(bytes)) as? Self
         }
         return nil
     }
-    
-    func serialize(_ writer: BinaryWriter) {
-        do { writer.write(try getEncoded(compressed: true)) }
-        catch {}
-    }
-    
-    var size: Int {
-        return w.infinity ? 1 : NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED
-    }
-    
     
 }
 

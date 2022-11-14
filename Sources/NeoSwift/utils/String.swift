@@ -1,7 +1,7 @@
 
 import Foundation
 
-extension String {
+public extension String {
     
     var bytesFromHex: Bytes {
         return Bytes(hex: self)
@@ -33,6 +33,26 @@ extension String {
     
     var varSize: Int {
         bytes.varSize
+    }
+    
+    var isValidAddress: Bool {
+        guard let data = base58Decoded, data.count == 25,
+              data[0] == NeoConfig.DEFAULT_ADDRESS_VERSION,
+              Bytes(data.prefix(21)).hash256().prefix(4) == data.suffix(4) else {
+            return false
+        }
+        return true
+    }
+    
+    var isValidHex: Bool {
+        return cleanedHexPrefix.count == cleanedHexPrefix.filter(\.isHexDigit).count
+    }
+    
+    func addressToScriptHash() throws -> Bytes {
+        guard isValidAddress, let b58 = base58Decoded else {
+            throw "Not a valid NEO address."
+        }
+        return b58[1..<21].reversed()
     }
     
 }

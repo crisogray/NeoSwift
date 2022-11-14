@@ -2,7 +2,7 @@
 import BigInt
 import Foundation
 
-class BinaryReader {
+public class BinaryReader {
     
     private let array: Bytes
     private var position: Int = 0

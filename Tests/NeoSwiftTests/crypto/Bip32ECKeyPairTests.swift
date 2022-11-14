@@ -7,7 +7,7 @@ import XCTest
 class Bip32ECKeyPairTests: XCTestCase {
     
     override func setUp() {
-        NeoConstants.startUsingK1CurveForTests()
+        NeoConstants.startUsingCurveForTests(.EC256k1)
     }
     
     override class func tearDown() {

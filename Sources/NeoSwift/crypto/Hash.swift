@@ -2,7 +2,7 @@
 import CryptoSwift
 import Foundation
 
-extension Bytes {
+public extension Bytes {
     
     func hash256() -> Bytes {
         return sha256().sha256()
@@ -24,7 +24,7 @@ extension Bytes {
     
 }
 
-extension String {
+public extension String {
     
     func hash256() -> String {
         return bytes.hash256().toHexString()

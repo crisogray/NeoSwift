@@ -2,7 +2,7 @@
 import BigInt
 import Foundation
 
-extension Bytes {
+public extension Bytes {
     
     var bInt: BInt {
         return BInt(magnitude: self)
@@ -22,6 +22,12 @@ extension Bytes {
     
     var varSize: Int {
         return count.varSize + count
+    }
+    
+    var scripthashToAddress: String {
+        let script: Bytes = NeoConfig.DEFAULT_ADDRESS_VERSION + reversed()
+        let checksum = script.hash256().prefix(upTo: 4)
+        return (script + checksum).base58Encoded
     }
     
     func toPadded(length: Int, trailing: Bool = false) -> Bytes {
