@@ -141,6 +141,7 @@ public enum OpCode: Byte, CaseIterable {
     }
     
     public struct OperandSize {
+        
         public var prefixSize: Int = 0
         public var size: Int = 0
         
@@ -150,10 +151,6 @@ public enum OpCode: Byte, CaseIterable {
         
         public static func withPrefixSize(_ pS: Int) -> OperandSize {
             return OperandSize(prefixSize: pS)
-        }
-        
-        public static func withPrefixSizeAndSize(_ pS: Int, _ s: Int) -> OperandSize {
-            return OperandSize(prefixSize: pS, size: s)
         }
         
     }

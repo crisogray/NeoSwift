@@ -1,15 +1,163 @@
 
+import BigInt
 import Foundation
 
 public struct ContractParameter: Codable, Hashable {
         
-    public var name: String?
-    public var type: ContractParamterType
-    public var value: AnyHashable?
+    public let name: String?
+    public let type: ContractParamterType
+    public let value: AnyHashable?
     
+    private init(name: String?, type: ContractParamterType, value: AnyHashable?) {
+        self.name = name
+        self.type = type
+        self.value = value
+    }
     
+    init(name: String?, type: ContractParamterType) {
+        self.init(name: name, type: type, value: nil)
+    }
     
+    init(type: ContractParamterType) {
+        self.init(name: nil, type: type, value: nil)
+    }
     
+    init(type: ContractParamterType, value: AnyHashable?) {
+        self.init(name: nil, type: type, value: value)
+    }
+ 
+    public static func any(_ value: AnyHashable?) -> ContractParameter {
+        return ContractParameter(type: .any, value: value)
+    }
+    
+    public static func string(_ value: String) -> ContractParameter {
+        return ContractParameter(type: .string, value: value)
+    }
+    
+    public static func byteArray(_ value: Bytes) -> ContractParameter {
+        return ContractParameter(type: .byteArray, value: value)
+    }
+    
+    public static func byteArray(_ value: String) throws -> ContractParameter {
+        guard value.isValidHex else {
+            throw "Argument is not a valid hex number."
+        }
+        return ContractParameter(type: .byteArray, value: value.bytesFromHex)
+    }
+    
+    public static func byteArrayFromString(_ value: String) -> ContractParameter {
+        return ContractParameter(type: .byteArray, value: Bytes(value.utf8))
+    }
+    
+    public static func signature(_ value: Bytes) throws -> ContractParameter {
+        guard value.count == NeoConstants.SIGNATURE_SIZE else {
+            throw "Signature is expected to have a length of \(NeoConstants.SIGNATURE_SIZE) bytes, but had \(value.count)."
+        }
+        return ContractParameter(type: .signature, value: value)
+    }
+    
+    public static func signature(_ value: Sign.SignatureData) throws -> ContractParameter {
+        return try signature(value.concatenated)
+    }
+    
+    public static func signature(_ value: String) throws -> ContractParameter {
+        guard value.isValidHex else {
+            throw "Argument is not a valid hex number."
+        }
+        return try signature(value.bytesFromHex)
+    }
+    
+    public static func bool(_ value: Bool) -> ContractParameter {
+        return ContractParameter(type: .boolean, value: value)
+    }
+    
+    public static func integer(_ value: Int) -> ContractParameter {
+        return ContractParameter(type: .integer, value: value)
+    }
+    
+    public static func integer(_ value: Byte) -> ContractParameter {
+        return integer(Int(value))
+    }
+    
+    public static func integer(_ value: BInt) -> ContractParameter {
+        return ContractParameter(type: .integer, value: value.asInt())
+    }
+    
+    public static func hash160(_ value: Hash160) -> ContractParameter {
+        return ContractParameter(type: .hash160, value: value)
+    }
+    
+    // TODO: Hash160 from Account
+    
+    public static func hash256(_ value: Hash256) -> ContractParameter {
+        return ContractParameter(type: .hash256, value: value)
+    }
+    
+    public static func hash256(_ value: Bytes) throws -> ContractParameter {
+        return try ContractParameter(type: .hash256, value: Hash256(value))
+    }
+    
+    public static func hash256(_ value: String) throws -> ContractParameter {
+        return try ContractParameter(type: .hash256, value: Hash256(value))
+    }
+    
+    public static func publicKey(_ value: Bytes) throws -> ContractParameter {
+        guard value.count == NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED else {
+            throw "Public key argument must be \(NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED) bytes but was \(value.count) bytes."
+        }
+        return ContractParameter(type: .publicKey, value: value)
+    }
+    
+    public static func publicKey(_ value: String) throws -> ContractParameter {
+        return try publicKey(value.bytesFromHex)
+    }
+    
+    public static func publicKey(_ value: ECPublicKey) throws -> ContractParameter {
+        return try publicKey(value.getEncoded(compressed: true))
+    }
+    
+    public static func array(_ values: [AnyHashable]) throws -> ContractParameter {
+        return try ContractParameter(type: .array, value: values.map(mapToContractParameter(_:)))
+    }
+    
+    public static func map(_ values: [AnyHashable: AnyHashable]) throws -> ContractParameter {
+        guard !values.isEmpty else {
+            throw "At least one map entry is required to create a map contract parameter."
+        }
+        var map: [ContractParameter: ContractParameter] = [:]
+        try values.forEach { k, v in
+            guard let key = try? mapToContractParameter(k),
+                  let value = try? mapToContractParameter(v),
+                    key.type != .array && key.type != .map else {
+                throw "The provided map contains an invalid key. The keys cannot be of type array or map."
+            }
+            map[key] = value
+        }
+        return ContractParameter(type: .map, value: map)
+    }
+    
+    public static func mapToContractParameter(_ value: AnyHashable) throws -> ContractParameter {
+        switch value {
+        case nil: return any(nil)
+        case is ContractParameter: return value as! ContractParameter
+        case is Bool: return bool(value as! Bool)
+        case is Int: return integer(value as! Int)
+        case is Byte: return integer(value as! Byte)
+        case is BInt: return integer(value as! BInt)
+        case is Bytes: return byteArray(value as! Bytes)
+        case is String: return string(value as! String)
+        case is Hash160: return hash160(value as! Hash160)
+        case is Hash256: return hash256(value as! Hash256)
+            // TODO: ACCOUNT
+        case is ECPublicKey: return try publicKey(value as! ECPublicKey)
+        case is Sign.SignatureData: return try signature(value as! Sign.SignatureData)
+        case is [AnyHashable]:
+            print("THING")
+            print(value)
+            return try array(value as! [AnyHashable])
+        default: throw "The provided object could not be casted into a supported contract parameter type."
+        }
+    }
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
