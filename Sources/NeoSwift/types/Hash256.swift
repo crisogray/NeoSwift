@@ -24,11 +24,11 @@ public class Hash256: NeoSerializable, Hashable, Comparable {
         self.hash = hash
     }
     
-    init (_ hash: String) throws {
+    convenience init (_ hash: String) throws {
         guard hash.isValidHex else {
             throw "String argument is not hexadecimal."
         }
-        self.hash = hash.bytesFromHex
+        try self.init(hash.bytesFromHex)
     }
 
     public func serialize(_ writer: BinaryWriter) {

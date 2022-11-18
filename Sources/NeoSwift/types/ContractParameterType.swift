@@ -2,21 +2,11 @@
 import Foundation
 
 
-public enum ContractParamterType: String, Codable, CaseIterable {
+public enum ContractParamterType: String, CaseIterable {
 
-    case any = "Any",
-         boolean = "Boolean",
-         integer = "Integer",
-         byteArray = "ByteArray",
-         string = "String",
-         hash160 = "Hash160",
-         hash256 = "Hash256",
-         publicKey = "PublicKey",
-         signature = "Signature",
-         array = "Array",
-         map = "Map",
-         interopInterface = "InteropInterface",
-         void = "Void"
+    case any = "Any", boolean = "Boolean", integer = "Integer", byteArray = "ByteArray", string = "String",
+         hash160 = "Hash160", hash256 = "Hash256", publicKey = "PublicKey", signature = "Signature",
+         array = "Array", map = "Map", interopInterface = "InteropInterface", void = "Void"
 
     var byte: Byte {
         switch self {

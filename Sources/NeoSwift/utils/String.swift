@@ -4,7 +4,7 @@ import Foundation
 public extension String {
     
     var bytesFromHex: Bytes {
-        return Bytes(hex: self)
+        return Bytes(hex: cleanedHexPrefix)
     }
     
     var cleanedHexPrefix: String {

@@ -12,6 +12,10 @@ public enum Sign {
         return try signMessage(message: message.bytesFromHex, keyPair: keyPair)
     }
     
+    public static func signMessage(message: String, keyPair: ECKeyPair) throws -> SignatureData {
+        return try signMessage(message: message.bytes, keyPair: keyPair)
+    }
+    
     public static func signMessage(message: Bytes, keyPair: ECKeyPair) throws -> SignatureData {
         let sig = keyPair.signAndGetECDSASignature(messageHash: message)
         var recId: Int = -1
@@ -98,10 +102,10 @@ public enum Sign {
     }
     
     /*
-    public static func recoverSigningScriptHash(message: Bytes, signatureData: SignatureData) throws -> Hash160 {
-        
-    }
-    */
+     public static func recoverSigningScriptHash(message: Bytes, signatureData: SignatureData) throws -> Hash160 {
+     
+     }
+     */
     
     public static func getRealV(_ v: Byte) -> Byte {
         if v == LOWER_REAL_V || v == LOWER_REAL_V + 1 {
@@ -116,7 +120,7 @@ public enum Sign {
         return pubKey.verify(signature: ECDSASignature(r: sig.r.bInt, s: sig.s.bInt).signature, msg: message)
     }
     
-    public class SignatureData: Equatable {
+    public class SignatureData: Equatable, Hashable {
         
         let v: Byte
         let r: Bytes
@@ -138,6 +142,20 @@ public enum Sign {
         
         convenience init(v: Byte, signature: Bytes) {
             self.init(v: v, r: Bytes(signature[0..<32]), s: Bytes(signature[32..<64]))
+        }
+        
+        public static func fromByteArray(signature: Bytes) -> SignatureData {
+            return fromByteArray(v: 0, signature: signature)
+        }
+        
+        public static func fromByteArray(v: Byte, signature: Bytes) -> SignatureData {
+            return SignatureData(v: v, r: Bytes(signature[0..<32]), s: Bytes(signature[32..<64]))
+        }
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(v)
+            hasher.combine(r)
+            hasher.combine(s)
         }
         
         public static func == (lhs: SignatureData, rhs: SignatureData) -> Bool {

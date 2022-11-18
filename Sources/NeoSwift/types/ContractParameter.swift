@@ -80,7 +80,7 @@ public struct ContractParameter: Codable, Hashable {
     }
     
     public static func integer(_ value: BInt) -> ContractParameter {
-        return ContractParameter(type: .integer, value: value.asInt())
+        return ContractParameter(type: .integer, value: value)
     }
     
     public static func hash160(_ value: Hash160) -> ContractParameter {
@@ -136,12 +136,13 @@ public struct ContractParameter: Codable, Hashable {
         return ContractParameter(type: .map, value: map)
     }
     
-    public static func mapToContractParameter(_ value: AnyHashable) throws -> ContractParameter {
+    public static func mapToContractParameter(_ value: AnyHashable?) throws -> ContractParameter {
         switch value {
         case nil: return any(nil)
         case is ContractParameter: return value as! ContractParameter
         case is Bool: return bool(value as! Bool)
         case is Int: return integer(value as! Int)
+        case is BInt: return integer(value as! BInt)
         case is Byte: return integer(value as! Byte)
         case is BInt: return integer(value as! BInt)
         case is Bytes: return byteArray(value as! Bytes)
@@ -151,10 +152,8 @@ public struct ContractParameter: Codable, Hashable {
             // TODO: ACCOUNT
         case is ECPublicKey: return try publicKey(value as! ECPublicKey)
         case is Sign.SignatureData: return try signature(value as! Sign.SignatureData)
-        case is [AnyHashable]:
-            print("THING")
-            print(value)
-            return try array(value as! [AnyHashable])
+        case is [AnyHashable]: return try array(value as! [AnyHashable])
+        case is [AnyHashable: AnyHashable]: return try map(value as! [AnyHashable: AnyHashable])
         default: throw "The provided object could not be casted into a supported contract parameter type."
         }
     }

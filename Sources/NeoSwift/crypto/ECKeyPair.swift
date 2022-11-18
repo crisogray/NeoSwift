@@ -95,7 +95,7 @@ public extension ECPublicKey {
     }
     
     convenience init(publicKey: String) throws {
-        try self.init(publicKey: publicKey.cleanedHexPrefix.bytesFromHex)
+        try self.init(publicKey: publicKey.bytesFromHex)
     }
     
     convenience init(publicKey: Bytes) throws {
@@ -153,6 +153,15 @@ extension ECPublicKey: Comparable {
     
     public static func == (lhs: ECPublicKey, rhs: ECPublicKey) -> Bool {
         return lhs.w == rhs.w
+    }
+    
+}
+
+extension ECPublicKey: Hashable {
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(w.x * 17)
+        hasher.combine(w.y * 257)
     }
     
 }
