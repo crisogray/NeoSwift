@@ -19,7 +19,7 @@ public enum OpCode: Byte, CaseIterable {
     case jmpLt = 0x30, jmpLt_l = 0x31, jmpLe = 0x32, jmpLe_l = 0x33
     case call = 0x34, call_l = 0x35, callA = 0x36, callT = 0x37
     case abort = 0x38, assert = 0x39, _throw = 0x3A, _try = 0x3B, try_l = 0x3C
-    case endTry = 0x3D, endTry_l = 0x3E, endFinally = 0x3F, ret = 0x40, syscall = 0x41
+    case endTry = 0x3D, endTry_l = 0x3E, endFinally = 0x3F, ret = 0x40, sysCall = 0x41
     
     // MARK: Stack
     
@@ -75,6 +75,10 @@ public enum OpCode: Byte, CaseIterable {
         return rawValue
     }
     
+    public var string: String {
+        return [opcode].toHexString()
+    }
+    
     public var price: Int {
         switch self {
         case .pushInt8, .pushInt16, .pushInt32, .pushInt64, .pushNull,
@@ -111,7 +115,7 @@ public enum OpCode: Byte, CaseIterable {
             return 1 << 13
         case .callT:
             return 1 << 15
-        case .abort, .ret, .syscall:
+        case .abort, .ret, .sysCall:
             return 0
         default: return 1 << 1
         }
@@ -128,7 +132,7 @@ public enum OpCode: Byte, CaseIterable {
             return .withSize(2)
         case .pushInt32, .pushA, .jmp_l, .jmpIf_l, .jmpIfNot_l,
                 .jmpEq_l, .jmpNe_l, .jmpGt_l, .jmpGe_l, .jmpLt_l,
-                .jmpLe_l, .call_l, .endTry_l, .syscall:
+                .jmpLe_l, .call_l, .endTry_l, .sysCall:
             return .withSize(4)
         case .pushInt64, .try_l: return .withSize(8)
         case .pushInt128: return .withSize(16)

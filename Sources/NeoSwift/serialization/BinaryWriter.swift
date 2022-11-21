@@ -5,6 +5,10 @@ public class BinaryWriter {
     
     private var array: Bytes = []
     
+    public var size: Int {
+        return array.count
+    }
+    
     public func write(_ buffer: Bytes) {
         array += buffer
     }

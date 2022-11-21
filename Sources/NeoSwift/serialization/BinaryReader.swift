@@ -4,8 +4,9 @@ import Foundation
 
 public class BinaryReader {
     
+    public var position: Int = 0
+
     private let array: Bytes
-    private var position: Int = 0
     private var marker: Int = -1
     
     init(_ input: Bytes) {
