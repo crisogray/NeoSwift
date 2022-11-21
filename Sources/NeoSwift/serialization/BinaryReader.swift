@@ -5,7 +5,10 @@ import Foundation
 public class BinaryReader {
     
     public var position: Int = 0
-
+    public var available: Int {
+        return array.count - position
+    }
+    
     private let array: Bytes
     private var marker: Int = -1
     
