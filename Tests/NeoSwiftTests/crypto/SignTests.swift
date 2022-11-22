@@ -33,6 +33,16 @@ class SignTests: XCTestCase {
         XCTAssertEqual(signatureDataHex, expected)
     }
     
+    public func testRecoverSigningScriptHash() {
+        let signatureData = Sign.SignatureData(v: 27,
+                                               r: "147e5f3c929dd830d961626551dbea6b70e4b2837ed2fe9089eed2072ab3a655".bytesFromHex,
+                                               s: "523ae0fa8711eee4769f1913b180b9b3410bbb2cf770f529c85f6886f22cbaaf".bytesFromHex)
+        XCTAssertEqual(
+            try! Sign.recoverSigningScriptHash(message: testMessageBytes, signatureData: signatureData),
+            try! keyPair.getScriptHash()
+        )
+    }
+    
     public func testSignatureDataFromBytes() {
         let bytes = "147e5f3c929dd830d961626551dbea6b70e4b2837ed2fe9089eed2072ab3a655523ae0fa8711eee4769f1913b180b9b3410bbb2cf770f529c85f6886f22cbaaf".bytesFromHex
         let signatureData = Sign.SignatureData(signature: bytes)

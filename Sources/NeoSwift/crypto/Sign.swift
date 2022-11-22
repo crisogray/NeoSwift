@@ -28,7 +28,7 @@ public enum Sign {
             }
         }
         
-        try (recId != -1).assert("Could not construct a recoverable key. This should never happen.")
+        guard recId != -1 else { throw "Could not construct a recoverable key. This should never happen." }
         
         return SignatureData(v: Byte(recId + 27),
                              r: sig.r.toBytesPadded(length: 32),
@@ -37,10 +37,10 @@ public enum Sign {
     }
     
     public static func recoverFromSignature(recId: Int, sig: ECDSASignature, message: Bytes) throws -> ECPublicKey? {
-        try (recId >= 0).assert("recId must be positive")
-        try (sig.r.signum >= 0).assert("r must be positive")
-        try (sig.s.signum >= 0).assert("s must be positive")
-        try (!message.isEmpty).assert("message cannot be empty")
+        guard recId >= 0 else { throw "recId must be positive" }
+        guard sig.r.signum >= 0 else { throw "r must be positive" }
+        guard sig.s.signum >= 0 else { throw "s must be positive" }
+        guard !message.isEmpty else { throw "message cannot be empty" }
         
         let c = NeoConstants.SECP256R1_DOMAIN
         let n = c.order, i = BInt(recId / 2), x = sig.r + i * n, prime = c.p
@@ -101,11 +101,11 @@ public enum Sign {
         return try NeoConstants.SECP256R1_DOMAIN.g.multiply(key)
     }
     
-    /*
-     public static func recoverSigningScriptHash(message: Bytes, signatureData: SignatureData) throws -> Hash160 {
-     
-     }
-     */
+    public static func recoverSigningScriptHash(message: Bytes, signatureData: SignatureData) throws -> Hash160 {
+        let sig = Sign.SignatureData(v: getRealV(signatureData.v), r: signatureData.r, s: signatureData.s)
+        let key = try Sign.signedMessageToKey(message: message, signatureData: sig)
+        return try Hash160.fromPublicKey(key.getEncoded(compressed: true))
+    }
     
     public static func getRealV(_ v: Byte) -> Byte {
         if v == LOWER_REAL_V || v == LOWER_REAL_V + 1 {

@@ -25,7 +25,6 @@ class EnumTypeTests: XCTestCase {
         XCTAssertEqual(ContractParamterType.valueOf(0xab), nil)
         XCTAssertEqual(ContractParamterType.fromJsonValue("String"), type)
         XCTAssertEqual(ContractParamterType.fromJsonValue("Invalid"), nil)
-
     }
     
 }

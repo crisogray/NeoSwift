@@ -13,7 +13,16 @@ public class ECKeyPair {
         self.publicKey = publicKey
     }
     
-    func sign(messageHash: Bytes) -> [BInt] {
+    public func getAddress() throws -> String {
+        return try getScriptHash().toAddress()
+    }
+    
+    public func getScriptHash() throws -> Hash160 {
+        let script = try ScriptBuilder.buildVerificationScript(publicKey.getEncoded(compressed: true))
+        return try Hash160.fromScript(script)
+    }
+    
+    public func sign(messageHash: Bytes) -> [BInt] {
         let signature: ECDSASignature = signAndGetECDSASignature(messageHash: messageHash)
         return [signature.r, signature.s]
     }
