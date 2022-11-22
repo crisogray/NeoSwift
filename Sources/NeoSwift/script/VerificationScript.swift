@@ -10,7 +10,7 @@ public class VerificationScript: NeoSerializable, Equatable, Hashable {
     }
     
     public var scriptHash: Hash160? {
-        return try? Hash160.fromScript(script: script)
+        return try? Hash160.fromScript(script)
     }
     
     init() {

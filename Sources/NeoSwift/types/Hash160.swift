@@ -24,13 +24,13 @@ public class Hash160: NeoSerializable, Hashable, Comparable {
         self.hash = hash
     }
     
-    init (_ hash: String) throws {
+    convenience init (_ hash: String) throws {
         guard hash.isValidHex else {
             throw "String argument is not hexadecimal."
         }
-        self.hash = hash.bytesFromHex
+        try self.init(hash.bytesFromHex)
     }
-
+    
     public func serialize(_ writer: BinaryWriter) {
         writer.write(hash.reversed())
     }
@@ -54,12 +54,22 @@ public class Hash160: NeoSerializable, Hashable, Comparable {
     public static func fromAddress(_ address: String) throws -> Hash160 {
         return try .init(address.addressToScriptHash())
     }
-        
-    public static func fromScript(script: Bytes) throws -> Hash160 {
+    
+    public static func fromScript(_ script: Bytes) throws -> Hash160 {
         return try Hash160(script.sha256ThenRipemd160().reversed())
     }
     
-    // TODO: From public keys
+    public static func fromScript(_ script: String) throws -> Hash160 {
+        return try fromScript(script.bytesFromHex)
+    }
+    
+    public static func fromPublicKey(_ encodedPublicKey: Bytes) throws -> Hash160 {
+        return try fromScript(ScriptBuilder.buildVerificationScript(encodedPublicKey))
+    }
+    
+    public static func fromPublicKeys(_ pubKeys: [ECPublicKey], signingThreshold: Int) throws -> Hash160 {
+        return try fromScript(ScriptBuilder.buildVerificationScript(pubKeys, signingThreshold))
+    }
     
     public func hash(into hasher: inout Hasher) {
         hasher.combine(hash)

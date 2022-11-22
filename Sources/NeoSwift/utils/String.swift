@@ -45,7 +45,7 @@ public extension String {
     }
     
     var isValidHex: Bool {
-        return cleanedHexPrefix.count == cleanedHexPrefix.filter(\.isHexDigit).count
+        return cleanedHexPrefix.count == cleanedHexPrefix.filter(\.isHexDigit).count && count % 2 == 0
     }
     
     func addressToScriptHash() throws -> Bytes {
