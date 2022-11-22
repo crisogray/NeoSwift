@@ -6,6 +6,10 @@ public enum NeoVMStateType: String, CaseIterable {
 
     case none = "NONE", halt = "HALT", fault = "FAULT", `break` = "BREAK"
 
+    var jsonvalue: String {
+        return rawValue
+    }
+    
     var int: Int {
         switch self {
         case .none: return 0
@@ -14,8 +18,14 @@ public enum NeoVMStateType: String, CaseIterable {
         case .break: return 1 << 2
         }
     }
-
-    static func valueOf(_ int: Int) -> NeoVMStateType? {
+    
+    static func fromJsonValue(_ value: String?) -> NeoVMStateType? {
+        guard let value = value, !value.isEmpty else { return NeoVMStateType.none }
+        return .init(rawValue: value)
+    }
+    
+    static func fromIntValue(_ int: Int?) -> NeoVMStateType? {
+        guard let int = int else { return NeoVMStateType.none }
         return allCases.first { $0.int == int }
     }
 

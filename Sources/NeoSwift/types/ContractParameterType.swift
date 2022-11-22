@@ -8,6 +8,10 @@ public enum ContractParamterType: String, CaseIterable {
          hash160 = "Hash160", hash256 = "Hash256", publicKey = "PublicKey", signature = "Signature",
          array = "Array", map = "Map", interopInterface = "InteropInterface", void = "Void"
 
+    var jsonvalue: String {
+        return rawValue
+    }
+    
     var byte: Byte {
         switch self {
         case .any: return 0x00
@@ -28,6 +32,10 @@ public enum ContractParamterType: String, CaseIterable {
 
     static func valueOf(_ byte: Byte) -> ContractParamterType? {
         return allCases.first { $0.byte == byte }
+    }
+    
+    static func fromJsonValue(_ value: String) -> ContractParamterType? {
+        return .init(rawValue: value)
     }
 
 }
