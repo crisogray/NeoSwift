@@ -15,6 +15,6 @@ public enum NodePluginType: String {
         rpcSystemAssetTracker = "RpcSystemAssetTrackerPlugin",
         simplePolicy = "SimplePolicyPlugin",
         statesDumper = "StatesDumper",
-        systemLog = "SystemLog";
+        systemLog = "SystemLog"
 
 }

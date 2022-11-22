@@ -88,7 +88,6 @@ public class BinaryWriter {
     
     public func writeVarInt(_ v: Int) {
         guard v >= 0 else {
-            print("Cannot writeVarInt with negative value")
             return
         }
         if (v < 0xFD) {

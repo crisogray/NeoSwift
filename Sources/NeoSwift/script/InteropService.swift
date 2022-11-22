@@ -39,7 +39,7 @@ public enum InteropService: String, CaseIterable {
          systemStorageDelete = "System.Storage.Delete"
     
     var hash: String {
-        return Bytes(rawValue.data(using: .ascii)!.prefix(4)).sha256().toHexString()
+        return Bytes(rawValue.data(using: .ascii)!.sha256().prefix(4)).toHexString()
     }
     
     var price: Int {

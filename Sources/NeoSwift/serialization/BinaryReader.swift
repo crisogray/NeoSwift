@@ -190,8 +190,7 @@ public class BinaryReader {
         case .pushInt256: count = 32
         default: throw "Couldn't parse PUSHINT OpCode"
         }
-        let int: Int = try readBytes(count).toNumeric()
-        return BInt(int)
+        return try BInt(signed: readBytes(count))
     }
     
 }
