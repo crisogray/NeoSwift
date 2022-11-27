@@ -3,6 +3,11 @@ import Foundation
 
 public class ScryptParams: Codable, Hashable {
     
+    public static let N_STANDARD: Int = 1 << 14
+    public static let R_STANDARD: Int = 8
+    public static let P_STANDARD: Int = 8
+    public static let DEFAULT: ScryptParams = .init(N_STANDARD, R_STANDARD, P_STANDARD)
+    
     public let n: Int
     public let r: Int
     public let p: Int

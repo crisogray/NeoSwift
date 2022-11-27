@@ -50,6 +50,13 @@ public extension Bytes {
             .withUnsafeBytes { return $0.load(as: T.self) }
     }
     
+    static func ^ (lhs: Bytes, rhs: Bytes) throws -> Bytes {
+        guard lhs.count == rhs.count else {
+            throw "Arrays do not have the same length to perform the XOR operation."
+        }
+        return lhs.enumerated().map { $1 ^ rhs[$0] }
+    }
+    
 }
 
 extension Byte {

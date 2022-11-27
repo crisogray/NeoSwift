@@ -4,8 +4,8 @@ import BigInt
 
 public class Hash160: NeoSerializable, Hashable, Comparable {
     
+    public let size: Int = NeoConstants.HASH160_SIZE
     private let hash: Bytes
-    public var size: Int = NeoConstants.HASH160_SIZE
     
     public static let ZERO: Hash160 = try! Hash160("0000000000000000000000000000000000000000")
     
