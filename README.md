@@ -2,7 +2,12 @@
 
 A Swift SDK for interacting with the Neo blockchain.
 
-Currently work-in-progress...
+Version 0.0.1
 
-Immediate Next Steps:
-* NEP2
+Functioanlity of the following modules completed:
+* constants
+* crypto
+* script
+* serialization
+* types
+* utils (as needed)

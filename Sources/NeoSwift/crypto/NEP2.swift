@@ -36,12 +36,10 @@ public class NEP2 {
         let addressHash = try getAddressHash(ecKeyPair), privateKey = ecKeyPair.privateKey.bytes
         let derivedKey = try generateDerivedScryptKey(password.bytes, addressHash, params)
         let derivedHalf1 = Bytes(derivedKey.prefix(32)), derivedHalf2 = Bytes(derivedKey.suffix(32))
-        let encryptedHalf1 = try performCypher(
-            xorPrivateKeyAndDerivedHalf(privateKey, derivedHalf1, 0..<16),
-            derivedHalf2, decrypt: false)
-        let encryptedHalf2 = try performCypher(
-            xorPrivateKeyAndDerivedHalf(privateKey, derivedHalf1, 16..<32),
-            derivedHalf2, decrypt: false)
+        let encryptedHalf1 = try performCypher(xorPrivateKeyAndDerivedHalf(privateKey, derivedHalf1, 0..<16),
+                                               derivedHalf2, decrypt: false)
+        let encryptedHalf2 = try performCypher(xorPrivateKeyAndDerivedHalf(privateKey, derivedHalf1, 16..<32),
+                                               derivedHalf2, decrypt: false)
         return ([NEP2_PREFIX_1, NEP2_PREFIX_2, NEP2_FLAGBYTE] + addressHash + encryptedHalf1 + encryptedHalf2).base58CheckEncoded
     }
     

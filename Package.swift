@@ -23,8 +23,9 @@ let package = Package(
     targets: [
         .target(
             name: "NeoSwift",
-            dependencies: ["BigInt", "CryptoSwift", "SwiftECC",
-                           .product(name: "Scrypt", package: "swift-scrypt")]),
+            dependencies: [
+                "BigInt", "CryptoSwift", "SwiftECC",
+                .product(name: "Scrypt", package: "swift-scrypt")]),
         .testTarget(
             name: "NeoSwiftTests",
             dependencies: ["NeoSwift"]),
