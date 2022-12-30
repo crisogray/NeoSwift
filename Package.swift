@@ -7,12 +7,13 @@ let package = Package(
     name: "NeoSwift",
     platforms: [
         .macOS(.v10_15),
-        .iOS(.v11)
+        .iOS(.v9),
+        .tvOS(.v9),
+        .watchOS(.v2)
     ],
     products: [
-        .library(
-            name: "NeoSwift",
-            targets: ["NeoSwift"]),
+        .library(name: "NeoSwift",
+                 targets: ["NeoSwift"]),
     ],
     dependencies: [
         .package(url: "https://github.com/leif-ibsen/BigInt", from: "1.4.0"),
@@ -21,13 +22,10 @@ let package = Package(
         .package(url: "https://github.com/greymass/swift-scrypt.git", from: "1.0.0"),
     ],
     targets: [
-        .target(
-            name: "NeoSwift",
-            dependencies: [
-                "BigInt", "CryptoSwift", "SwiftECC",
-                .product(name: "Scrypt", package: "swift-scrypt")]),
-        .testTarget(
-            name: "NeoSwiftTests",
-            dependencies: ["NeoSwift"]),
+        .target(name: "NeoSwift",
+                dependencies: ["BigInt", "CryptoSwift", "SwiftECC",
+                               .product(name: "Scrypt", package: "swift-scrypt")]),
+        .testTarget(name: "NeoSwiftTests",
+                    dependencies: ["NeoSwift", "BigInt", "SwiftECC"]),
     ]
 )
