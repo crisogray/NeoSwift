@@ -13,7 +13,7 @@ https://github.com/crisogray/NeoSwift
 
 Alternatively, if using `Package.swift`, you can add the package by adding the following line to the list of dependencies.
 ```
-.package(url: “https://github.com/crisogray/NeoSwift”, from: “0.0.2”)
+.package(url: “https://github.com/crisogray/NeoSwift”, from: “0.1.0”)
 ```
 and add `”NeoSwift"` to the dependencies in your target.
 
