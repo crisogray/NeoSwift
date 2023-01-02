@@ -1,0 +1,27 @@
+name: Pre Release
+
+on:
+  push:
+    tags:
+      - "0.[0-9]+.[0-9]+"
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        swift-version: "5.6"
+    - name: Build
+      run: swift build -v
+    - name: Run tests
+      run: swift test -v
+  pre-release:
+    name: "Pre Release"
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: true
