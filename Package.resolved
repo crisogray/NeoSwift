@@ -37,15 +37,6 @@
       }
     },
     {
-      "identity" : "serializedswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/dejanskledar/SerializedSwift.git",
-      "state" : {
-        "revision" : "9ed26f1561156c42374280ebdbf92bf5327bc8b5",
-        "version" : "0.2.0"
-      }
-    },
-    {
       "identity" : "swift-scrypt",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/greymass/swift-scrypt.git",
