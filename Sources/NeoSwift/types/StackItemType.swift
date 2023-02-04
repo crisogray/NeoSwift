@@ -1,9 +1,24 @@
 
 import Foundation
+import DynamicCodableKit
 
+public enum StackItemType: String, CaseIterable, Encodable, Hashable, DynamicDecodingContextIdentifierKey {
 
-public enum StackItemType: String, CaseIterable {
-
+    public var associatedContext: DynamicDecodingContext<StackItem> {
+        switch self {
+        case .any: return DynamicDecodingContext(decoding: AnyStackItem.self)
+        case .pointer: return DynamicDecodingContext(decoding: PointerStackItem.self)
+        case .boolean: return DynamicDecodingContext(decoding: BooleanStackItem.self)
+        case .integer: return DynamicDecodingContext(decoding: IntegerStackItem.self)
+        case .byteString: return DynamicDecodingContext(decoding: ByteStringStackItem.self)
+        case .buffer: return DynamicDecodingContext(decoding: BufferStackItem.self)
+        case .array: return DynamicDecodingContext(decoding: ArrayStackItem.self)
+        case .struct: return DynamicDecodingContext(decoding: StructStackItem.self)
+        case .map: return DynamicDecodingContext(decoding: MapStackItem.self)
+        case .interopInterface: return DynamicDecodingContext(decoding: InteropInterfaceStackItem.self)
+        }
+    }
+    
     case any = "Any", pointer = "Pointer", boolean = "Boolean", integer = "Integer", byteString = "ByteString",
          buffer = "Buffer", array = "Array", `struct` = "Struct", map = "Map", interopInterface = "InteropInterface"
 
@@ -26,4 +41,13 @@ public enum StackItemType: String, CaseIterable {
         return allCases.first { $0.byte == byte }
     }
 
+}
+
+public enum StackItemTypeCodingKey: String, DynamicDecodingContextIdentifierCodingKey {
+    
+    public typealias Identifier = StackItemType
+    public typealias Identified = StackItem
+    case type
+    public static var identifierCodingKey: Self { .type }
+    
 }
