@@ -9,7 +9,7 @@ public struct ByteStringStackItem: StackItem, Hashable {
     let value: Bytes
     
     public init(from decoder: Decoder) throws {
-        self.value = (try? Self.stringToType(decoder)) ?? []
+        self.value = (try? stringToType(decoder, forKey: StackItemValueCodingKey.value)) ?? []
     }
     
     public var valueString: String {

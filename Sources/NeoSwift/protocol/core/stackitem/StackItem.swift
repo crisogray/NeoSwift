@@ -91,23 +91,6 @@ public extension StackItem {
         throw "Cannot cast stack item \(string) to a neo-vm session id."
     }
     
-    static func stringToType<T: Decodable>(_ decoder: Decoder) throws -> T? {
-        if let container = try? decoder.container(keyedBy: StackItemValueCodingKey.self) {
-            if let value = try? container.decode(T.self, forKey: .value) {
-                return value
-            } else if let string = try? container.decode(String.self, forKey: .value) {
-                if T.self == Bool.self || T.self == Optional<Bool>.self {
-                    return (string == "true") as? T
-                } else if T.self == Int.self || T.self == Optional<Int>.self {
-                    return Int(string) as? T
-                } else if T.self == Bytes.self || T.self == Optional<Bytes>.self {
-                    return string.base64Decoded as? T
-                }
-            }
-        }
-        throw "Unable to convert stack item value to \(T.self)"
-    }
-    
     func hash(into hasher: inout Hasher) {
         hasher.combine(type)
         hasher.combine(try? getValue())
