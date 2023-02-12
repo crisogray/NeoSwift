@@ -1,111 +1,241 @@
 
 import Foundation
-import DynamicCodableKit
+import BigInt
 
-public protocol StackItem: DynamicCodable {
+public indirect enum StackItem: Hashable {
     
-    var type: StackItemType { get }
-    var valueString: String { get }
-    func getValue() throws -> AnyHashable
-    func getBoolean() throws -> Bool
-    func getInteger() throws -> Int
-    func getAddress() throws -> String
-    func getString() throws -> String
-    func getHexString() throws -> String
-    func getByteArray() throws -> Bytes
-    func getList() throws -> [StackItem]
-    func getMap() throws -> [(StackItem, StackItem)]
-    func getPointer() throws -> Int
-    func getIteratorId() throws -> String
-}
-
-public extension StackItem {
+    static let ANY_VALUE = "Any"
+    static let POINTER_VALUE = "Pointer"
+    static let BOOLEAN_VALUE = "Boolean"
+    static let INTEGER_VALUE = "Integer"
+    static let BYTE_STRING_VALUE = "ByteString"
+    static let BUFFER_VALUE = "Buffer"
+    static let ARRAY_VALUE = "Array"
+    static let STRUCT_VALUE = "Struct"
+    static let MAP_VALUE = "Map"
+    static let INTEROP_INTERFACE_VALUE = "InteropInterface"
     
-    var valueString: String {
-        return (try? getValue().description) ?? "null"
-    }
+    static let ANY_BYTE: Byte = 0x00
+    static let POINTER_BYTE: Byte = 0x10
+    static let BOOLEAN_BYTE: Byte = 0x20
+    static let INTEGER_BYTE: Byte = 0x21
+    static let BYTE_STRING_BYTE: Byte = 0x28
+    static let BUFFER_BYTE: Byte = 0x30
+    static let ARRAY_BYTE: Byte = 0x40
+    static let STRUCT_BYTE: Byte = 0x41
+    static let MAP_BYTE: Byte = 0x48
+    static let INTEROP_INTERFACE_BYTE: Byte = 0x60
     
-    var string: String {
-        let maxLength = 80
-        var valueString = valueString
-        valueString = valueString.count > maxLength ? "\(String(valueString.prefix(maxLength)))..." : valueString
-        return type.rawValue + "{value='\(valueString)'}"
-    }
-    
-    func anyHashable() -> AnyHashable {
-        switch type {
-        case .any: return self as! AnyStackItem
-        case .pointer: return self as! PointerStackItem
-        case .boolean: return self as! BooleanStackItem
-        case .integer: return self as! IntegerStackItem
-        case .byteString: return self as! ByteStringStackItem
-        case .buffer: return self as! BufferStackItem
-        case .array: return self as! ArrayStackItem
-        case .struct: return self as! StructStackItem
-        case .map: return self as! MapStackItem
-        case .interopInterface: return self as! InteropInterfaceStackItem
+    var jsonValue: String {
+        switch self {
+        case .any: return StackItem.ANY_VALUE
+        case .pointer: return StackItem.POINTER_VALUE
+        case .boolean: return StackItem.BOOLEAN_VALUE
+        case .integer: return StackItem.INTEGER_VALUE
+        case .byteString: return StackItem.BYTE_STRING_VALUE
+        case .buffer: return StackItem.BUFFER_VALUE
+        case .array: return StackItem.ARRAY_VALUE
+        case .struct: return StackItem.STRUCT_VALUE
+        case .map: return StackItem.MAP_VALUE
+        case .interopInterface: return StackItem.INTEROP_INTERFACE_VALUE
         }
     }
     
-    func getValue() throws -> AnyHashable {
-        throw "Cannot get stack item value because it is null"
+    var byte: Byte {
+        switch self {
+        case .any: return StackItem.ANY_BYTE
+        case .pointer: return StackItem.POINTER_BYTE
+        case .boolean: return StackItem.BOOLEAN_BYTE
+        case .integer: return StackItem.INTEGER_BYTE
+        case .byteString: return StackItem.BYTE_STRING_BYTE
+        case .buffer: return StackItem.BUFFER_BYTE
+        case .array: return StackItem.ARRAY_BYTE
+        case .struct: return StackItem.STRUCT_BYTE
+        case .map: return StackItem.MAP_BYTE
+        case .interopInterface: return StackItem.INTEROP_INTERFACE_BYTE
+        }
     }
     
-    func getBoolean() throws -> Bool {
-        throw "Cannot cast stack item \(string) to a boolean."
-    }
+    case any(_ value: AnyHashable?)
+    case pointer(_ value: Int)
+    case boolean(_ value: Bool)
+    case integer(_ value: Int)
+    case byteString(_ value: Bytes)
+    case buffer(_ value: Bytes)
+    case array(_ value: [StackItem])
+    case `struct`(_ value: [StackItem])
+    case map(_ value: [StackItem : StackItem])
+    case interopInterface(_ iteratorId: String, _ interfaceName: String)
     
-    func getInteger() throws -> Int {
-        throw "Cannot cast stack item \(string) to a boolean."
-    }
-    
-    func getAddress() throws -> String {
-        throw "Cannot cast stack item \(string) to an address."
-    }
-    
-    func getString() throws -> String {
-        throw "Cannot cast stack item \(string) to a string."
-    }
-    
-    func getHexString() throws -> String {
-        throw "Cannot cast stack item \(string) to a string."
-    }
-    
-    func getByteArray() throws -> Bytes {
-        throw "Cannot cast stack item \(string) to a byte array."
-    }
-    
-    func getList() throws -> [StackItem] {
-        throw "Cannot cast stack item \(string) to a list."
-    }
+}
 
-    func getMap() throws -> [(StackItem, StackItem)] {
-        throw "Cannot cast stack item \(string) to a map."
+extension StackItem: Codable {
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .type)
+        switch type {
+        case StackItem.ANY_VALUE: self = .any(try? container.decode(AnyHashable.self, forKey: .value))
+        case StackItem.POINTER_VALUE, StackItem.INTEGER_VALUE:
+            let int = try container.decode(SafeDecode<Int>.self, forKey: .value).value
+            self = type == StackItem.POINTER_VALUE ? .pointer(int) : .integer(int)
+        case StackItem.BOOLEAN_VALUE: self = try .boolean(container.decode(SafeDecode<Bool>.self, forKey: .value).value)
+        case StackItem.BYTE_STRING_VALUE, StackItem.BUFFER_VALUE:
+            let bytes = try container.decode(SafeDecode<Bytes>.self, forKey: .value).value
+            self = type == StackItem.BYTE_STRING_VALUE ? .byteString(bytes) : .buffer(bytes)
+        case StackItem.ARRAY_VALUE, StackItem.STRUCT_VALUE:
+            let array = try container.decode([StackItem].self, forKey: .value)
+            self = type == StackItem.ARRAY_VALUE ? .array(array) : .struct(array)
+        case StackItem.MAP_VALUE:
+            let map = try container.decode([[String : StackItem]].self, forKey: .value)
+                .reduce(into: [StackItem : StackItem]()) { $0[$1["key"]!] = $1["value"]! }
+            self = .map(map)
+        case StackItem.INTEROP_INTERFACE_VALUE:
+            let id = try container.decode(String.self, forKey: .id)
+            let interface = try container.decode(String.self, forKey: .interface)
+            self = .interopInterface(id, interface)
+        default: throw "Unable to decode StackItem"
+        }
     }
     
-    func getPointer() throws -> Int {
-        throw "Cannot cast stack item \(string) to a neo-vm pointer."
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(jsonValue, forKey: .type)
+        switch self {
+        case .any(let value): try container.encode(value, forKey: .value)
+        case .pointer(let int), .integer(let int): try container.encode(int, forKey: .value)
+        case .boolean(let bool): try container.encode(bool, forKey: .value)
+        case .byteString(let bytes), .buffer(let bytes): try container.encode(String(bytes: bytes, encoding: .utf8), forKey: .value)
+        case .array(let array), .struct(let array): try container.encode(array, forKey: .value)
+        case .map(let map):
+            let transformed = map.map { keyItem, valueItem in
+                ["key" : keyItem, "value" : valueItem]
+            }
+            try container.encode(transformed, forKey: .value)
+        case .interopInterface(let id, let interface):
+            try container.encode(id, forKey: .id)
+            try container.encode(interface, forKey: .interface)
+        }
     }
     
-    func getIteratorId() throws -> String {
-        throw "Cannot cast stack item \(string) to a neo-vm session id."
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(type)
-        hasher.combine(try? getValue())
+    enum CodingKeys: String, CodingKey {
+        case type, value, id, interface
     }
     
 }
 
-enum StackItemValueCodingKey: String, CodingKey {
-    case value
-}
+extension StackItem {
+    
+    var toString: String {
+        let maxLength = 80
+        var valueString = valueString
+        valueString = valueString.count > maxLength ? "\(String(valueString.prefix(maxLength)))..." : valueString
+        return jsonValue + "{value='\(valueString)'}"
+    }
+    
+    var valueString: String {
+        switch self {
+        case .any(let value): return value == nil ? "null" : String(describing: value)
+        case .pointer(let int), .integer(let int): return String(int)
+        case .boolean(let bool): return bool ? "true" : "false"
+        case .byteString(let bytes), .buffer(let bytes): return bytes.toHexString().cleanedHexPrefix
+        case .array(let array), .struct(let array): return array.map(\.toString).joined(separator: ", ")
+        case .map(let map): return map.map { $0.key.toString + " -> " + $0.value.toString }.joined(separator: ", ")
+        case .interopInterface(let id, _): return id
+        }
+    }
+    
+    var value: AnyHashable? {
+        switch self {
+        case .any(let value): return value
+        case .pointer(let int), .integer(let int): return int
+        case .boolean(let bool): return bool
+        case .byteString(let bytes), .buffer(let bytes): return bytes
+        case .array(let array), .struct(let array): return array
+        case .map(let map): return map
+        case .interopInterface(let id, _): return id
+        }
+    }
+    
+    var boolean: Bool? {
+        switch self {
+        case .any(let value): return value as? Bool
+        case .boolean(let bool): return bool
+        case .integer(let int): return int == 1 ? true : int == 0 ? false : nil
+        case .byteString(_), .buffer(_): return integer! > 0
+        default: return nil
+        }
+    }
+    
+    var integer: Int? {
+        switch self {
+        case .any(let value): return value as? Int
+        case .boolean(let bool): return bool ? 1 : 0
+        case .pointer(let int), .integer(let int): return int
+        case .byteString(let bytes), .buffer(let bytes): return BInt(magnitude: bytes.reversed()).asInt()!
+        default: return nil
+        }
+    }
+    
+    var address: String? {
+        switch self {
+        case .byteString(let bytes), .buffer(let bytes): return try? Hash160(bytes.reversed()).toAddress()
+        default: return nil
+        }
+    }
+        
+    var string: String? {
+        switch self {
+        case .any(let value): return value as? String
+        case .boolean(let bool): return bool ? "true" : "false"
+        case .integer(let int): return String(int)
+        case .byteString(let bytes), .buffer(let bytes): return String(bytes: bytes, encoding: .utf8)
+        default: return nil
+        }
+    }
 
-public func == (lhs: StackItem, rhs: StackItem) -> Bool {
-    return lhs.anyHashable() == rhs.anyHashable()
-}
+    var hexString: String? {
+        switch self {
+        case .byteString(let bytes), .buffer(let bytes): return bytes.toHexString().cleanedHexPrefix
+        case .integer(_): return byteArray?.reduce("") {$0 + String(format: "%02x", $1)}
+        default: return nil
+        }
+    }
+    
+    var byteArray: Bytes? {
+        switch self {
+        case .byteString(let bytes), .buffer(let bytes): return bytes.isEmpty ? nil : bytes
+        case .integer(let int): return BInt(int).asSignedBytes().reversed()
+        default: return nil
+        }
+    }
 
-public func != (lhs: StackItem, rhs: StackItem) -> Bool {
-    return !(lhs == rhs)
+    var list: [StackItem]? {
+        switch self {
+        case .array(let array), .struct(let array): return array
+        default: return nil
+        }
+    }
+    
+    var map: [StackItem: StackItem]? {
+        if case .map(let map) = self {
+            return map
+        }
+        return nil
+    }
+    
+    var pointer: Int? {
+        if case .pointer = self {
+            return integer
+        }
+        return nil
+    }
+    
+    var iteratorId: String? {
+        if case .interopInterface(let id, _) = self {
+            return id
+        }
+        return nil
+    }
+    
 }

@@ -1,23 +1,6 @@
 
 import Foundation
 
-func stringToType<T: Decodable, K: CodingKey>(_ decoder: Decoder, forKey key: KeyedDecodingContainer<K>.Key) throws -> T {
-    if let container = try? decoder.container(keyedBy: StackItemValueCodingKey.self) {
-        if let value = try? container.decode(T.self, forKey: .value) {
-            return value
-        } else if let string = try? container.decode(String.self, forKey: .value) {
-            if T.self == Bool.self || T.self == Optional<Bool>.self {
-                return (string == "true") as! T
-            } else if T.self == Int.self || T.self == Optional<Int>.self {
-                return Int(string) as! T
-            } else if T.self == Bytes.self || T.self == Optional<Bytes>.self {
-                return string.base64Decoded as! T
-            }
-        }
-    }
-    throw "Unable to convert stack item value to \(T.self)"
-}
-
 public protocol SafeDecodable {
     init?(_ string: String)
 }
@@ -55,3 +38,44 @@ extension Bytes: SafeDecodable {
     
 }
 
+extension AnyHashable: Codable {
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let value = try? container.decode(String.self) {
+            self = value
+        } else if let value = try? container.decode(Int.self) {
+            self = value
+        } else if let value = try? container.decode(Double.self) {
+            self = value
+        } else if let value = try? container.decode(Bool.self) {
+            self = value
+        } else if let value = try? container.decode([AnyHashable].self) {
+            self = value
+        } else if let value = try? container.decode([AnyHashable : AnyHashable].self) {
+            self = value
+        } else {
+            throw "Unable to decode AnyHashable"
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        if let string = self as? String {
+            try container.encode(string)
+        } else if let int = self as? Int {
+            try container.encode(int)
+        } else if let double = self as? Double {
+            try container.encode(double)
+        } else if let bool = self as? Bool {
+            try container.encode(bool)
+        } else if let hashables = self as? [AnyHashable] {
+            try container.encode(hashables)
+        } else if let hashables = self as? [AnyHashable : AnyHashable] {
+            try container.encode(hashables)
+        } else {
+            throw "Unable to encode AnyHashable"
+        }
+    }
+    
+}

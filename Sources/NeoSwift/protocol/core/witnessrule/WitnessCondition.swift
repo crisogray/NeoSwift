@@ -2,7 +2,7 @@
 import Foundation
 import SwiftECC
 
-public indirect enum WitnessCondition: Hashable, Codable {
+public indirect enum WitnessCondition: Hashable {
     
     case boolean(_ expression: Bool)
     case not(_ expression: WitnessCondition)
@@ -62,6 +62,10 @@ public indirect enum WitnessCondition: Hashable, Codable {
         }
     }
     
+}
+
+extension WitnessCondition: Codable {
+    
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
@@ -103,40 +107,7 @@ public indirect enum WitnessCondition: Hashable, Codable {
         case type, expression, expressions, hash, group
     }
     
-    var booleanExpression: Bool? {
-        if case let .boolean(bool) = self { return bool }
-        return nil
-    }
-    
-    var expression: WitnessCondition? {
-        if case let .not(exp) = self { return exp }
-        return nil
-    }
-    
-    var expressionList: [WitnessCondition]? {
-        switch self {
-        case .or(let expressions), .and(let expressions): return expressions
-        default: return nil
-        }
-    }
-    
-    var scriptHash: Hash160? {
-        switch self {
-        case .scriptHash(let hash), .calledByContract(let hash): return hash
-        default: return nil
-        }
-    }
-    
-    var group: ECPublicKey? {
-        switch self {
-        case .group(let group), .calledByGroup(let group): return group
-        default: return nil
-        }
-    }
-    
-    
 }
-
 
 extension WitnessCondition: NeoSerializable {
     
@@ -193,4 +164,38 @@ extension WitnessCondition: NeoSerializable {
     
 }
 
+extension WitnessCondition {
+    
+    var booleanExpression: Bool? {
+        if case let .boolean(bool) = self { return bool }
+        return nil
+    }
+    
+    var expression: WitnessCondition? {
+        if case let .not(exp) = self { return exp }
+        return nil
+    }
+    
+    var expressionList: [WitnessCondition]? {
+        switch self {
+        case .or(let expressions), .and(let expressions): return expressions
+        default: return nil
+        }
+    }
+    
+    var scriptHash: Hash160? {
+        switch self {
+        case .scriptHash(let hash), .calledByContract(let hash): return hash
+        default: return nil
+        }
+    }
+    
+    var group: ECPublicKey? {
+        switch self {
+        case .group(let group), .calledByGroup(let group): return group
+        default: return nil
+        }
+    }
+    
+}
 

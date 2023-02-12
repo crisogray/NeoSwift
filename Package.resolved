@@ -28,15 +28,6 @@
       }
     },
     {
-      "identity" : "dynamiccodablekit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftyLab/DynamicCodableKit.git",
-      "state" : {
-        "revision" : "a1b9c888239c26b83e0030ddbae8ba36dbf51d6b",
-        "version" : "1.0.0"
-      }
-    },
-    {
       "identity" : "swift-scrypt",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/greymass/swift-scrypt.git",
