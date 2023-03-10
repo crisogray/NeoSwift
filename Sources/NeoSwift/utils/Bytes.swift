@@ -20,6 +20,10 @@ public extension Bytes {
         return Base58.base58CheckEncode(self)
     }
     
+    var noPrefixHex: String {
+        return toHexString().cleanedHexPrefix
+    }
+    
     var varSize: Int {
         return count.varSize + count
     }

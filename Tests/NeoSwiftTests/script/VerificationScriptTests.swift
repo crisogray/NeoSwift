@@ -29,14 +29,14 @@ class VerificationScriptTests: XCTestCase {
         OpCode.pushData1.string + "21" + key3 + OpCode.pushData1.string + "21" + key2 +
         OpCode.push3.string + OpCode.sysCall.string + InteropService.systemCryptoCheckMultisig.hash
         
-        XCTAssertEqual(expected.bytesFromHex, script?.script)
+        XCTAssertEqual(expected.bytesFromHex, script.script)
     }
     
     public func testSerializeAndDeserialize() {
         let key = "035fdb1d1f06759547020891ae97c729327853aeb1256b6fe0473bc2e9fa42ff50"
         let ecPubKey = try! ECPublicKey(publicKey: key.bytesFromHex)
         let script = try! VerificationScript(ecPubKey)
-        let size = Bytes([Byte(NeoConstants.VERIFICATION_SCRIPT_SIZE)]).toHexString().cleanedHexPrefix
+        let size = Bytes([Byte(NeoConstants.VERIFICATION_SCRIPT_SIZE)]).noPrefixHex
         let expected = "\(OpCode.pushData1.string)"
         + "21\(key)\(OpCode.sysCall.string)\(InteropService.systemCryptoCheckSig.hash)"
         let serialized = "\(size)\(expected)"
@@ -188,7 +188,7 @@ class VerificationScriptTests: XCTestCase {
             XCTFail()
             return
         }
-        XCTAssertEqual(encoded.toHexString().cleanedHexPrefix, "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef")
+        XCTAssertEqual(encoded.noPrefixHex, "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef")
     }
     
     public func testPublicKeysFromMultiSig() {
@@ -209,9 +209,9 @@ class VerificationScriptTests: XCTestCase {
             XCTFail()
             return
         }
-        XCTAssertEqual(key1.toHexString().cleanedHexPrefix, "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef")
-        XCTAssertEqual(key2.toHexString().cleanedHexPrefix, "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9")
-        XCTAssertEqual(key3.toHexString().cleanedHexPrefix, "03f0f9b358dfed564e74ffe242713f8bc866414226649f59859b140a130818898b")
+        XCTAssertEqual(key1.noPrefixHex, "02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef")
+        XCTAssertEqual(key2.noPrefixHex, "031d8e1630ce640966967bc6d95223d21f44304133003140c3b52004dc981349c9")
+        XCTAssertEqual(key3.noPrefixHex, "03f0f9b358dfed564e74ffe242713f8bc866414226649f59859b140a130818898b")
     }
     
     private func assertErrorMessage(_ message: String, _ expression: () throws -> Any) {

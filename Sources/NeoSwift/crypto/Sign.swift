@@ -8,15 +8,15 @@ public enum Sign {
     
     private static let LOWER_REAL_V: Int = 27
     
-    public static func signHexMessage(message: String, keyPair: ECKeyPair) throws -> SignatureData {
-        return try signMessage(message: message.bytesFromHex, keyPair: keyPair)
+    public static func signHexMessage(_ message: String, _ keyPair: ECKeyPair) throws -> SignatureData {
+        return try signMessage(message.bytesFromHex, keyPair)
     }
     
-    public static func signMessage(message: String, keyPair: ECKeyPair) throws -> SignatureData {
-        return try signMessage(message: message.bytes, keyPair: keyPair)
+    public static func signMessage(_ message: String, _ keyPair: ECKeyPair) throws -> SignatureData {
+        return try signMessage(message.bytes, keyPair)
     }
     
-    public static func signMessage(message: Bytes, keyPair: ECKeyPair) throws -> SignatureData {
+    public static func signMessage(_ message: Bytes, _ keyPair: ECKeyPair) throws -> SignatureData {
         let sig = keyPair.signAndGetECDSASignature(messageHash: message)
         var recId: Int = -1
         

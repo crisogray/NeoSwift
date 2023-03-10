@@ -7,11 +7,11 @@ class InvocationScriptTests: XCTestCase {
     public func testFromMessageAndKeyPair() {
         let message = Bytes(repeating: 10, count: 10)
         let keyPair = try! ECKeyPair.createEcKeyPair()
-        let script = InvocationScript.fromMessageAndKeyPair(message, keyPair)
-        let expectedSignature = try! Sign.signMessage(message: message, keyPair: keyPair).concatenated
-        let expected = OpCode.pushData1.string + "40" + expectedSignature.toHexString().cleanedHexPrefix
-        XCTAssertEqual(expected.bytesFromHex, script?.script)
-        XCTAssertEqual("42\(expected)".bytesFromHex, script?.toArray())
+        let script = try! InvocationScript.fromMessageAndKeyPair(message, keyPair)
+        let expectedSignature = try! Sign.signMessage(message, keyPair).concatenated
+        let expected = OpCode.pushData1.string + "40" + expectedSignature.noPrefixHex
+        XCTAssertEqual(expected.bytesFromHex, script.script)
+        XCTAssertEqual("42\(expected)".bytesFromHex, script.toArray())
     }
     
     public func testSerializeRandomInvocationScript() {
@@ -22,7 +22,7 @@ class InvocationScriptTests: XCTestCase {
     
     public func testDeserializeCustomInvocationScript() {
         let message = Bytes(repeating: 1, count: 256)
-        let script = "\(OpCode.pushData2.string)0001\(message.toHexString().cleanedHexPrefix)"
+        let script = "\(OpCode.pushData2.string)0001\(message.noPrefixHex)"
         let serializedScript = "FD0301\(script)"
         let deserialized = InvocationScript.from(serializedScript.bytesFromHex)
         XCTAssertEqual(deserialized?.script, script.bytesFromHex)
@@ -31,8 +31,8 @@ class InvocationScriptTests: XCTestCase {
     public func testDeserializeSignatureInvocationScript() {
         let message = Bytes(repeating: 0, count: 10)
         let keyPair = try! ECKeyPair.createEcKeyPair()
-        let signature = try! Sign.signMessage(message: message, keyPair: keyPair).concatenated
-        let script = "\(OpCode.pushData1.string)40\(signature.toHexString().cleanedHexPrefix)"
+        let signature = try! Sign.signMessage(message, keyPair).concatenated
+        let script = "\(OpCode.pushData1.string)40\(signature.noPrefixHex)"
         let deserialized = InvocationScript.from("42\(script)".bytesFromHex)
         XCTAssertEqual(deserialized?.script, script.bytesFromHex)
     }
@@ -47,7 +47,7 @@ class InvocationScriptTests: XCTestCase {
     public func testGetSignatures() {
         let message = Bytes(repeating: 0, count: 10)
         let keyPair = try! ECKeyPair.createEcKeyPair()
-        let signature = try! Sign.signMessage(message: message, keyPair: keyPair)
+        let signature = try! Sign.signMessage(message, keyPair)
         let inv = InvocationScript.fromSignatures([signature, signature, signature])
         inv.getSignatures().forEach { XCTAssertEqual($0.concatenated, signature.concatenated) }
     }

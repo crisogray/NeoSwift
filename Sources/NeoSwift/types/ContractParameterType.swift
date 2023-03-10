@@ -1,18 +1,28 @@
 
-import Foundation
+public enum ContractParamterType: ByteEnum {
 
+    case any, boolean, integer, byteArray, string, hash160, hash256,
+         publicKey, signature, array, map, interopInterface, void
 
-public enum ContractParamterType: String, CaseIterable {
-
-    case any = "Any", boolean = "Boolean", integer = "Integer", byteArray = "ByteArray", string = "String",
-         hash160 = "Hash160", hash256 = "Hash256", publicKey = "PublicKey", signature = "Signature",
-         array = "Array", map = "Map", interopInterface = "InteropInterface", void = "Void"
-
-    var jsonvalue: String {
-        return rawValue
+    public var jsonValue: String {
+        switch self {
+        case .any: return "Any"
+        case .boolean: return "Boolean"
+        case .integer: return "Integer"
+        case .byteArray: return "ByteArray"
+        case .string: return "String"
+        case .hash160: return "Hash160"
+        case .hash256: return "Hash256"
+        case .publicKey: return "PublicKey"
+        case .signature: return "Signature"
+        case .array: return "Array"
+        case .map: return "Map"
+        case .interopInterface: return "InteropInterface"
+        case .void: return "Void"
+        }
     }
     
-    var byte: Byte {
+    public var byte: Byte {
         switch self {
         case .any: return 0x00
         case .boolean: return 0x10
@@ -30,12 +40,5 @@ public enum ContractParamterType: String, CaseIterable {
         }
     }
 
-    static func valueOf(_ byte: Byte) -> ContractParamterType? {
-        return allCases.first { $0.byte == byte }
-    }
-    
-    static func fromJsonValue(_ value: String) -> ContractParamterType? {
-        return .init(rawValue: value)
-    }
 
 }

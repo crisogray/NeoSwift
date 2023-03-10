@@ -26,10 +26,10 @@ class SignTests: XCTestCase {
     public func testSignMessage() {
         let expected = Sign.SignatureData(v: 27, r: expectedR.bytesFromHex, s: expectedS.bytesFromHex)
 
-        let signatureData = try? Sign.signMessage(message: testMessageBytes, keyPair: keyPair)
+        let signatureData = try? Sign.signMessage(testMessageBytes, keyPair)
         XCTAssertEqual(signatureData, expected)
 
-        let signatureDataHex = try? Sign.signHexMessage(message: testMessageBytes.toHexString(), keyPair: keyPair)
+        let signatureDataHex = try? Sign.signHexMessage(testMessageBytes.toHexString(), keyPair)
         XCTAssertEqual(signatureDataHex, expected)
     }
     
@@ -59,7 +59,7 @@ class SignTests: XCTestCase {
     }
     
     public func testPublicKeyFromSignedMessage() {
-        let signatureData = try! Sign.signMessage(message: testMessageBytes, keyPair: keyPair)
+        let signatureData = try! Sign.signMessage(testMessageBytes, keyPair)
         let pK = try? Sign.signedMessageToKey(message: testMessageBytes, signatureData: signatureData)
         XCTAssertEqual(publicKey, pK)
     }
@@ -82,7 +82,7 @@ class SignTests: XCTestCase {
     }
     
     public func testVerifySignature() {
-        let signatureData = try! Sign.signMessage(message: testMessageBytes, keyPair: keyPair)
+        let signatureData = try! Sign.signMessage(testMessageBytes, keyPair)
         XCTAssertTrue(Sign.verifySignature(message: testMessageBytes, sig: signatureData, pubKey: publicKey))
     }
         

@@ -1,6 +1,4 @@
 
-import Foundation
-
 public extension Array {
     
     static func + (lhs: Array<Element>, rhs: Element) -> Array<Element> {

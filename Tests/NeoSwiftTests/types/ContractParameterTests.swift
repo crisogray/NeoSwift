@@ -302,7 +302,7 @@ class ContractParameterTests: XCTestCase {
         p = try! ContractParameter.mapToContractParameter(keyPair.publicKey)
         assertContractParameter(p, try! keyPair.publicKey.getEncoded(compressed: true), .publicKey)
         
-        let signatureData = try! Sign.signMessage(message: "Test message.", keyPair: keyPair)
+        let signatureData = try! Sign.signMessage("Test message.", keyPair)
         p = try! ContractParameter.mapToContractParameter(signatureData)
         assertContractParameter(p, signatureData.concatenated, .signature)
         
@@ -314,7 +314,7 @@ class ContractParameterTests: XCTestCase {
     func testMapListToContractParameter() {
         
         let keyPair = try! ECKeyPair.createEcKeyPair()
-        let signatureData = try! Sign.signMessage(message: "Test message.", keyPair: keyPair)
+        let signatureData = try! Sign.signMessage("Test message.", keyPair)
         let subList: [AnyHashable] = [2048, false]
         let list: [AnyHashable] = ["neo", 1024, subList, signatureData]
         let p = try! ContractParameter.array(list)

@@ -1,9 +1,3 @@
-//
-//  Bip32ECKeyPair.swift
-//  
-//
-//  Created by Ben Gray on 02/11/2022.
-//
 
 import BigInt
 import Foundation

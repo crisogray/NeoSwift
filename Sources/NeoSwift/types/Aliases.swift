@@ -1,6 +1,4 @@
 
-import Foundation
-import BigInt
 import SwiftECC
 
 public typealias ECPoint = Point

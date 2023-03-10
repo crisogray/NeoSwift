@@ -1,7 +1,7 @@
 
 import Foundation
 
-public struct WitnessRule: Codable, Equatable {
+public struct WitnessRule: Codable, Hashable {
     
     let action: WitnessAction
     let condition: WitnessCondition

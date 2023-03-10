@@ -76,7 +76,7 @@ public enum OpCode: Byte, CaseIterable {
     }
     
     public var string: String {
-        return [opcode].toHexString()
+        return [opcode].noPrefixHex
     }
     
     public var price: Int {

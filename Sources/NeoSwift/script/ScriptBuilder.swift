@@ -53,7 +53,7 @@ public class ScriptBuilder {
         case .map: return pushMap(value as! [ContractParameter: ContractParameter])
         case .any: return self
         default:
-            print("Parameter type '\(param.type.rawValue)' not supported.")
+            print("Parameter type '\(param.type.jsonValue)' not supported.")
             return self
         }
     }

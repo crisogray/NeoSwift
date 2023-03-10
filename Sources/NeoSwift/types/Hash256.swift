@@ -1,16 +1,14 @@
 
-import Foundation
 import BigInt
 
-public class Hash256: NeoSerializable, Hashable, Comparable {
+public struct Hash256: StringDecodable, Hashable {
     
-    public let size: Int = NeoConstants.HASH256_SIZE
     private let hash: Bytes
     
     public static let ZERO: Hash256 = try! Hash256("0000000000000000000000000000000000000000000000000000000000000000")
     
     public var string: String {
-        return hash.toHexString().cleanedHexPrefix
+        return hash.noPrefixHex
     }
     
     init() {
@@ -24,19 +22,15 @@ public class Hash256: NeoSerializable, Hashable, Comparable {
         self.hash = hash
     }
     
-    convenience init (_ hash: String) throws {
+    init(_ hash: String) throws {
         guard hash.isValidHex else {
             throw "String argument is not hexadecimal."
         }
         try self.init(hash.bytesFromHex)
     }
-
-    public func serialize(_ writer: BinaryWriter) {
-        writer.write(hash.reversed())
-    }
     
-    public static func deserialize(_ reader: BinaryReader) -> Self? {
-        return try? Hash256.init(reader.readBytes(NeoConstants.HASH256_SIZE).reversed()) as? Self
+    public init(string: String) throws {
+        try self.init(string)
     }
     
     public func toArray() -> Bytes {
@@ -46,14 +40,26 @@ public class Hash256: NeoSerializable, Hashable, Comparable {
     public func toLittleEndianArray() -> Bytes {
         return hash.reversed()
     }
+        
+}
+
+extension Hash256: NeoSerializable {
     
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(hash)
+    public var size: Int {
+        return NeoConstants.HASH256_SIZE
+    }
+
+    public func serialize(_ writer: BinaryWriter) {
+        writer.write(hash.reversed())
     }
     
-    public static func == (lhs: Hash256, rhs: Hash256) -> Bool {
-        return lhs.hash == rhs.hash
+    public static func deserialize(_ reader: BinaryReader) -> Hash256? {
+        return try? Hash256.init(reader.readBytes(NeoConstants.HASH256_SIZE).reversed())
     }
+    
+}
+
+extension Hash256: Comparable {
     
     public static func < (lhs: Hash256, rhs: Hash256) -> Bool {
         return BInt(magnitude: lhs.hash) < BInt(magnitude: rhs.hash)

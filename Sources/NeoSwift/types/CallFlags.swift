@@ -1,6 +1,4 @@
 
-import Foundation
-
 public enum CallFlags: CaseIterable {
     
     case none, readStates, writeStates, allowCall, allowNotify, states, readOnly, all

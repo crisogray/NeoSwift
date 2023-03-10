@@ -1,8 +1,5 @@
 
-import Foundation
-
-
-public enum NeoVMStateType: String, CaseIterable {
+public enum NeoVMStateType: String, Codable, CaseIterable {
 
     case none = "NONE", halt = "HALT", fault = "FAULT", `break` = "BREAK"
 
@@ -16,6 +13,19 @@ public enum NeoVMStateType: String, CaseIterable {
         case .halt: return 1
         case .fault: return 1 << 1
         case .break: return 1 << 2
+        }
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let string = try? container.decode(String.self),
+           let value = NeoVMStateType.fromJsonValue(string) {
+           self = value
+        } else if let int = try? container.decode(Int.self),
+                  let value = NeoVMStateType.fromIntValue(int) {
+            self = value
+        } else {
+            throw "\(String(describing: Self.self)) value type not found"
         }
     }
     

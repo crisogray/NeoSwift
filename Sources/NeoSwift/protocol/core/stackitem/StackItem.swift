@@ -138,7 +138,7 @@ extension StackItem {
         case .any(let value): return value == nil ? "null" : String(describing: value)
         case .pointer(let int), .integer(let int): return String(int)
         case .boolean(let bool): return bool ? "true" : "false"
-        case .byteString(let bytes), .buffer(let bytes): return bytes.toHexString().cleanedHexPrefix
+        case .byteString(let bytes), .buffer(let bytes): return bytes.noPrefixHex
         case .array(let array), .struct(let array): return array.map(\.toString).joined(separator: ", ")
         case .map(let map): return map.map { $0.key.toString + " -> " + $0.value.toString }.joined(separator: ", ")
         case .interopInterface(let id, _): return id
@@ -196,7 +196,7 @@ extension StackItem {
 
     var hexString: String? {
         switch self {
-        case .byteString(let bytes), .buffer(let bytes): return bytes.toHexString().cleanedHexPrefix
+        case .byteString(let bytes), .buffer(let bytes): return bytes.noPrefixHex
         case .integer(_): return byteArray?.reduce("") {$0 + String(format: "%02x", $1)}
         default: return nil
         }

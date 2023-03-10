@@ -19,7 +19,7 @@ class EnumTypeTests: XCTestCase {
     
     public func testContractParameterType() {
         let type = ContractParamterType.string
-        XCTAssertEqual(type.jsonvalue, "String")
+        XCTAssertEqual(type.jsonValue, "String")
         XCTAssertEqual(type.byte, 0x13)
         XCTAssertEqual(ContractParamterType.valueOf(0x13), type)
         XCTAssertEqual(ContractParamterType.valueOf(0xab), nil)

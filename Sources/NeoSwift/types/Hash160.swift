@@ -1,16 +1,14 @@
 
-import Foundation
 import BigInt
 
-public class Hash160: NeoSerializable, Hashable, Comparable {
+public struct Hash160: StringDecodable, Hashable {
     
-    public let size: Int = NeoConstants.HASH160_SIZE
     private let hash: Bytes
     
     public static let ZERO: Hash160 = try! Hash160("0000000000000000000000000000000000000000")
     
     public var string: String {
-        return hash.toHexString().cleanedHexPrefix
+        return hash.noPrefixHex
     }
     
     init() {
@@ -24,19 +22,15 @@ public class Hash160: NeoSerializable, Hashable, Comparable {
         self.hash = hash
     }
     
-    convenience init (_ hash: String) throws {
+    init(_ hash: String) throws {
         guard hash.isValidHex else {
             throw "String argument is not hexadecimal."
         }
         try self.init(hash.bytesFromHex)
     }
     
-    public func serialize(_ writer: BinaryWriter) {
-        writer.write(hash.reversed())
-    }
-    
-    public static func deserialize(_ reader: BinaryReader) -> Self? {
-        return try? Hash160.init(reader.readBytes(NeoConstants.HASH160_SIZE).reversed()) as? Self
+    public init(string: String) throws {
+        try self.init(string)
     }
     
     public func toArray() -> Bytes {
@@ -71,13 +65,25 @@ public class Hash160: NeoSerializable, Hashable, Comparable {
         return try fromScript(ScriptBuilder.buildVerificationScript(pubKeys, signingThreshold))
     }
     
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(hash)
+}
+
+extension Hash160: NeoSerializable {
+    
+    public var size: Int {
+        NeoConstants.HASH160_SIZE
+    }
+
+    public func serialize(_ writer: BinaryWriter) {
+        writer.write(hash.reversed())
     }
     
-    public static func == (lhs: Hash160, rhs: Hash160) -> Bool {
-        return lhs.hash == rhs.hash
+    public static func deserialize(_ reader: BinaryReader) -> Hash160? {
+        return try? Hash160.init(reader.readBytes(NeoConstants.HASH160_SIZE).reversed())
     }
+    
+}
+
+extension Hash160: Comparable {
     
     public static func < (lhs: Hash160, rhs: Hash160) -> Bool {
         return BInt(magnitude: lhs.hash) < BInt(magnitude: rhs.hash)

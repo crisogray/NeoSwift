@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class InvocationScript: NeoSerializable, Equatable, Hashable {
+public class InvocationScript: NeoSerializable, Hashable {
     
     public let script: Bytes
     
@@ -21,8 +21,8 @@ public class InvocationScript: NeoSerializable, Equatable, Hashable {
         return .init(ScriptBuilder().pushData(signature.concatenated).toArray())
     }
     
-    public static func fromMessageAndKeyPair(_ message: Bytes, _ keyPair: ECKeyPair) -> InvocationScript? {
-        return try? .init(ScriptBuilder().pushData(Sign.signMessage(message: message, keyPair: keyPair).concatenated).toArray())
+    public static func fromMessageAndKeyPair(_ message: Bytes, _ keyPair: ECKeyPair) throws -> InvocationScript {
+        return try .init(ScriptBuilder().pushData(Sign.signMessage(message, keyPair).concatenated).toArray())
     }
     
     public static func fromSignatures(_ signatures: [Sign.SignatureData]) -> InvocationScript {

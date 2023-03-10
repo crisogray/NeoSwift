@@ -129,7 +129,7 @@ public extension ECPublicKey {
     }
     
     func getEncodedCompressedHex() throws -> String {
-        return try getEncoded(compressed: true).toHexString()
+        return try getEncoded(compressed: true).noPrefixHex
     }
     
 }

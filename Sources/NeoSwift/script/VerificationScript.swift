@@ -1,7 +1,7 @@
 
 import Foundation
 
-public class VerificationScript: NeoSerializable, Equatable, Hashable {
+public class VerificationScript: NeoSerializable, Hashable {
     
     public let script: Bytes
     
@@ -25,7 +25,7 @@ public class VerificationScript: NeoSerializable, Equatable, Hashable {
         self.script = try ScriptBuilder.buildVerificationScript(publicKey.getEncoded(compressed: true))
     }
     
-    init?(_ publicKeys: [ECPublicKey], _ signingThreshold: Int) throws {
+    init(_ publicKeys: [ECPublicKey], _ signingThreshold: Int) throws {
         guard signingThreshold >= 1 && signingThreshold <= publicKeys.count else {
             throw "Signing threshold must be at least 1 and not higher than the number of public keys."
         }
@@ -49,7 +49,7 @@ public class VerificationScript: NeoSerializable, Equatable, Hashable {
         guard script.count == 40 else {
             return false
         }
-        let interopService = Bytes(script.suffix(4)).toHexString().cleanedHexPrefix
+        let interopService = Bytes(script.suffix(4)).noPrefixHex
         return script[0] == OpCode.pushData1.opcode &&
         script[1] == 33 && script[35] == OpCode.sysCall.opcode &&
         interopService == InteropService.systemCryptoCheckSig.hash
@@ -78,7 +78,7 @@ public class VerificationScript: NeoSerializable, Equatable, Hashable {
             }
             reader.reset()
             guard try m == reader.readPushInt(), reader.readByte() == OpCode.sysCall.opcode,
-                  try reader.readBytes(4).toHexString().cleanedHexPrefix == InteropService.systemCryptoCheckMultisig.hash else {
+                  try reader.readBytes(4).noPrefixHex == InteropService.systemCryptoCheckMultisig.hash else {
                 return false
             }
             return true

@@ -14,6 +14,9 @@ public indirect enum WitnessCondition: Hashable {
     case calledByContract(_ hash: Hash160)
     case calledByGroup(_ key: ECPublicKey)
     
+    static let MAX_SUBITEMS = 16
+    static let MAX_NESTING_DEPTH = 2
+    
     static let BOOLEAN_VALUE = "Boolean"
     static let NOT_VALUE = "Not"
     static let AND_VALUE = "And"
