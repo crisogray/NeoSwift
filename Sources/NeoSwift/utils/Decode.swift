@@ -16,6 +16,11 @@ extension StringDecodable {
         }
     }
     
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(string)
+    }
+    
 }
 
 public class SafeDecode<T: StringDecodable>: Codable {

@@ -3,7 +3,7 @@ public class NeoBlockCount: Response<Int> { var blockCount: Int? { return result
 
 public class NeoBlockHash: Response<Hash256> { var blockHash: Hash256? { return result } }
 
-typealias NeoBlockHeaderCount = NeoConnectionCount
+public typealias NeoBlockHeaderCount = NeoConnectionCount
 
 public class NeoCalculateNetworkFee: Response<NeoNetworkFee> { var networkFee: NeoNetworkFee? { return result } }
 
@@ -59,7 +59,7 @@ public class NeoGetTransaction: Response<Transaction> { var transaction: Transac
 
 public class NeoGetWalletHeight: Response<Int> { var height: Int? { return result } }
 
-typealias NeoGetTransactionHeight = NeoGetWalletHeight
+public typealias NeoGetTransactionHeight = NeoGetWalletHeight
 
 public class NeoGetWalletUnclaimedGas: Response<String> { var walletUnclaimedGas: String? { return result } }
 
@@ -67,9 +67,9 @@ public class NeoImportPrivKey: Response<NeoAddress> { var address: NeoAddress? {
 
 public class NeoInvoke: Response<InvocationResult> { var invocationResult: InvocationResult? { return result } }
 
-typealias NeoInvokeContractVerify = NeoInvoke
-typealias NeoInvokeFunction = NeoInvoke
-typealias NeoInvokeScript = NeoInvoke
+public typealias NeoInvokeContractVerify = NeoInvoke
+public typealias NeoInvokeFunction = NeoInvoke
+public typealias NeoInvokeScript = NeoInvoke
 
 public class NeoListAddress: Response<[NeoAddress]> { var addresses: [NeoAddress]? { return result } }
 

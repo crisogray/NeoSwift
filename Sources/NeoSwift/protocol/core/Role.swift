@@ -1,6 +1,4 @@
 
-import Foundation
-
 public enum Role: ByteEnum {
     
     case stateValidator, oracle, neoFSAlphabetNode
