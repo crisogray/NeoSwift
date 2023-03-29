@@ -36,11 +36,11 @@ public class ECKeyPair {
     }
     
     public static func create(privateKey: BInt) throws -> ECKeyPair {
-        return try create(privateKey: ECPrivateKey(key: privateKey))
+        return try create(privateKey: ECPrivateKey(privateKey))
     }
     
     public static func create(privateKey: Bytes) throws -> ECKeyPair {
-        return try create(privateKey: ECPrivateKey(key: privateKey))
+        return try create(privateKey: ECPrivateKey(privateKey))
     }
     
     public static func createEcKeyPair() throws -> ECKeyPair {
@@ -72,7 +72,7 @@ public extension ECPrivateKey {
         return s
     }
     
-    convenience init(key: BInt) throws {
+    convenience init(_ key: BInt) throws {
         let keyString = key.asString(radix: 16, uppercase: false)
         guard keyString.count <= NeoConstants.PRIVATE_KEY_SIZE * 2 else {
             throw "Private key must fit into \(NeoConstants.PRIVATE_KEY_SIZE) bytes, but required \(keyString.count / 2) bytes."
@@ -80,7 +80,7 @@ public extension ECPrivateKey {
         try self.init(domain: NeoConstants.SECP256R1_DOMAIN, s: key)
     }
     
-    convenience init(key: Bytes) throws {
+    convenience init(_ key: Bytes) throws {
         guard key.count == NeoConstants.PRIVATE_KEY_SIZE else {
             throw "Private key byte array must have length of \(NeoConstants.PRIVATE_KEY_SIZE) but had length \(key.count)"
         }
@@ -103,11 +103,11 @@ public extension ECPublicKey {
         return w
     }
     
-    convenience init(publicKey: String) throws {
-        try self.init(publicKey: publicKey.bytesFromHex)
+    convenience init(_ publicKey: String) throws {
+        try self.init(publicKey.bytesFromHex)
     }
     
-    convenience init(publicKey: Bytes) throws {
+    convenience init(_ publicKey: Bytes) throws {
         do {
             try self.init(domain: NeoConstants.SECP256R1_DOMAIN,
                           w: NeoConstants.SECP256R1_DOMAIN.decodePoint(publicKey))
@@ -116,8 +116,8 @@ public extension ECPublicKey {
         }
     }
     
-    convenience init(publicKey: BInt) throws {
-        try self.init(publicKey: publicKey.toBytesPadded(length: NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED))
+    convenience init(_ publicKey: BInt) throws {
+        try self.init(publicKey.toBytesPadded(length: NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED))
     }
     
     convenience init(_ point: ECPoint) throws {

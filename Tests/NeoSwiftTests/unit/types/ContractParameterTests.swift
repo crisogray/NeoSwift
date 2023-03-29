@@ -180,7 +180,7 @@ class ContractParameterTests: XCTestCase {
     }
     
     public func testPublicKeyFromPublicKey() {
-        let key = try! ECPublicKey(publicKey: "03b4af8efe55d98b44eedfcfaa39642fd5d53ad543d18d3cc2db5880970a4654f6")
+        let key = try! ECPublicKey("03b4af8efe55d98b44eedfcfaa39642fd5d53ad543d18d3cc2db5880970a4654f6")
         let p = try! ContractParameter.publicKey(key)
         try! assertContractParameter(p, key.getEncoded(compressed: true), .publicKey)
     }

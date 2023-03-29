@@ -1,4 +1,5 @@
 import BigInt
+import Foundation
 
 public protocol StringDecodable: Codable {
     init(string: String) throws
@@ -134,6 +135,13 @@ extension AnyHashable: Codable {
         case is Bool: try container.encode(self as! Bool)
         case is [AnyHashable]: try container.encode(self as! [AnyHashable])
         case is [AnyHashable: AnyHashable]: try container.encode(self as! [AnyHashable: AnyHashable])
+        case is TransactionAttribute: try container.encode(self as! TransactionAttribute)
+        case is ContractParameter: try container.encode(self as! ContractParameter)
+        case is [ContractParameter]: try container.encode(self as! [ContractParameter])
+        case is TransactionSigner: try container.encode(self as! TransactionSigner)
+        case is [TransactionSigner]: try container.encode(self as! [TransactionSigner])
+        case is TransactionSendToken: try container.encode(self as! TransactionSendToken)
+        case is [TransactionSendToken]: try container.encode(self as! [TransactionSendToken])
         default: throw "Unable to encode AnyHashable"
         }
     }
@@ -170,7 +178,18 @@ public struct SingleValueOrNilArray<T: Codable>: Codable {
     
 }
 
-
 extension SingleValueOrNilArray: Equatable where T: Equatable { }
 extension SingleValueOrNilArray: Hashable where T: Hashable { }
 
+public class RawResponseJSONDecoder: JSONDecoder {
+    
+    public override func decode<T>(_ type: T.Type, from data: Data) throws -> T where T : Decodable {
+        let t = try super.decode(T.self, from: data)
+        if var r = t as? HasRawResponse {
+            r.rawResponse = String(data: data, encoding: .utf8)
+            return r as! T
+        }
+        return t
+    }
+    
+}

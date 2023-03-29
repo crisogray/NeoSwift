@@ -38,7 +38,7 @@ public class Bip32ECKeyPair: ECKeyPair {
     }
     
     public static func create(privateKey: BInt, chainCode: Bytes) throws -> Bip32ECKeyPair {
-        let pK = try ECPrivateKey(key: privateKey)
+        let pK = try ECPrivateKey(privateKey)
         return try Bip32ECKeyPair(privateKey: pK,
                                   publicKey: Sign.publicKeyFromPrivateKey(privKey: pK),
                                   childNumber: 0, chainCode: chainCode, parent: nil)
@@ -74,7 +74,7 @@ public class Bip32ECKeyPair: ECKeyPair {
         let i = try data.hmacSha512(key: chainCode)
         let il = Bytes(i[0..<32])
         let chainCode = Bytes(i[32..<64])
-        let privateKey = try ECPrivateKey(key: (self.privateKey.int + il.bInt)
+        let privateKey = try ECPrivateKey((self.privateKey.int + il.bInt)
             .mod(NeoConstants.SECP256R1_DOMAIN.order))
         let publicKey = try Sign.publicKeyFromPrivateKey(privKey: privateKey)
         return try Bip32ECKeyPair(privateKey: privateKey, publicKey: publicKey,

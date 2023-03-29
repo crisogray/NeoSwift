@@ -85,7 +85,7 @@ class ScriptBuilderTests: XCTestCase {
         let key2 = "03eda286d19f7ee0b472afd1163d803d620a961e1581a8f2704b52c0285f6e022d"
         let key3 = "03ac81ec17f2f15fd6d193182f927c5971559c2a32b9408a06fec9e711fb7ca02e"
         
-        let keys = try! [ECPublicKey(publicKey: key1), ECPublicKey(publicKey: key2), ECPublicKey(publicKey: key3)]
+        let keys = try! [ECPublicKey(key1), ECPublicKey(key2), ECPublicKey(key3)]
         let script = try! ScriptBuilder.buildVerificationScript(keys, 2)
         
         let expected = OpCode.push2.string + OpCode.pushData1.string + "21" + key1 +

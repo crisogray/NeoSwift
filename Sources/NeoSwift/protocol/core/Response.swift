@@ -1,16 +1,27 @@
 
 import Foundation
 
-public class Response<T: Codable>: Codable {
+protocol HasRawResponse {
+    var rawResponse: String? { get set }
+}
+
+public class Response<T: Codable>: Codable, HasRawResponse {
     
     @StringDecode public private(set) var id: Int
     public let jsonrpc: String
     public let result: T?
     public let error: Error?
-    public let rawResponse: String?
+    public var rawResponse: String?
     
     public var hasError: Bool {
         return error != nil
+    }
+    
+    public func getResult() throws -> T {
+        guard !hasError else {
+            throw "The Neo node responded with an error: \(error!.string)"
+        }
+        return result!
     }
     
     public struct Error: Codable, Hashable {
@@ -33,6 +44,10 @@ public class Response<T: Codable>: Codable {
                let json = try? JSONEncoder().encode(data), let string = String(data: json, encoding: .utf8) {
                 self.data = string
             } else { self.data = nil }
+        }
+        
+        public var string: String {
+            return "Error{code=\(code), message=\(message), data=\(data)}"
         }
 
     }

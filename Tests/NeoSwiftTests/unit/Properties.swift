@@ -12,5 +12,7 @@ let defaultAccountPassword = "neo"
 
 // MARK: Committee Account
 
+let committeeAccountAddress = "NXXazKH39yNFWWZF5MJ8tEN98VYHwzn7g3"
 let committeeAccountScriptHash = "05859de95ccbbd5668e0f055b208273634d4657f"
+let committeeAccountVerificationScript = "110c21033a4d051b04b7fc0230d2b1aaedfd5a84be279a5361a7358db665ad7857787f1b11419ed0dc3a"
 

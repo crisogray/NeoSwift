@@ -86,7 +86,7 @@ extension WitnessCondition: Codable {
             self = type == WitnessCondition.SCRIPT_HASH_VALUE ? .scriptHash(hash) : .calledByContract(hash)
         case WitnessCondition.GROUP_VALUE, WitnessCondition.CALLED_BY_GROUP_VALUE:
             let publicKeyString = try container.decode(String.self, forKey: .group)
-            let publicKey = try ECPublicKey(publicKey: publicKeyString)
+            let publicKey = try ECPublicKey(publicKeyString)
             self = type == WitnessCondition.GROUP_VALUE ? .group(publicKey) : .calledByGroup(publicKey)
         case WitnessCondition.CALLED_BY_ENTRY_VALUE: self = .calledByEntry
         default: throw "Unable to deserialse WitnessCondition from JSON"

@@ -37,7 +37,7 @@ public extension String {
     
     var isValidAddress: Bool {
         guard let data = base58Decoded, data.count == 25,
-              data[0] == NeoConfig.DEFAULT_ADDRESS_VERSION,
+              data[0] == NeoSwiftConfig.DEFAULT_ADDRESS_VERSION,
               Bytes(data.prefix(21)).hash256().prefix(4) == data.suffix(4) else {
             return false
         }

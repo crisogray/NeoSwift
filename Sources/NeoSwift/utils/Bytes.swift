@@ -29,7 +29,7 @@ public extension Bytes {
     }
     
     var scripthashToAddress: String {
-        let script: Bytes = NeoConfig.DEFAULT_ADDRESS_VERSION + reversed()
+        let script: Bytes = NeoSwiftConfig.DEFAULT_ADDRESS_VERSION + reversed()
         let checksum = script.hash256().prefix(upTo: 4)
         return (script + checksum).base58Encoded
     }

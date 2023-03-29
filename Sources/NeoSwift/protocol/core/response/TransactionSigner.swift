@@ -7,11 +7,11 @@ public struct TransactionSigner: Codable, Hashable {
     public let allowedGroups: [String]?
     public let rules: [WitnessRule]?
         
-    public init(_ signer: Signer) throws {
+    public init(_ signer: Signer) {
         account = signer.signerHash
         scopes = signer.scopes
         allowedContracts = signer.allowedContracts.map(\.string)
-        allowedGroups = try signer.allowedGroups.map { try $0.getEncodedCompressedHex() }
+        allowedGroups = signer.allowedGroups.compactMap { try? $0.getEncodedCompressedHex() }
         rules = signer.rules
     }
     

@@ -73,7 +73,7 @@ class Hash160Tests: XCTestCase {
         let hash = try! Hash160.fromPublicKey(key.bytesFromHex)
         XCTAssertEqual(hash.toLittleEndianArray(), script.bytesFromHex.sha256ThenRipemd160())
     
-        let publicKey = try! ECPublicKey(publicKey: defaultAccountPublicKey)
+        let publicKey = try! ECPublicKey(defaultAccountPublicKey)
         let hash2 = try! Hash160.fromPublicKeys([publicKey], signingThreshold: 1)
         XCTAssertEqual(hash2.string, committeeAccountScriptHash)
     }

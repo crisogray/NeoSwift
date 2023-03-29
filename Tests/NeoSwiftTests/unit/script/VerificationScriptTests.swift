@@ -6,7 +6,7 @@ class VerificationScriptTests: XCTestCase {
     
     public func testFromPublicKey() {
         let key = "035fdb1d1f06759547020891ae97c729327853aeb1256b6fe0473bc2e9fa42ff50"
-        let ecKey = try! ECPublicKey(publicKey: key)
+        let ecKey = try! ECPublicKey(key)
         let script = try! VerificationScript(ecKey)
         let expected = "\(OpCode.pushData1.string)21\(key)\(OpCode.sysCall.string)\(InteropService.systemCryptoCheckSig.hash)"
         XCTAssertEqual(script.script, expected.bytesFromHex)
@@ -18,9 +18,9 @@ class VerificationScriptTests: XCTestCase {
         let key3 = "03ac81ec17f2f15fd6d193182f927c5971559c2a32b9408a06fec9e711fb7ca02e"
         
         let publicKeys = [
-            try! ECPublicKey(publicKey: key1.bytesFromHex),
-            try! ECPublicKey(publicKey: key2.bytesFromHex),
-            try! ECPublicKey(publicKey: key3.bytesFromHex)
+            try! ECPublicKey(key1.bytesFromHex),
+            try! ECPublicKey(key2.bytesFromHex),
+            try! ECPublicKey(key3.bytesFromHex)
         ]
         
         let script = try! VerificationScript(publicKeys, 2)
@@ -34,7 +34,7 @@ class VerificationScriptTests: XCTestCase {
     
     public func testSerializeAndDeserialize() {
         let key = "035fdb1d1f06759547020891ae97c729327853aeb1256b6fe0473bc2e9fa42ff50"
-        let ecPubKey = try! ECPublicKey(publicKey: key.bytesFromHex)
+        let ecPubKey = try! ECPublicKey(key.bytesFromHex)
         let script = try! VerificationScript(ecPubKey)
         let size = Bytes([Byte(NeoConstants.VERIFICATION_SCRIPT_SIZE)]).noPrefixHex
         let expected = "\(OpCode.pushData1.string)"

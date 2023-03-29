@@ -39,15 +39,15 @@ public protocol Neo {
     
     // MARK: SmartContract Methods
     
-    func invokeFunction(_ contractHash: Hash160, _ functionName: String, _ signers: Signer...) -> Request<NeoInvokeFunction, InvocationResult>
-    func invokeFunction(_ contractHash: Hash160, _ functionName: String, _ params: [ContractParameter], _ signers: Signer...) -> Request<NeoInvokeFunction, InvocationResult>
-    func invokeFunctionDiagnostics(_ contractHash: Hash160, _ functionName: String, _ signers: Signer...) -> Request<NeoInvokeFunction, InvocationResult>
-    func invokeFunctionDiagnostics(_ contractHash: Hash160, _ functionName: String, _ params: [ContractParameter], _ signers: Signer...) -> Request<NeoInvokeFunction, InvocationResult>
-    func invokeScript(_ scriptHex: String, _ signers: Signer...) -> Request<NeoInvokeScript, InvocationResult>
-    func invokeScriptDiagnostics(_ scriptHex: String, _ signers: Signer...) -> Request<NeoInvokeScript, InvocationResult>
+    func invokeFunction(_ contractHash: Hash160, _ functionName: String, _ signers: [Signer]) -> Request<NeoInvokeFunction, InvocationResult>
+    func invokeFunction(_ contractHash: Hash160, _ functionName: String, _ params: [ContractParameter], _ signers: [Signer]) -> Request<NeoInvokeFunction, InvocationResult>
+    func invokeFunctionDiagnostics(_ contractHash: Hash160, _ functionName: String, _ signers: [Signer]) -> Request<NeoInvokeFunction, InvocationResult>
+    func invokeFunctionDiagnostics(_ contractHash: Hash160, _ functionName: String, _ params: [ContractParameter], _ signers: [Signer]) -> Request<NeoInvokeFunction, InvocationResult>
+    func invokeScript(_ scriptHex: String, _ signers: [Signer]) -> Request<NeoInvokeScript, InvocationResult>
+    func invokeScriptDiagnostics(_ scriptHex: String, _ signers: [Signer]) -> Request<NeoInvokeScript, InvocationResult>
     func traverseIterator(_ sessionId: String, _ iteratorId: String, _ count: Int) -> Request<NeoTraverseIterator, [StackItem]>
     func termiateSession(_ sessionId: String) -> Request<NeoTerminateSession, Bool>
-    func invokeContractVerify(_ contractHash: Hash160, _ methodParameters: [ContractParameter], _ signers: Signer...) -> Request<NeoInvokeContractVerify, InvocationResult>
+    func invokeContractVerify(_ contractHash: Hash160, _ methodParameters: [ContractParameter], _ signers: [Signer]) -> Request<NeoInvokeContractVerify, InvocationResult>
     func getUnclaimedGas(_ scriptHash: Hash160) -> Request<NeoGetUnclaimedGas, NeoGetUnclaimedGas.GetUnclaimedGas>
     
     // MARK: Utilities Methods
@@ -67,11 +67,11 @@ public protocol Neo {
     func calculateNetworkFee(_ transactionHex: String) -> Request<NeoCalculateNetworkFee, NeoNetworkFee>
     func listAddress() -> Request<NeoListAddress, [NeoAddress]>
     func sendFrom(_ tokenHash: Hash160, _ from: Hash160, _ to: Hash160, _ amount: Int) -> Request<NeoSendFrom, Transaction>
-    func sendFrom(_ from: Hash160, _ txSendToken: TransactionSendToken) -> Request<NeoSendFrom, Transaction>
+    func sendFrom(_ from: Hash160, _ txSendToken: TransactionSendToken) throws -> Request<NeoSendFrom, Transaction>
     func sendMany(_ txSendTokens: [TransactionSendToken]) -> Request<NeoSendMany, Transaction>
     func sendMany(_ from: Hash160, _ txSendTokens: [TransactionSendToken]) -> Request<NeoSendMany, Transaction>
     func sendToAddress(_ tokenHash: Hash160, _ to: Hash160, _ amount: Int) -> Request<NeoSendToAddress, Transaction>
-    func sendToAddress(_ txSendToken: TransactionSendToken) -> Request<NeoSendToAddress, Transaction>
+    func sendToAddress(_ txSendToken: TransactionSendToken) throws -> Request<NeoSendToAddress, Transaction>
     
     // MARK: TokenTracker
     
@@ -87,7 +87,7 @@ public protocol Neo {
     
     // MARK: ApplicationLogs
     
-    func getApplicationLog(_ blockIndex: Int) -> Request<NeoGetApplicationLog, NeoApplicationLog>
+    func getApplicationLog(_ txHash: Hash256) -> Request<NeoGetApplicationLog, NeoApplicationLog>
     
     // MARK: StateService
     
@@ -96,9 +96,9 @@ public protocol Neo {
     func verifyProof(_ rootHash: Hash256, _ proofDataHex: String) -> Request<NeoVerifyProof, String>
     func getStateHeight() -> Request<NeoGetStateHeight, NeoGetStateHeight.StateHeight>
     func getState(_ rootHash: Hash256, _ contractHash: Hash160, _ keyHex: String) -> Request<NeoGetState, String>
-    func findStates(_ rootHash: Hash256, _ contractHash: Hash160, _ keyPrefixHex: String, _ startKeyHex: String, _ countFindResultItems: Int) -> Request<NeoFindStates, NeoFindStates.States>
-    func findStates(_ rootHash: Hash256, _ contractHash: Hash160, _ keyPrefixHex: String, _ startKeyHex: String) -> Request<NeoFindStates, NeoFindStates.States>
-    func findStates(_ rootHash: Hash256, _ contractHash: Hash160, _ keyPrefixHex: String, _ countFindResultItems: Int) -> Request<NeoFindStates, NeoFindStates.States>
+    func findStates(_ rootHash: Hash256, _ contractHash: Hash160, _ keyPrefixHex: String, _ startKeyHex: String?, _ countFindResultItems: Int?) -> Request<NeoFindStates, NeoFindStates.States>
+    func findStates(_ rootHash: Hash256, _ contractHash: Hash160, _ keyPrefixHex: String, _ startKeyHex: String?) -> Request<NeoFindStates, NeoFindStates.States>
+    func findStates(_ rootHash: Hash256, _ contractHash: Hash160, _ keyPrefixHex: String, _ countFindResultItems: Int?) -> Request<NeoFindStates, NeoFindStates.States>
     func findStates(_ rootHash: Hash256, _ contractHash: Hash160, _ keyPrefixHex: String) -> Request<NeoFindStates, NeoFindStates.States>
 
 }

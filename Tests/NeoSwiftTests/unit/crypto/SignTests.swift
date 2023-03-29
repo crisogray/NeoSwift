@@ -5,8 +5,8 @@ import XCTest
 
 class SignTests: XCTestCase {
 
-    private let privateKey = try! ECPrivateKey(key: BInt("9117f4bf9be717c9a90994326897f4243503accd06712162267e77f18b49c3a3", radix: 16)!)
-    private let publicKey = try! ECPublicKey(publicKey: BInt("0265bf906bf385fbf3f777832e55a87991bcfbe19b097fb7c5ca2e4025a4d5e5d6", radix: 16)!)
+    private let privateKey = try! ECPrivateKey(BInt("9117f4bf9be717c9a90994326897f4243503accd06712162267e77f18b49c3a3", radix: 16)!)
+    private let publicKey = try! ECPublicKey(BInt("0265bf906bf385fbf3f777832e55a87991bcfbe19b097fb7c5ca2e4025a4d5e5d6", radix: 16)!)
     private let data = Sign.SignatureData(v: 27,
                                   r: "147e5f3c929dd830d961626551dbea6b70e4b2837ed2fe9089eed2072ab3a655".bytesFromHex,
                                   s: "523ae0fa8711eee4769f1913b180b9b3410bbb2cf770f529c85f6886f22cbaaf".bytesFromHex)

@@ -1,27 +1,23 @@
 
 typealias NeoResponse = Response
 
-public struct Request<T, U> where T: Response<U> {
+public struct Request<T, U>: Codable where T: Response<U> {
         
     public let jsonrpc = "2.0"
     public let method: String
     public let params: [AnyHashable]
     public let id: Int
-    private let neoSwiftService: NeoSwiftService?
+    private var neoSwiftService: NeoSwiftService?
     
-    init(method: String, params: [AnyHashable], neoSwiftService: NeoSwiftService?) {
+    init(method: String, params: [AnyHashable], neoSwiftService: NeoSwiftService) {
         self.method = method
         self.params = params
-        self.id = NeoConfig.requestCounter.getAndIncrement()
+        self.id = NeoSwiftConfig.REQUEST_COUNTER.getAndIncrement()
         self.neoSwiftService = neoSwiftService
     }
     
-    public func send() throws -> T {
-        return try neoSwiftService!.send(self)
-    }
-    
-    public func sendAsync(_ callback: @escaping (T?, Error?) -> Void) {
-        neoSwiftService!.sendAsync(self, callback)
+    public func send() async throws -> T {
+        return try await neoSwiftService!.send(self)
     }
     
     enum CodingKeys: CodingKey {

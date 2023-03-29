@@ -1183,7 +1183,7 @@ class ResponseTests: XCTestCase {
         XCTAssertEqual(version.nonce, 224036820)
         XCTAssertEqual(version.userAgent, "/Neo:3.0.0/")
         
-        let p = version.protocol
+        let p = version.protocol!
         XCTAssertEqual(p.addressVersion, 22)
         XCTAssertEqual(p.network, 769)
         XCTAssertEqual(p.msPerBlock, 15000)
@@ -1223,7 +1223,7 @@ class ResponseTests: XCTestCase {
         XCTAssertEqual(version.nonce, 224036820)
         XCTAssertEqual(version.userAgent, "/Neo:3.0.0/")
         
-        let p = version.protocol
+        let p = version.protocol!
         XCTAssertEqual(p.addressVersion, 22)
         XCTAssertEqual(p.network, 4232068425)
         XCTAssertEqual(p.msPerBlock, 15000)
@@ -2838,6 +2838,22 @@ class ResponseTests: XCTestCase {
             "keyProp2" : "valueProp2"
         ])
         
+    }
+    
+    func testRawResponse() {
+        let json = """
+{
+    "id": 67,
+    "jsonrpc": "2.0",
+    "result": {
+        "port": 1234,
+        "nonce": 12345678,
+        "useragent": "\\/NEO:2.7.6\\/"
+    }
+}
+"""
+        let getVersion = try! RawResponseJSONDecoder().decode(NeoGetVersion.self, from: json.data(using: .utf8)!)
+        XCTAssertEqual(getVersion.rawResponse, json)
     }
     
     private func decodeJson<T: Decodable>(_ type: T.Type, from json: String) -> T {

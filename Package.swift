@@ -6,10 +6,10 @@ import PackageDescription
 let package = Package(
     name: "NeoSwift",
     platforms: [
-        .macOS(.v10_15),
-        .iOS(.v9),
-        .tvOS(.v9),
-        .watchOS(.v2)
+        .macOS(.v11),
+        .iOS(.v13),
+        .tvOS(.v15),
+        .watchOS(.v6)
     ],
     products: [
         .library(name: "NeoSwift",

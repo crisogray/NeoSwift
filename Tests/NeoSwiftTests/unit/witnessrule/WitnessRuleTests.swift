@@ -46,7 +46,7 @@ class WitnessRuleTest: XCTestCase {
             XCTFail()
             return
         }
-        let pubKey = try! ECPublicKey(publicKey: "021821807f923a3da004fb73871509d7635bcc05f41edef2a3ca5c941d8bbc1231")
+        let pubKey = try! ECPublicKey("021821807f923a3da004fb73871509d7635bcc05f41edef2a3ca5c941d8bbc1231")
         XCTAssertEqual(pubKey, decodedPublicKey)
         XCTAssertEqual(pubKey, expressions[1].group)
         
@@ -66,7 +66,7 @@ class WitnessRuleTest: XCTestCase {
               case .calledByEntry = expressions[1] else {
             return XCTFail()
         }
-        let pubKey = try! ECPublicKey(publicKey: "023be7b6742268f4faca4835718f3232ddc976855d5ef273524cea36f0e8d102f3")
+        let pubKey = try! ECPublicKey("023be7b6742268f4faca4835718f3232ddc976855d5ef273524cea36f0e8d102f3")
         XCTAssertEqual(pubKey, decodedPublicKey)
         XCTAssertEqual(pubKey, expressions[0].group)
         XCTAssertEqual(rule.condition, .or([.group(pubKey), .calledByEntry]))
@@ -90,7 +90,7 @@ class WitnessRuleTest: XCTestCase {
         guard case .group(let decodedPublicKey) = rule.condition else {
             return XCTFail()
         }
-        let publicKey = try! ECPublicKey(publicKey: "0352321377ac7b4e1c4c2ebfe28f4d82fa3c213f7ccfcc9dac62da37fb9b433f0c")
+        let publicKey = try! ECPublicKey("0352321377ac7b4e1c4c2ebfe28f4d82fa3c213f7ccfcc9dac62da37fb9b433f0c")
         XCTAssertEqual(publicKey, decodedPublicKey)
         XCTAssertEqual(publicKey, rule.condition.group)
         XCTAssertEqual(rule.condition, .group(publicKey))
@@ -119,7 +119,7 @@ class WitnessRuleTest: XCTestCase {
         guard case .calledByGroup(let decodedPublicKey) = rule.condition else {
             return XCTFail()
         }
-        let publicKey = try! ECPublicKey(publicKey: "035a1ced7ae274a881c3f479452c8bca774c89f653d54c5c5959a01371a8c696fd")
+        let publicKey = try! ECPublicKey("035a1ced7ae274a881c3f479452c8bca774c89f653d54c5c5959a01371a8c696fd")
         XCTAssertEqual(publicKey, decodedPublicKey)
         XCTAssertEqual(publicKey, rule.condition.group)
         XCTAssertEqual(rule.condition, .calledByGroup(publicKey))
@@ -220,7 +220,7 @@ class WitnessRuleTest: XCTestCase {
     }
     
     func testGroupConditionSerializeDeserialize() {
-        let key = try! ECPublicKey(publicKey: defaultAccountPublicKey)
+        let key = try! ECPublicKey(defaultAccountPublicKey)
         
         let condition = WitnessCondition.group(key)
         let bytes = "19\(defaultAccountPublicKey)".bytesFromHex
@@ -260,7 +260,7 @@ class WitnessRuleTest: XCTestCase {
     }
     
     func testCalledByGroupGroupConditionSerializeDeserialize() {
-        let key = try! ECPublicKey(publicKey: defaultAccountPublicKey)
+        let key = try! ECPublicKey(defaultAccountPublicKey)
         
         let condition = WitnessCondition.calledByGroup(key)
         let bytes = "29\(defaultAccountPublicKey)".bytesFromHex

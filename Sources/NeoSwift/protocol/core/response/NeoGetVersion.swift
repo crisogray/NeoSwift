@@ -8,11 +8,11 @@ public class NeoGetVersion: Response<NeoGetVersion.NeoVersion> {
     
     public struct NeoVersion: Codable, Hashable {
         
-        public let tcpPort: Int
-        public let wsPort: Int
+        public let tcpPort: Int?
+        public let wsPort: Int?
         public let nonce: Int
         public let userAgent: String
-        public let `protocol`: `Protocol`
+        public let `protocol`: `Protocol`?
         
         enum CodingKeys: String, CodingKey {
             case nonce, `protocol`
