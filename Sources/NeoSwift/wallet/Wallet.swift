@@ -1,0 +1,7 @@
+
+public struct Wallet {
+    
+    
+    
+}
+

@@ -24,25 +24,23 @@ extension NeoSwift {
         _ = config.setNNSResolver(nnsResolver)
     }
     
-    public mutating func getNetworkMagicNumberBytes() async -> Bytes? {
+    public mutating func getNetworkMagicNumberBytes() async throws -> Bytes {
         if config.networkMagic == nil {
-            if let magic = try? await getVersion().send().version?.protocol?.network {
-                do {
-                    _ = try config.setNetworkMagic(magic)
-                } catch { return nil }
-            } else { return nil }
+            guard let magic = try await getVersion().send().getResult().protocol?.network else {
+                throw "Unable to read Network Magic Number from Version"
+            }
+            _ = try config.setNetworkMagic(magic)
         }
         let magicInt = config.networkMagic! & 0xFFFFFFFF
         return Bytes(magicInt.bytes.prefix(4))
     }
     
-    public mutating func getNetworkMagicNumber() async -> Int? {
+    public mutating func getNetworkMagicNumber() async throws -> Int? {
         if config.networkMagic == nil {
-            if let magic = try? await getVersion().send().version?.protocol?.network {
-                do {
-                    _ = try config.setNetworkMagic(magic)
-                } catch { return nil }
-            } else { return nil }
+            guard let magic = try await getVersion().send().getResult().protocol?.network else {
+                throw "Unable to read Network Magic Number from Version"
+            }
+            _ = try config.setNetworkMagic(magic)
         }
         return config.networkMagic!
     }

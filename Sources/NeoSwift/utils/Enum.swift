@@ -7,8 +7,15 @@ public protocol ByteEnum: Codable, Hashable, CaseIterable {
 
 public extension ByteEnum {
     
+    static func throwingValueOf(_ byte: Byte) throws -> Self {
+        guard let value = allCases.first(where: { $0.byte == byte }) else {
+            throw "\(String(describing: OracleResponseCode.self)) value type not found"
+        }
+        return value
+    }
+    
     static func valueOf(_ byte: Byte) -> Self? {
-        return allCases.first { $0.byte == byte }
+        return try? throwingValueOf(byte)
     }
     
     static func fromJsonValue(_ value: String) -> Self? {

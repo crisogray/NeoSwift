@@ -17,11 +17,9 @@ extension WitnessRule: NeoSerializable {
         writer.writeSerializableFixed(condition)
     }
     
-    public static func deserialize(_ reader: BinaryReader) -> WitnessRule? {
-        guard let action = WitnessAction.valueOf(reader.readByte()),
-              let condition = WitnessCondition.deserialize(reader) else {
-            return nil
-        }
+    public static func deserialize(_ reader: BinaryReader) throws -> WitnessRule {
+        let action = try WitnessAction.throwingValueOf(reader.readByte())
+        let condition = try WitnessCondition.deserialize(reader)
         return WitnessRule(action: action, condition: condition)
     }
     

@@ -81,18 +81,17 @@ extension TransactionAttribute: NeoSerializable {
         }
     }
     
-    public static func deserialize(_ reader: BinaryReader) -> TransactionAttribute? {
-        if let type = TransactionAttribute.valueOf(reader.readByte()) {
-            if case .highPriority = type { return type }
-            else {
-                if let id = try? BInt(magnitude: reader.readBytes(8).reversed()).asInt()!,
-                   let code = OracleResponseCode.valueOf(reader.readByte()),
-                   let result = try? reader.readVarBytes(MAX_RESULT_SIZE).base64Encoded {
-                    return .oracleResponse(id, code, result)
-                }
-            }
+    public static func deserialize(_ reader: BinaryReader) throws -> TransactionAttribute {
+        guard let type = TransactionAttribute.valueOf(reader.readByte()) else {
+            throw "The deserialized type does not match the type information in the serialized data."
         }
-        return nil
+        if case .highPriority = type { return type }
+        else {
+            let id = try BInt(magnitude: reader.readBytes(8).reversed()).asInt()!
+            let code = try OracleResponseCode.throwingValueOf(reader.readByte())
+            let result = try reader.readVarBytes(MAX_RESULT_SIZE).base64Encoded
+            return .oracleResponse(id, code, result)
+        }
     }
     
 }

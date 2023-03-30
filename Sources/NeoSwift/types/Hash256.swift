@@ -53,8 +53,8 @@ extension Hash256: NeoSerializable {
         writer.write(hash.reversed())
     }
     
-    public static func deserialize(_ reader: BinaryReader) -> Hash256? {
-        return try? Hash256.init(reader.readBytes(NeoConstants.HASH256_SIZE).reversed())
+    public static func deserialize(_ reader: BinaryReader) throws -> Hash256 {
+        return try Hash256.init(reader.readBytes(NeoConstants.HASH256_SIZE).reversed())
     }
     
 }

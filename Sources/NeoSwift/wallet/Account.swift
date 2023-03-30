@@ -84,7 +84,7 @@ public struct Account {
         keyPair = nil
     }
     
-    private func getScriptHash() throws -> Hash160 {
+    public func getScriptHash() throws -> Hash160 {
         return try .fromAddress(address)
     }
     

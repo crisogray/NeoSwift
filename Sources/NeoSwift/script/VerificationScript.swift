@@ -111,8 +111,8 @@ public class VerificationScript: NeoSerializable, Hashable {
         writer.writeVarBytes(script)
     }
     
-    public static func deserialize(_ reader: BinaryReader) -> Self? {
-        return try? VerificationScript(reader.readVarBytes()) as? Self
+    public static func deserialize(_ reader: BinaryReader) throws -> Self {
+        return try VerificationScript(reader.readVarBytes()) as! Self
     }
     
     public static func == (lhs: VerificationScript, rhs: VerificationScript) -> Bool {

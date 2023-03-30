@@ -137,31 +137,26 @@ extension WitnessCondition: NeoSerializable {
         }
     }
     
-    public static func deserialize(_ reader: BinaryReader) -> WitnessCondition? {
+    public static func deserialize(_ reader: BinaryReader) throws -> WitnessCondition {
         let typeByte = reader.readByte()
         switch typeByte {
         case BOOLEAN_BYTE: return .boolean(reader.readBoolean())
         case NOT_BYTE:
-            if let condition = WitnessCondition.deserialize(reader) {
-                return .not(condition)
-            }
+            return try .not(WitnessCondition.deserialize(reader))
         case AND_BYTE, WitnessCondition.OR_BYTE:
-            let expressions = (0 ..< reader.readVarInt()).compactMap { _ in
-                return WitnessCondition.deserialize(reader)
+            let expressions = try (0 ..< reader.readVarInt()).map { _ in
+                return try WitnessCondition.deserialize(reader)
             }
             return typeByte == AND_BYTE ? .and(expressions) : .or(expressions)
         case SCRIPT_HASH_BYTE, CALLED_BY_CONTRACT_BYTE:
-            if let hash = Hash160.deserialize(reader) {
-                return typeByte == SCRIPT_HASH_BYTE ? .scriptHash(hash) : .calledByContract(hash)
-            }
+            let hash = try Hash160.deserialize(reader)
+            return typeByte == SCRIPT_HASH_BYTE ? .scriptHash(hash) : .calledByContract(hash)
         case GROUP_BYTE, CALLED_BY_GROUP_BYTE:
-            if let key = ECPublicKey.deserialize(reader) {
-                return typeByte == GROUP_BYTE ? .group(key) : .calledByGroup(key)
-            }
+            let key = try ECPublicKey.deserialize(reader)
+            return typeByte == GROUP_BYTE ? .group(key) : .calledByGroup(key)
         case CALLED_BY_ENTRY_BYTE: return .calledByEntry
-        default: break
+        default: throw "The deserialized type does not match the type information in the serialized data."
         }
-        return nil
     }
     
     

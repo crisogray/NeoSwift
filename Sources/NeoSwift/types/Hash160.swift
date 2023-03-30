@@ -77,8 +77,8 @@ extension Hash160: NeoSerializable {
         writer.write(hash.reversed())
     }
     
-    public static func deserialize(_ reader: BinaryReader) -> Hash160? {
-        return try? Hash160.init(reader.readBytes(NeoConstants.HASH160_SIZE).reversed())
+    public static func deserialize(_ reader: BinaryReader) throws -> Hash160 {
+        return try Hash160.init(reader.readBytes(NeoConstants.HASH160_SIZE).reversed())
     }
     
 }

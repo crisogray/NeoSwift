@@ -65,11 +65,9 @@ extension Witness: NeoSerializable {
         verificationScript.serialize(writer)
     }
     
-    public static func deserialize(_ reader: BinaryReader) -> Witness? {
-        guard let invocationScript = InvocationScript.deserialize(reader),
-           let verificationScript = VerificationScript.deserialize(reader) else {
-            return nil
-        }
+    public static func deserialize(_ reader: BinaryReader) throws -> Witness {
+        let invocationScript = try InvocationScript.deserialize(reader)
+        let verificationScript = try VerificationScript.deserialize(reader)
         return Witness(invocationScript, verificationScript)
     }
 }

@@ -96,8 +96,8 @@ public class BinaryReader {
         return try NeoConstants.SECP256R1_DOMAIN.decodePoint(encoded)
     }
     
-    public func readSerializable<T: NeoSerializable>() -> T? {
-        return T.deserialize(self)
+    public func readSerializable<T: NeoSerializable>() throws -> T {
+        return try T.deserialize(self)
     }
     
     public func readSerializableListVarBytes<T: NeoSerializable>() -> [T] {
@@ -105,7 +105,7 @@ public class BinaryReader {
         var bytesRead = 0, offset = position
         var list: [T] = []
         while bytesRead < length {
-            if let t = T.deserialize(self) { list.append(t) }
+            if let t = try? T.deserialize(self) { list.append(t) }
             bytesRead = position - offset
         }
         return list
@@ -115,7 +115,7 @@ public class BinaryReader {
         let length = readVarInt(0x10000000)
         var list: [T] = []
         for _ in 0..<length {
-            if let t = T.deserialize(self) { list.append(t) }
+            if let t = try? T.deserialize(self) { list.append(t) }
         }
         return list
     }

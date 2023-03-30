@@ -35,8 +35,8 @@ public class InvocationScript: NeoSerializable, Hashable {
         writer.writeVarBytes(script)
     }
     
-    public static func deserialize(_ reader: BinaryReader) -> Self? {
-        return try? InvocationScript(reader.readVarBytes()) as? Self
+    public static func deserialize(_ reader: BinaryReader) throws -> Self {
+        return try InvocationScript(reader.readVarBytes()) as! Self
     }
     
     public static func == (lhs: InvocationScript, rhs: InvocationScript) -> Bool {

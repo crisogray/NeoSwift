@@ -112,32 +112,35 @@ extension Signer: NeoSerializable {
         if scopes.contains(.witnessRules) { writer.writeSerializableVariable(rules) }
     }
     
-    public static func deserialize(_ reader: BinaryReader) -> Self? {
-        if let signerHash: Hash160 = reader.readSerializable() {
-            let scopes = WitnessScope.extractCombinedScopes(reader.readByte())
-            var allowedContracts: [Hash160] = []
-            var allowedGroups: [ECPublicKey] = []
-            var rules: [WitnessRule] = []
-            let allowedScopes: [WitnessScope] = [.customContracts, .customGroups, .witnessRules]
-            for scope in allowedScopes where scopes.contains(scope) {
-                var count = 0
-                switch scope {
-                case .customContracts:
-                    allowedContracts = reader.readSerializableList()
-                    count = allowedContracts.count
-                case .customGroups:
-                    allowedGroups = reader.readSerializableList()
-                    count = allowedGroups.count
-                case .witnessRules:
-                    rules = reader.readSerializableList()
-                    count = rules.count
-                default: return nil
-                }
-                guard count <= NeoConstants.MAX_SIGNER_SUBITEMS else { return nil }
+    public static func deserialize(_ reader: BinaryReader) throws -> Self {
+        let signerHash: Hash160 = try reader.readSerializable()
+        let scopes = WitnessScope.extractCombinedScopes(reader.readByte())
+        var allowedContracts: [Hash160] = []
+        var allowedGroups: [ECPublicKey] = []
+        var rules: [WitnessRule] = []
+        let allowedScopes: [WitnessScope] = [.customContracts, .customGroups, .witnessRules]
+        for scope in allowedScopes where scopes.contains(scope) {
+            var count = 0, errorLabel = ""
+            switch scope {
+            case .customContracts:
+                allowedContracts = reader.readSerializableList()
+                count = allowedContracts.count
+                errorLabel = "allowed contracts"
+            case .customGroups:
+                allowedGroups = reader.readSerializableList()
+                count = allowedGroups.count
+                errorLabel = "allowed contract groups"
+            case .witnessRules:
+                rules = reader.readSerializableList()
+                count = rules.count
+                errorLabel = "rules"
+            default: break
             }
-            return Signer(signerHash, scopes, allowedContracts, allowedGroups, rules) as? Self
+            guard count <= NeoConstants.MAX_SIGNER_SUBITEMS else {
+                throw "A signer's scope can only contain \(NeoConstants.MAX_SIGNER_SUBITEMS) \(errorLabel). The input data contained \(count)."
+            }
         }
-        return nil
+        return Signer(signerHash, scopes, allowedContracts, allowedGroups, rules) as! Self
     }
     
 }

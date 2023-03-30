@@ -5,7 +5,7 @@ import SwiftECC
 public protocol NeoSerializable {
     var size: Int { get }
     func serialize(_ writer: BinaryWriter)
-    static func deserialize(_ reader: BinaryReader) -> Self?
+    static func deserialize(_ reader: BinaryReader) throws -> Self
     func toArray() -> Bytes
 }
 
@@ -18,7 +18,7 @@ extension NeoSerializable {
     }
     
     public static func from(_ bytes: Bytes) -> Self? {
-        return Self.deserialize(BinaryReader(bytes))
+        return try? Self.deserialize(BinaryReader(bytes))
     }
     
 }
