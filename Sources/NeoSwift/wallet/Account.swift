@@ -1,7 +1,7 @@
 
 import BigInt
 
-public struct Account {
+public class Account {
     
     public private(set) var keyPair: ECKeyPair?
     public let address: String
@@ -54,21 +54,21 @@ public struct Account {
         self.nrOfParticipants = nrOfParticipants
     }
     
-    public mutating func label(_ label: String) -> Account {
+    public func label(_ label: String) -> Account {
         self.label = label
         return self
     }
     
-    public mutating func lock() -> Account {
+    public func lock() -> Account {
         self.isLocked = true
         return self
     }
     
-    public mutating func unlock() {
+    public func unlock() {
         self.isLocked = false
     }
     
-    public mutating func decryptPrivateKey(_ password: String, _ scryptParams: ScryptParams = .DEFAULT) throws {
+    public func decryptPrivateKey(_ password: String, _ scryptParams: ScryptParams = .DEFAULT) throws {
         if keyPair != nil { return }
         if encryptedPrivateKey == nil {
             throw "The account does not hold an encrypted private key."
@@ -76,7 +76,7 @@ public struct Account {
         keyPair = try NEP2.decrypt(password, encryptedPrivateKey!, scryptParams)
     }
     
-    public mutating func encryptPrivateKey(_ password: String, _ scryptParams: ScryptParams = .DEFAULT) throws {
+    public func encryptPrivateKey(_ password: String, _ scryptParams: ScryptParams = .DEFAULT) throws {
         if keyPair == nil {
             throw "The account does not hold a decrypted private key."
         }

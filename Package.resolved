@@ -19,6 +19,15 @@
       }
     },
     {
+      "identity" : "bip39",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pengpengliu/BIP39",
+      "state" : {
+        "revision" : "e79bd90275e50643cf8f97208ffa536d0def3ec7",
+        "version" : "1.0.1"
+      }
+    },
+    {
       "identity" : "cryptoswift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/krzyzanowskim/CryptoSwift.git",
