@@ -13,7 +13,6 @@ class Bip39AccountTests: XCTestCase {
         XCTAssertEqual(a1.keyPair, a2.keyPair)
         XCTAssertEqual(a1.mnemonic, a2.mnemonic)
         XCTAssert(!a1.mnemonic.isEmpty)
-        print(a1.mnemonic)
     }
     
 }
