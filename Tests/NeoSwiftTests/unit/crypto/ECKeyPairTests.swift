@@ -42,7 +42,7 @@ class ECKeyPairTests: XCTestCase {
     
     public func testDeserializePublicKey() {
         let data = "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296".bytesFromHex
-        guard let publicKey = ECPublicKey.from(data) else {
+        guard let publicKey = try? ECPublicKey.from(data) else {
             XCTFail()
             return
         }

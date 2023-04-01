@@ -52,7 +52,7 @@ class Hash256Tests: XCTestCase {
         try? Hash256(string).serialize(writer)
         
         XCTAssertEqual(writer.toArray(), data)
-        XCTAssertEqual(Hash256.from(data)?.string, string)
+        XCTAssertEqual((try? Hash256.from(data))?.string, string)
     }
     
     public func testEquals() {

@@ -82,7 +82,7 @@ class WitnessTests: XCTestCase {
         let verificationScript = try! "\(OpCode.pushData1.string)21\(keyPair.publicKey.getEncodedCompressedHex())\(OpCode.sysCall.string)\(InteropService.systemCryptoCheckSig.hash)"
         let serialized = "42\(invocationScript)28\(verificationScript)"
         
-        let witness = Witness.from(serialized.bytesFromHex)!
+        let witness = try! Witness.from(serialized.bytesFromHex)
         XCTAssertEqual(invocationScript.bytesFromHex, witness.invocationScript.script)
         XCTAssertEqual(verificationScript.bytesFromHex, witness.verificationScript.script)
     }

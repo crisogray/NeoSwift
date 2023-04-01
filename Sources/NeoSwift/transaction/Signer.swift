@@ -24,8 +24,8 @@ public class Signer {
         self.allowedGroups = allowedGroups
         self.rules = rules
     }
-    
-    public func setAllowedContractes(_ allowedContracts: Hash160...) throws -> Signer {
+
+    public func setAllowedContracts(_ allowedContracts: [Hash160]) throws -> Signer {
         if allowedContracts.isEmpty { return self }
         else if scopes.contains(.global) { throw "Trying to set allowed contracts on a Signer with global scope." }
         else if self.allowedContracts.count + allowedContracts.count > NeoConstants.MAX_SIGNER_SUBITEMS {
@@ -37,7 +37,7 @@ public class Signer {
         return self
     }
     
-    public func setAllowedGroups(_ allowedGroups: ECPublicKey...) throws -> Signer {
+    public func setAllowedGroups(_ allowedGroups: [ECPublicKey]) throws -> Signer {
         if allowedGroups.isEmpty { return self }
         else if scopes.contains(.global) { throw "Trying to set allowed contract groups on a Signer with global scope." }
         else if self.allowedGroups.count + allowedGroups.count > NeoConstants.MAX_SIGNER_SUBITEMS {
@@ -49,7 +49,7 @@ public class Signer {
         return self
     }
     
-    public func setRules(_ rules: WitnessRule...) throws -> Signer {
+    public func setRules(_ rules: [WitnessRule]) throws -> Signer {
         if rules.isEmpty { return self }
         else if scopes.contains(.global) { throw "Trying to set witness rules on a Signer with global scope." }
         else if self.rules.count + rules.count > NeoConstants.MAX_SIGNER_SUBITEMS {

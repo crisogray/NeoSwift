@@ -161,7 +161,7 @@ class WitnessRuleTest: XCTestCase {
         let condition = WitnessCondition.boolean(true)
         let bytes = "0001".bytesFromHex
 
-        let deserialized = WitnessCondition.from(bytes)
+        let deserialized = try! WitnessCondition.from(bytes)
         XCTAssertEqual(deserialized, condition)
         
         let writer = BinaryWriter()
@@ -173,7 +173,7 @@ class WitnessRuleTest: XCTestCase {
         let condition = WitnessCondition.not(.boolean(true))
         let bytes = "010001".bytesFromHex
         
-        let deserialized = WitnessCondition.from(bytes)
+        let deserialized = try! WitnessCondition.from(bytes)
         XCTAssertEqual(deserialized, condition)
         
         let writer = BinaryWriter()
@@ -185,7 +185,7 @@ class WitnessRuleTest: XCTestCase {
         let condition = WitnessCondition.and([.boolean(true), .boolean(false)])
         let bytes = "020200010000".bytesFromHex
         
-        let deserialized = WitnessCondition.from(bytes)
+        let deserialized = try! WitnessCondition.from(bytes)
         XCTAssertEqual(condition, deserialized)
         
         let writer = BinaryWriter()
@@ -197,7 +197,7 @@ class WitnessRuleTest: XCTestCase {
         let condition = WitnessCondition.or([.boolean(true), .boolean(false)])
         let bytes = "030200010000".bytesFromHex
         
-        let deserialized = WitnessCondition.from(bytes)
+        let deserialized = try! WitnessCondition.from(bytes)
         XCTAssertEqual(condition, deserialized)
         
         let writer = BinaryWriter()
@@ -211,7 +211,7 @@ class WitnessRuleTest: XCTestCase {
         let condition = WitnessCondition.scriptHash(hash)
         let bytes = "18\(Bytes(defaultAccountScriptHash.bytesFromHex.reversed()).toHexString())".bytesFromHex
         
-        let deserialized = WitnessCondition.from(bytes)
+        let deserialized = try! WitnessCondition.from(bytes)
         XCTAssertEqual(condition, deserialized)
         
         let writer = BinaryWriter()
@@ -225,7 +225,7 @@ class WitnessRuleTest: XCTestCase {
         let condition = WitnessCondition.group(key)
         let bytes = "19\(defaultAccountPublicKey)".bytesFromHex
         
-        let deserialized = WitnessCondition.from(bytes)
+        let deserialized = try! WitnessCondition.from(bytes)
         XCTAssertEqual(condition, deserialized)
         
         let writer = BinaryWriter()
@@ -237,7 +237,7 @@ class WitnessRuleTest: XCTestCase {
         let condition = WitnessCondition.calledByEntry
         let bytes = "20".bytesFromHex
         
-        let deserialized = WitnessCondition.from(bytes)
+        let deserialized = try! WitnessCondition.from(bytes)
         XCTAssertEqual(condition, deserialized)
         
         let writer = BinaryWriter()
@@ -251,7 +251,7 @@ class WitnessRuleTest: XCTestCase {
         let condition = WitnessCondition.calledByContract(hash)
         let bytes = "28\(Bytes(defaultAccountScriptHash.bytesFromHex.reversed()).toHexString())".bytesFromHex
         
-        let deserialized = WitnessCondition.from(bytes)
+        let deserialized = try! WitnessCondition.from(bytes)
         XCTAssertEqual(condition, deserialized)
         
         let writer = BinaryWriter()
@@ -265,7 +265,7 @@ class WitnessRuleTest: XCTestCase {
         let condition = WitnessCondition.calledByGroup(key)
         let bytes = "29\(defaultAccountPublicKey)".bytesFromHex
         
-        let deserialized = WitnessCondition.from(bytes)
+        let deserialized = try! WitnessCondition.from(bytes)
         XCTAssertEqual(condition, deserialized)
         
         let writer = BinaryWriter()

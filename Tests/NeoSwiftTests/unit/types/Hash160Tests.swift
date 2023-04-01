@@ -45,7 +45,7 @@ class Hash160Tests: XCTestCase {
         try? Hash160(string).serialize(writer)
         
         XCTAssertEqual(writer.toArray(), data)
-        XCTAssertEqual(Hash160.from(data)?.string, string)
+        XCTAssertEqual((try? Hash160.from(data))?.string, string)
     }
     
     public func testEquals() {

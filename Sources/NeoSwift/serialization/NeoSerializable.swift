@@ -17,8 +17,8 @@ extension NeoSerializable {
         return writer.toArray()
     }
     
-    public static func from(_ bytes: Bytes) -> Self? {
-        return try? Self.deserialize(BinaryReader(bytes))
+    public static func from(_ bytes: Bytes) throws -> Self {
+        return try Self.deserialize(BinaryReader(bytes))
     }
     
 }

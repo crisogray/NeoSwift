@@ -24,7 +24,7 @@ class InvocationScriptTests: XCTestCase {
         let message = Bytes(repeating: 1, count: 256)
         let script = "\(OpCode.pushData2.string)0001\(message.noPrefixHex)"
         let serializedScript = "FD0301\(script)"
-        let deserialized = InvocationScript.from(serializedScript.bytesFromHex)
+        let deserialized = try? InvocationScript.from(serializedScript.bytesFromHex)
         XCTAssertEqual(deserialized?.script, script.bytesFromHex)
     }
     
@@ -33,7 +33,7 @@ class InvocationScriptTests: XCTestCase {
         let keyPair = try! ECKeyPair.createEcKeyPair()
         let signature = try! Sign.signMessage(message, keyPair).concatenated
         let script = "\(OpCode.pushData1.string)40\(signature.noPrefixHex)"
-        let deserialized = InvocationScript.from("42\(script)".bytesFromHex)
+        let deserialized = try? InvocationScript.from("42\(script)".bytesFromHex)
         XCTAssertEqual(deserialized?.script, script.bytesFromHex)
     }
     

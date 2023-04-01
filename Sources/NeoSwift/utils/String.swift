@@ -55,6 +55,10 @@ public extension String {
         return b58[1..<21].reversed()
     }
     
+    var reversedHex: String {
+        return Bytes(bytesFromHex.reversed()).noPrefixHex
+    }
+    
 }
 
 extension String: LocalizedError {

@@ -7,7 +7,7 @@ let package = Package(
     name: "NeoSwift",
     platforms: [
         .macOS(.v11),
-        .iOS(.v13),
+        .iOS(.v14),
         .tvOS(.v15),
         .watchOS(.v6)
     ],

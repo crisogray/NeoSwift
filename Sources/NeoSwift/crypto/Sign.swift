@@ -120,7 +120,7 @@ public enum Sign {
         return pubKey.verify(signature: ECDSASignature(r: sig.r.bInt, s: sig.s.bInt).signature, msg: message)
     }
     
-    public class SignatureData: Equatable, Hashable {
+    public class SignatureData: Hashable {
         
         let v: Byte
         let r: Bytes

@@ -41,8 +41,8 @@ class VerificationScriptTests: XCTestCase {
         + "21\(key)\(OpCode.sysCall.string)\(InteropService.systemCryptoCheckSig.hash)"
         let serialized = "\(size)\(expected)"
         XCTAssertEqual(serialized.bytesFromHex, script.toArray())
-        let s = VerificationScript.from(serialized.bytesFromHex)
-        XCTAssertEqual(s?.script, expected.bytesFromHex)
+        let s = try! VerificationScript.from(serialized.bytesFromHex)
+        XCTAssertEqual(s.script, expected.bytesFromHex)
     }
     
     public func testGetSigningThreshold() {
