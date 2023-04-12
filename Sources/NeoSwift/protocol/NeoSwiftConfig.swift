@@ -1,7 +1,7 @@
 
 import Foundation
 
-public struct NeoSwiftConfig {
+public class NeoSwiftConfig {
 
     public static let DEFAULT_BLOCK_TIME: Int = 15_000
     public static let DEFAULT_ADDRESS_VERSION: Byte = 0x35
@@ -38,12 +38,12 @@ public struct NeoSwiftConfig {
         self.nnsResolver = nnsResolver
     }
     
-    public mutating func setPollingInterval(_ pollingInterval: Int) -> NeoSwiftConfig {
+    public func setPollingInterval(_ pollingInterval: Int) -> NeoSwiftConfig {
         self.pollingInterval = pollingInterval
         return self
     }
     
-    public mutating func setScheduledExecutorService(_ executorService: DispatchQueue) -> NeoSwiftConfig {
+    public func setScheduledExecutorService(_ executorService: DispatchQueue) -> NeoSwiftConfig {
         self.scheduledExecutorService = executorService
         return self
     }
@@ -52,7 +52,7 @@ public struct NeoSwiftConfig {
         NeoSwiftConfig.addressVersion = addressVersion
     }
     
-    public mutating func setNetworkMagic(_ magic: Int) throws -> NeoSwiftConfig {
+    public func setNetworkMagic(_ magic: Int) throws -> NeoSwiftConfig {
         guard magic <= 0xFFFFFFFF && magic >= 0 else {
             throw "The network magic number must fit into a 32-bit unsigned integer, i.e., it must be positive and not greater than 0xFFFFFFFF."
         }
@@ -60,28 +60,28 @@ public struct NeoSwiftConfig {
         return self
     }
     
-    public mutating func setBlockInterval(_ blockInterval: Int) -> NeoSwiftConfig {
+    public func setBlockInterval(_ blockInterval: Int) -> NeoSwiftConfig {
         self.blockInterval = blockInterval
         return self
     }
     
-    public mutating func setMaxValidUntilBlockIncrement(_ maxValidUntilBlockIncrement: Int) -> NeoSwiftConfig {
+    public func setMaxValidUntilBlockIncrement(_ maxValidUntilBlockIncrement: Int) -> NeoSwiftConfig {
         self.maxValidUntilBlockIncrement = maxValidUntilBlockIncrement
         return self
     }
     
-    public mutating func setNNSResolver(_ nnsResolver: Hash160) -> NeoSwiftConfig {
+    public func setNNSResolver(_ nnsResolver: Hash160) -> NeoSwiftConfig {
         self.nnsResolver = nnsResolver
         return self
     }
     
     
-    public mutating func allowTransmissionOnFault() -> NeoSwiftConfig {
+    public func allowTransmissionOnFault() -> NeoSwiftConfig {
         self.allowsTransmissionOnFault = true
         return self
     }
     
-    public mutating func preventTransmissionOnFault() -> NeoSwiftConfig {
+    public func preventTransmissionOnFault() -> NeoSwiftConfig {
         self.allowsTransmissionOnFault = false
         return self
     }

@@ -1,18 +1,35 @@
 
 public struct ContractManifest: Codable, Hashable {
     
-    public let name: String
-    @SingleValueOrNilArray public private(set) var groups: [ContractGroup]
-    public let features: [String : AnyHashable]?
+    public let name: String?
+    @SingleValueOrNilArray public var groups: [ContractGroup]
+    public private(set) var features: [String : AnyHashable]?
     @SingleValueOrNilArray public private(set) var supportedStandards: [String]
-    public let abi: ContractABI
+    public let abi: ContractABI?
     @SingleValueOrNilArray public private(set) var permissions: [ContractPermission]
     @WildcardContainerSerialized @SingleValueOrNilArray public private(set) var trusts: [String]
     public let extra: [String : AnyHashable]?
     
+    init(name: String? = nil, groups: [ContractGroup] = [], features: [String : AnyHashable] = [:], supportedStandards: [String] = [], abi: ContractABI? = nil, permissions: [ContractPermission] = [], trusts: [String] = [], extra: [String : AnyHashable]? = nil) {
+        self.name = name
+        self.groups = groups
+        self.features = features
+        self.supportedStandards = supportedStandards
+        self.abi = abi
+        self.permissions = permissions
+        self.trusts = trusts
+        self.extra = extra
+    }
+    
     enum CodingKeys: String, CodingKey {
         case name, groups, features, abi, permissions, trusts, extra
         case supportedStandards = "supportedstandards"
+    }
+    
+    public func createGroup(_ groupECKeyPair: ECKeyPair, _ deploymentSender: Hash160, _ nefCheckSum: Int) throws -> ContractGroup {
+        let contractHashBytes = ScriptBuilder.buildContractHashScript(deploymentSender, nefCheckSum, name ?? "")
+        let signatureData = try Sign.signMessage(contractHashBytes, groupECKeyPair)
+        return try ContractGroup(pubKey: groupECKeyPair.publicKey.getEncodedCompressedHex(), signature: signatureData.concatenated.base64Encoded)
     }
     
     public struct ContractGroup: Codable, Hashable {
@@ -26,6 +43,7 @@ public struct ContractManifest: Codable, Hashable {
         }
     
         init(pubKey: String, signature: String) throws {
+            let pubKey = pubKey.cleanedHexPrefix
             guard pubKey.bytesFromHex.count == NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED else {
                 throw "The provided value is not a valid public key: \(pubKey)"
             }
@@ -80,7 +98,7 @@ public struct ContractManifest: Codable, Hashable {
     
     public struct ContractPermission: Codable, Hashable {
         public let contract: String
-        @SingleValueOrNilArray public private(set) var methods: [String]
+        @WildcardContainerSerialized @SingleValueOrNilArray public private(set) var methods: [String]
     }
     
 }

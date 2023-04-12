@@ -1,7 +1,7 @@
 
 import Foundation
 
-public struct HttpService: Service {
+public class HttpService: Service {
     
     public static let JSON_MEDIA_TYPE = "application/json; charset=utf-8"
     public static let DEFAULT_URL = URL(string: "http://localhost:10333/")!
@@ -31,15 +31,15 @@ public struct HttpService: Service {
         } catch { throw error }
     }
     
-    public mutating func addHeader(_ key: String, _ value: String) {
+    public func addHeader(_ key: String, _ value: String) {
         headers[key] = value
     }
     
-    public mutating func addHeaders(_ headersToAdd: [String : String]) {
+    public func addHeaders(_ headersToAdd: [String : String]) {
         headersToAdd.forEach { headers[$0] = $1 }
     }
     
-    public mutating func setURLSession(_ urlSession: URLSession) {
+    public func setURLSession(_ urlSession: URLSession) {
         self.urlSession = urlSession
     }
     

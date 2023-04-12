@@ -622,8 +622,8 @@ class ResponseTests: XCTestCase {
         XCTAssertEqual(manifest1.name, "GasToken")
         XCTAssert(manifest1.groups.isEmpty)
         XCTAssertEqual(manifest1.supportedStandards, ["NEP-17"])
-        XCTAssertEqual(manifest1.abi.methods.count, 5)
-        XCTAssertEqual(manifest1.abi.events.count, 1)
+        XCTAssertEqual(manifest1.abi?.methods.count, 5)
+        XCTAssertEqual(manifest1.abi?.events.count, 1)
         
         let c2 = nativeContracts[1]
         XCTAssertEqual(c2.id, -8)
@@ -642,8 +642,8 @@ class ResponseTests: XCTestCase {
         XCTAssertEqual(manifest2.name, "RoleManagement")
         XCTAssert(manifest2.groups.isEmpty)
         XCTAssert(manifest2.supportedStandards.isEmpty)
-        XCTAssertEqual(manifest2.abi.methods.count, 2)
-        XCTAssert(manifest2.abi.events.isEmpty)
+        XCTAssertEqual(manifest2.abi?.methods.count, 2)
+        XCTAssert(manifest2.abi?.events.isEmpty ?? false)
         
         let c3 = nativeContracts[2]
         XCTAssertEqual(c3.id, -9)
@@ -735,7 +735,7 @@ class ResponseTests: XCTestCase {
         XCTAssertEqual(manifest.trusts, [])
         XCTAssertNil(manifest.extra)
         
-        let abi = manifest.abi
+        let abi = manifest.abi!
         XCTAssertEqual(abi.methods.count, 2)
         XCTAssert(abi.events.isEmpty)
         

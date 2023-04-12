@@ -62,7 +62,7 @@ public class ScriptBuilder {
         if i <= 16 && i >= -1 {
             return opCode(OpCode(rawValue: OpCode.push0.opcode + Byte(i.asInt()!))!)
         }
-        let bytes: Bytes = i.asMagnitudeBytes().reversed()
+        let bytes: Bytes = i.asSignedBytes().reversed()
         if bytes.count == 1 { return opCode(.pushInt8, bytes) }
         else if bytes.count == 2 { return opCode(.pushInt16, bytes) }
         else if bytes.count <= 4 { return opCode(.pushInt32, padNumber(i, 4)) }
@@ -139,13 +139,12 @@ public class ScriptBuilder {
         return builder.pushInteger(pubKeys.count).sysCall(.systemCryptoCheckMultisig).toArray()
     }
     
-    public static func buildVerificationScript(_ sender: Hash160, _ nefCheckSum: Int, _ contractName: String) -> Bytes {
+    public static func buildContractHashScript(_ sender: Hash160, _ nefCheckSum: Int, _ contractName: String) -> Bytes {
         return ScriptBuilder()
             .opCode(.abort).pushData(sender.toLittleEndianArray())
             .pushInteger(nefCheckSum).pushData(contractName).toArray()
     }
-    
-    
+        
     public static func buildContractCallAndUnwrapIterator(_ contractHash: Hash160, _ method: String, _ params: [ContractParameter],
                                                           _ callFlags: CallFlags = .all, _ maxIteratorResultItems: Int) -> Bytes {
         let b = ScriptBuilder().pushInteger(maxIteratorResultItems)
