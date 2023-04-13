@@ -4,18 +4,33 @@ import Combine
 public struct SerializableTransaction {
     
     public static let HEADER_SIZE: Int = 25
-    
+
+    private var neoSwift: NeoSwift?
+
     public let version: Byte
-    public let nonce: UInt32
-    public let validUntilBlock: UInt32
+    public let nonce: Int
+    public let validUntilBlock: Int
     public let signers: [Signer]
-    public let systemFee: Int64
-    public let networkFee: Int64
+    public let systemFee: Int
+    public let networkFee: Int
     public let attributes: [TransactionAttribute]
     public let script: Bytes
     public private(set) var witnesses: [Witness]
     private var blockCountWhenSent: Int?
-    private var neoSwift: NeoSwift?
+    
+    init(neoSwift: NeoSwift? = nil, version: Byte, nonce: Int, validUntilBlock: Int, signers: [Signer], systemFee: Int, networkFee: Int, attributes: [TransactionAttribute], script: Bytes, witnesses: [Witness], blockCountWhenSent: Int? = nil) {
+        self.neoSwift = neoSwift
+        self.version = version
+        self.nonce = nonce
+        self.validUntilBlock = validUntilBlock
+        self.signers = signers
+        self.systemFee = systemFee
+        self.networkFee = networkFee
+        self.attributes = attributes
+        self.script = script
+        self.witnesses = witnesses
+        self.blockCountWhenSent = blockCountWhenSent
+    }
     
     public var sender: Hash160 {
         return (signers.first { $0.scopes.contains(.none) } ?? signers.first!).signerHash
@@ -113,10 +128,10 @@ extension SerializableTransaction: NeoSerializable {
     
     private func serializeWithoutWitnesses(_ writer: BinaryWriter) {
         writer.writeByte(version)
-        writer.writeUInt32(nonce)
-        writer.writeInt64(systemFee)
-        writer.writeInt64(networkFee)
-        writer.writeUInt32(validUntilBlock)
+        writer.writeUInt32(UInt32(nonce))
+        writer.writeInt64(Int64(systemFee))
+        writer.writeInt64(Int64(networkFee))
+        writer.writeUInt32(UInt32(validUntilBlock))
         writer.writeSerializableVariable(signers)
         writer.writeSerializableVariable(attributes)
         writer.writeVarBytes(script)
@@ -135,9 +150,9 @@ extension SerializableTransaction: NeoSerializable {
     }
 
     public static func deserialize(_ reader: BinaryReader) throws -> SerializableTransaction {
-        let version = reader.readByte(), nonce = reader.readUInt32()
-        let systemFee = reader.readInt64(), networkFee = reader.readInt64()
-        let validUntilBlock = reader.readUInt32()
+        let version = reader.readByte(), nonce = Int(reader.readUInt32())
+        let systemFee = Int(reader.readInt64()), networkFee = Int(reader.readInt64())
+        let validUntilBlock = Int(reader.readUInt32())
         let signers: [Signer] = reader.readSerializableList()
         let attributes = try readTransactionAttributes(reader, signers.count)
         let script = try reader.readVarBytes()

@@ -14,10 +14,10 @@ public class TransactionBuilder {
     private var additionalNetworkFee: Int
     private var additionalSystemFee: Int
     private var attributes: [TransactionAttribute]
-    public private(set) var script: Bytes
+    public private(set) var script: Bytes?
 
     private var consumer: ((Int, Int) -> Void)? = nil
-    private var supplier: (() -> Error)? = nil
+    private var feeError: Error? = nil
 
     private var isHighPriority: Bool {
         return attributes.contains(where: { return $0 == .highPriority })
@@ -106,7 +106,7 @@ public class TransactionBuilder {
     }
     
     public func extendScript(_ script: Bytes) -> TransactionBuilder {
-        self.script += script
+        self.script = (self.script ?? []) + script
         return self
     }
     
@@ -121,6 +121,146 @@ public class TransactionBuilder {
                 self.attributes.append(attr)
             }
         }
+    }
+    
+    public func getUnsignedTransaction() async throws -> SerializableTransaction {
+        guard let script = script, !script.isEmpty else {
+            throw "Cannot build a transaction without a script."
+        }
+        if validUntilBlock == nil {
+            let currentBlockCount = try await neoSwift.getBlockCount().send().getResult()
+            try _ = validUntilBlock(currentBlockCount + neoSwift.maxValidUntilBlockIncrement)
+        }
+        guard !signers.isEmpty else {
+            throw "Cannot create a transaction without signers. At least one signer with witness scope fee-only or higher is required."
+        }
+        if isHighPriority {
+            let isAllowed = try await isAllowedForHighPriority()
+            if !isAllowed {
+                throw "This transaction does not have a committee member as signer. Only committee members can send transactions with high priority."
+            }
+        }
+        
+        let systemFee = try await getSystemFeeForScript() + additionalSystemFee
+        let networkFee = try await calcNetworkFee() + additionalNetworkFee
+        let fees = systemFee + networkFee
+        
+        let gasBalance = try await neoSwift.invokeFunction(Self.GAS_TOKEN_HASH, Self.BALANCE_OF_FUNCTION, [.hash160(signers[0].signerHash)], []).send().getResult().stack[0].integer!
+        
+        if let feeError = feeError, fees > gasBalance {
+            throw feeError
+        } else if let consumer = consumer, fees > gasBalance {
+            consumer(fees, gasBalance)
+        }
+        
+        return SerializableTransaction(neoSwift: neoSwift, version: version, nonce: nonce,
+                                       validUntilBlock: validUntilBlock!, signers: signers,
+                                       systemFee: systemFee, networkFee: networkFee,
+                                       attributes: attributes, script: script, witnesses: [])
+    }
+    
+    private func isAllowedForHighPriority() async throws -> Bool {
+        let committee = try await neoSwift.getCommittee().send().getResult()
+            .map { try ECPublicKey($0).getEncoded(compressed: true) }
+            .map(Hash160.fromPublicKey)
+        return signers.map(\.signerHash).contains(where: committee.contains)
+            || signersContainMultiSigWithCommitteeMember(committee)
+        
+    }
+    
+    private func signersContainMultiSigWithCommitteeMember(_ committee: [Hash160]) -> Bool {
+        for signer in signers {
+            if let s = signer as? AccountSigner, s.account.isMultiSig,
+               let script = s.account.verificationScript,
+               let contains = try? script.getPublicKeys()
+                .compactMap({ try? $0.getEncoded(compressed: true)})
+                .compactMap(Hash160.fromPublicKey)
+                .contains(where: committee.contains), contains {
+                return true
+            }
+        }
+        return false
+    }
+    
+    private func getSystemFeeForScript() async throws -> Int {
+        let response = try await neoSwift.invokeScript(script?.noPrefixHex ?? "", self.signers).send()
+        let result = try response.getResult()
+        guard !result.hasStateFault || neoSwift.config.allowsTransmissionOnFault else {
+            throw "The vm exited due to the following exception: \(result.exception ?? "nil")"
+        }
+        return try Int(string: result.gasConsumed)
+    }
+    
+    private func calcNetworkFee() async throws -> Int {
+        var tx = SerializableTransaction(neoSwift: neoSwift, version: version, nonce: nonce,
+                                         validUntilBlock: validUntilBlock!, signers: signers,
+                                         systemFee: 0, networkFee: 0, attributes: attributes,
+                                         script: script!, witnesses: [])
+        var hasAtLeastOneSigningAccount = false
+        for signer in signers {
+            if let contractSigner = signer as? ContractSigner {
+                _ = tx.addWitness(.createContractWitness(contractSigner.verifyParams))
+            } else if let accountSigner = signer as? AccountSigner {
+                let verificationScript = try createFakeVerificationScript(accountSigner.account)
+                _ = tx.addWitness(.init([], verificationScript.script))
+                hasAtLeastOneSigningAccount = true
+            }
+        }
+        guard hasAtLeastOneSigningAccount else {
+            throw "A transaction requires at least one signing account (i.e. an AccountSigner). None was provided."
+        }
+        return try await neoSwift.calculateNetworkFee(tx.toArray().noPrefixHex).send().getResult().networkFee
+    }
+    
+    private func createFakeVerificationScript(_ account: Account) throws -> VerificationScript {
+        if account.isMultiSig {
+            return try VerificationScript((0..<account.getNrOfParticipants()).map { _ in try ECPublicKey(Self.DUMMY_PUB_KEY) },
+                                          account.getSigningThreshold())
+        }
+        return try VerificationScript(ECPublicKey(Self.DUMMY_PUB_KEY))
+    }
+    
+    public func callInvokeScript() async throws -> NeoInvokeScript {
+        guard !signers.isEmpty else {
+            throw "Cannot make an 'invokescript' call without the script being configured."
+        }
+        return try await neoSwift.invokeScript(script?.noPrefixHex ?? "", []).send()
+    }
+    
+    public func sign() async throws -> SerializableTransaction {
+        var transaction = try await getUnsignedTransaction()
+        let txBytes = try await transaction.getHashData()
+        try transaction.signers.forEach { signer in
+            if let contractSigner = signer as? ContractSigner {
+                _ = transaction.addWitness(.createContractWitness(contractSigner.verifyParams))
+            } else if let accountSigner = signer as? AccountSigner {
+                let acc = accountSigner.account
+                guard !acc.isMultiSig else {
+                    throw "Transactions with multi-sig signers cannot be signed automatically."
+                }
+                guard let keyPair = acc.keyPair else {
+                    throw "Cannot create transaction signature because account \(acc.address) does not hold a private key."
+                }
+                _ = try transaction.addWitness(.create(txBytes, keyPair))
+            }
+        }
+        return transaction
+    }
+    
+    public func doIfSenderCannotCoverFees(_ consumer: @escaping (Int, Int) -> Void) throws -> TransactionBuilder {
+        guard feeError == nil else {
+            throw "Cannot handle a consumer for this case, since an exception will be thrown if the sender cannot cover the fees."
+        }
+        self.consumer = consumer
+        return self
+    }
+    
+    public func throwIfSenderCannotCoverFees(_ error: Error) throws -> TransactionBuilder {
+        guard consumer == nil else {
+            throw "Cannot handle a supplier for this case, since a consumer will be executed if the sender cannot cover the fees."
+        }
+        feeError = error
+        return self
     }
     
 }

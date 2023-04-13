@@ -12,6 +12,10 @@ public struct InvocationResult: Codable, Hashable {
     public let pendingSignature: PendingSignature?
     public let sessionId: String?
     
+    public var hasStateFault: Bool {
+        return state == .fault
+    }
+    
     enum CodingKeys: String, CodingKey {
         case script, state, exception, notifications, diagnostics, stack, tx
         case gasConsumed = "gasconsumed"
