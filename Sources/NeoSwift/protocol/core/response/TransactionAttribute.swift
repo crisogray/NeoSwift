@@ -45,11 +45,12 @@ extension TransactionAttribute: Codable {
     }
     
     public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(jsonValue, forKey: .type)
         switch self {
-        case .highPriority: break
+        case .highPriority:
+            var container = encoder.singleValueContainer()
+            try container.encode(jsonValue)
         case .oracleResponse(let id, let responseCode, let result):
+            var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(id, forKey: .id)
             try container.encode(responseCode, forKey: .code)
             try container.encode(result, forKey: .result)

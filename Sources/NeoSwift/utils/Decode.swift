@@ -131,8 +131,8 @@ extension AnyHashable: Codable {
         switch self {
         case is String: try container.encode(self as! String)
         case is Int: try container.encode(self as! Int)
-        case is Double: try container.encode(self as! Double)
         case is Bool: try container.encode(self as! Bool)
+        case is Double: try container.encode(self as! Double)
         case is [AnyHashable]: try container.encode(self as! [AnyHashable])
         case is [AnyHashable: AnyHashable]: try container.encode(self as! [AnyHashable: AnyHashable])
         case is TransactionAttribute: try container.encode(self as! TransactionAttribute)
@@ -142,7 +142,7 @@ extension AnyHashable: Codable {
         case is [TransactionSigner]: try container.encode(self as! [TransactionSigner])
         case is TransactionSendToken: try container.encode(self as! TransactionSendToken)
         case is [TransactionSendToken]: try container.encode(self as! [TransactionSendToken])
-        default: throw "Unable to encode AnyHashable"
+        default: throw "Unable to encode AnyHashable \(self)"
         }
     }
     

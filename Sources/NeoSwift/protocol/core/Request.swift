@@ -24,12 +24,5 @@ public struct Request<T, U>: Codable where T: Response<U> {
         case jsonrpc, method, params, id
     }
     
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(jsonrpc, forKey: .jsonrpc)
-        try container.encode(params, forKey: .params)
-        try container.encode(id, forKey: .id)
-    }
-    
 }
 

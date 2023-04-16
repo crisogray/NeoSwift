@@ -56,7 +56,8 @@ struct WitnessScopesFromString: Codable, Hashable {
     }
     
     public func encode(to encoder: Encoder) throws {
-        try wrappedValue.encode(to: encoder)
+        var container = encoder.singleValueContainer()
+        try container.encode(wrappedValue.map(\.jsonValue).joined(separator: ","))
     }
     
 }

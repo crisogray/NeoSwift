@@ -46,7 +46,7 @@ public protocol Neo {
     func invokeScript(_ scriptHex: String, _ signers: [Signer]) -> Request<NeoInvokeScript, InvocationResult>
     func invokeScriptDiagnostics(_ scriptHex: String, _ signers: [Signer]) -> Request<NeoInvokeScript, InvocationResult>
     func traverseIterator(_ sessionId: String, _ iteratorId: String, _ count: Int) -> Request<NeoTraverseIterator, [StackItem]>
-    func termiateSession(_ sessionId: String) -> Request<NeoTerminateSession, Bool>
+    func terminateSession(_ sessionId: String) -> Request<NeoTerminateSession, Bool>
     func invokeContractVerify(_ contractHash: Hash160, _ methodParameters: [ContractParameter], _ signers: [Signer]) -> Request<NeoInvokeContractVerify, InvocationResult>
     func getUnclaimedGas(_ scriptHash: Hash160) -> Request<NeoGetUnclaimedGas, NeoGetUnclaimedGas.GetUnclaimedGas>
     

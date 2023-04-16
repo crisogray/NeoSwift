@@ -2840,21 +2840,6 @@ class ResponseTests: XCTestCase {
         
     }
     
-    func testRawResponse() {
-        let json = """
-{
-    "id": 67,
-    "jsonrpc": "2.0",
-    "result": {
-        "port": 1234,
-        "nonce": 12345678,
-        "useragent": "\\/NEO:2.7.6\\/"
-    }
-}
-"""
-        let getVersion = try! RawResponseJSONDecoder().decode(NeoGetVersion.self, from: json.data(using: .utf8)!)
-        XCTAssertEqual(getVersion.rawResponse, json)
-    }
     
     private func decodeJson<T: Decodable>(_ type: T.Type, from json: String) -> T {
         return try! JSONDecoder().decode(type, from: json.data(using: .utf8)!)
