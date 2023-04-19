@@ -68,13 +68,13 @@ class AccountTests: XCTestCase {
     
     public func testEncryptPublicKey() {
         let keyPair = try! ECKeyPair.create(privateKey: defaultAccountPrivateKey.bytesFromHex)
-        var account = try! Account(keyPair: keyPair)
+        let account = try! Account(keyPair: keyPair)
         try! account.encryptPrivateKey(defaultAccountPassword)
         XCTAssertEqual(account.encryptedPrivateKey, defaultAccountEncryptedPrivateKey)
     }
     
     public func testFailEncryptAccountWithoutPrivateKey() {
-        var account = try! Account.fromAddress(defaultAccountAddress)
+        let account = try! Account.fromAddress(defaultAccountAddress)
         XCTAssertThrowsError(try account.encryptPrivateKey("pwd")) { error in
             XCTAssertEqual(error.localizedDescription, "The account does not hold a decrypted private key.")
         }
@@ -83,7 +83,7 @@ class AccountTests: XCTestCase {
     public func testDecryptWithStandardScryptParams() {
         let privateKey = try! ECPrivateKey(defaultAccountPrivateKey.bytesFromHex)
         let nep6Account = NEP6Account(address: "", label: "", isDefault: true, lock: false, key: defaultAccountEncryptedPrivateKey, contract: nil, extra: nil)
-        var account = try! Account.fromNEP6Account(nep6Account)
+        let account = try! Account.fromNEP6Account(nep6Account)
         try! account.decryptPrivateKey(defaultAccountPassword)
         XCTAssertEqual(account.keyPair?.privateKey, privateKey)
         try! account.decryptPrivateKey(defaultAccountPassword)
@@ -91,7 +91,7 @@ class AccountTests: XCTestCase {
     }
     
     public func testFailDecryptingAccountWithoutDecryptedPrivateKey() {
-        var account = try! Account.fromAddress(defaultAccountAddress)
+        let account = try! Account.fromAddress(defaultAccountAddress)
         XCTAssertThrowsError(try account.decryptPrivateKey(defaultAccountPassword)) { error in
             XCTAssertEqual(error.localizedDescription, "The account does not hold an encrypted private key.")
         }
@@ -118,7 +118,7 @@ class AccountTests: XCTestCase {
     }
     
     public func testToNep6AccountWithEncryptedPrivateKey() {
-        var account = try! Account.fromWIF(defaultAccountWIF)
+        let account = try! Account.fromWIF(defaultAccountWIF)
         try! account.encryptPrivateKey("neo")
         let nep6 = try! account.toNEP6Account()
         XCTAssertEqual(nep6.contract?.script, defaultAccountVerificationScript.base64Encoded)

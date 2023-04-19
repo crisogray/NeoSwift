@@ -1,11 +1,11 @@
 
 import Combine
 
-public struct SerializableTransaction {
+public class SerializableTransaction {
     
     public static let HEADER_SIZE: Int = 25
 
-    private var neoSwift: NeoSwift?
+    public var neoSwift: NeoSwift?
 
     public let version: Byte
     public let nonce: Int
@@ -44,18 +44,18 @@ public struct SerializableTransaction {
         return try Hash256(toArrayWithoutWitnesses().sha256().reversed())
     }
     
-    public mutating func addWitness(_ witness: Witness) -> SerializableTransaction {
+    public func addWitness(_ witness: Witness) -> SerializableTransaction {
         witnesses.append(witness)
         return self
     }
     
-    public mutating func addMultiSigWitness(_ verificationScript: VerificationScript, _ pubKeySigMap: [ECPublicKey : Sign.SignatureData]) throws -> SerializableTransaction {
+    public func addMultiSigWitness(_ verificationScript: VerificationScript, _ pubKeySigMap: [ECPublicKey : Sign.SignatureData]) throws -> SerializableTransaction {
         let signatures = pubKeySigMap.keys.sorted().map { pubKeySigMap[$0]! }
         let multiSigWitness = try Witness.creatMultiSigWitness(signatures, verificationScript)
         return addWitness(multiSigWitness)
     }
     
-    public mutating func addMultiSigWitness(_ verificationScript: VerificationScript, _ accounts: Account...) async throws -> SerializableTransaction {
+    public func addMultiSigWitness(_ verificationScript: VerificationScript, _ accounts: Account...) async throws -> SerializableTransaction {
         let hashData = try await getHashData()
         let signatures = accounts
             .compactMap(\.keyPair)
@@ -65,7 +65,7 @@ public struct SerializableTransaction {
         return addWitness(witness)
     }
     
-    public mutating func send() async throws -> NeoSendRawTransaction {
+    public func send() async throws -> NeoSendRawTransaction {
         guard signers.count == witnesses.count else {
             throw "The transaction does not have the same number of signers and witnesses. For every signer there has to be one witness, even if that witness is empty."
         }
@@ -84,7 +84,7 @@ public struct SerializableTransaction {
         }
         try throwIfNeoSwiftNil()
         let predicate = { (getBlock: NeoGetBlock) -> Bool in
-            if let contains = getBlock.block?.transactions?.contains(where: { $0.hash == txId }) { return !contains }
+            if let contains = getBlock.block?.transactions?.contains(where: { $0.hash == self.txId }) { return !contains }
             return true
         }
         let inversePredicate = { (getBlock: NeoGetBlock) -> Bool in return !predicate(getBlock) }
@@ -121,7 +121,7 @@ extension SerializableTransaction: NeoSerializable {
         + witnesses.varSize
     }
     
-    public mutating func getHashData() async throws -> Bytes {
+    public func getHashData() async throws -> Bytes {
         try throwIfNeoSwiftNil()
         return try await neoSwift!.getNetworkMagicNumberBytes() + toArrayWithoutWitnesses().sha256()
     }
@@ -137,7 +137,7 @@ extension SerializableTransaction: NeoSerializable {
         writer.writeVarBytes(script)
     }
     
-    private func toArrayWithoutWitnesses() -> Bytes {
+    public func toArrayWithoutWitnesses() -> Bytes {
         let writer = BinaryWriter()
         serializeWithoutWitnesses(writer)
         return writer.toArray()
@@ -149,7 +149,7 @@ extension SerializableTransaction: NeoSerializable {
         writer.writeSerializableVariable(witnesses)
     }
 
-    public static func deserialize(_ reader: BinaryReader) throws -> SerializableTransaction {
+    public static func deserialize(_ reader: BinaryReader) throws -> Self {
         let version = reader.readByte(), nonce = Int(reader.readUInt32())
         let systemFee = Int(reader.readInt64()), networkFee = Int(reader.readInt64())
         let validUntilBlock = Int(reader.readUInt32())
@@ -158,11 +158,11 @@ extension SerializableTransaction: NeoSerializable {
         let script = try reader.readVarBytes()
         var witnesses: [Witness] = []
         if reader.available > 0 { witnesses = reader.readSerializableList() }
-        return .init(version: version, nonce: nonce,
+        return SerializableTransaction(version: version, nonce: nonce,
                      validUntilBlock: validUntilBlock,
                      signers: signers, systemFee: systemFee,
                      networkFee: networkFee, attributes: attributes,
-                     script: script, witnesses: witnesses)
+                     script: script, witnesses: witnesses) as! Self
     }
     
     private static func readTransactionAttributes(_ reader: BinaryReader, _ signerSize: Int) throws -> [TransactionAttribute] {
@@ -173,8 +173,38 @@ extension SerializableTransaction: NeoSerializable {
         return try (0..<nrOfAttributes).map { _ in try TransactionAttribute.deserialize(reader) }
     }
     
-    // TODO: ContractParametersContext
+    public func toContractParametersContext() async throws -> ContractParametersContext {
+        let hash = try getTxId().string
+        let data = toArrayWithoutWitnesses().base64Encoded
+        try throwIfNeoSwiftNil()
+        let network = try await neoSwift!.getNetworkMagicNumber()
+        
+        let items: [String: ContractParametersContext.ContextItem] = try signers.map { signer in
+            guard let accountSigner = signer as? AccountSigner else {
+                throw "Cannot handle contract signers"
+            }
+            guard let verificationScript = accountSigner.account.verificationScript else {
+                throw "Account on AccountSigner has no verification script"
+            }
+            var params: [ContractParameter] = []
+            if let invocationScript = witnesses.first(where: { $0.verificationScript == verificationScript })?.invocationScript {
+                params = invocationScript.getSignatures().map { ContractParameter(type: .signature, value: $0.concatenated) }
+            }
+            if params.isEmpty {
+                params = try (1...verificationScript.getSigningThreshold()).map { _ in ContractParameter(type: .signature) }
+            }
+            var pubKeyToSignature: [String: String] = [:]
+            if verificationScript.isSingleSigScript(), let value = params.first?.value {
+                let pubKey = try verificationScript.getPublicKeys()[0].getEncodedCompressedHex()
+                pubKeyToSignature[pubKey] = (value as! Bytes).base64Encoded
+            }
+            let script = verificationScript.script.base64Encoded
+            return ContractParametersContext.ContextItem(script: script, parameters: params, signatures: pubKeyToSignature)
+        }.reduce(into: .init(), { dict, contextItem in
+            let hash = try Hash160.fromScript(contextItem.script.base64Decoded).string
+            dict["0x\(hash)"] = contextItem
+        })
+        return .init(hash: hash, data: data, items: items, network: network)
+    }
     
 }
-
-

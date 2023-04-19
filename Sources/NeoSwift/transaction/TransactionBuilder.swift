@@ -192,7 +192,7 @@ public class TransactionBuilder {
     }
     
     private func calcNetworkFee() async throws -> Int {
-        var tx = SerializableTransaction(neoSwift: neoSwift, version: version, nonce: nonce,
+        let tx = SerializableTransaction(neoSwift: neoSwift, version: version, nonce: nonce,
                                          validUntilBlock: validUntilBlock!, signers: signers,
                                          systemFee: 0, networkFee: 0, attributes: attributes,
                                          script: script!, witnesses: [])
@@ -228,7 +228,7 @@ public class TransactionBuilder {
     }
     
     public func sign() async throws -> SerializableTransaction {
-        var transaction = try await getUnsignedTransaction()
+        let transaction = try await getUnsignedTransaction()
         let txBytes = try await transaction.getHashData()
         try transaction.signers.forEach { signer in
             if let contractSigner = signer as? ContractSigner {

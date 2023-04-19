@@ -16,12 +16,13 @@ class MockURLSession: URLRequester {
 }
 """.data(using: .utf8)!
     
-    private var data: Data? = nil
+    private var i = 0
+    private var data: [Data]? = nil
     private var error: Error? = nil
     
     private var requestInterceptor: ((URLRequest) -> Void)?
     
-    public func data(_ data: Data) -> MockURLSession {
+    public func data(_ data: Data...) -> MockURLSession {
         self.data = data
         return self
     }
@@ -43,7 +44,9 @@ class MockURLSession: URLRequester {
         if let error = error {
             throw error
         }
-        return (data ?? defaultData, nil)
+        let d = data?[i] ?? data?[0] ?? defaultData
+        i += 1
+        return (d, nil)
     }
     
 }

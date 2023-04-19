@@ -104,7 +104,7 @@ public class Account {
     
     public func getNep17Balances(_ neoSwift: NeoSwift) async throws -> [Hash160 : Int] {
         let result = try await neoSwift.getNep17Balances(getScriptHash()).send().getResult().balances
-        return try result.reduce(into: [Hash160 : Int]()) { a, b in a[b.assetHash] = try Int(string: b.amount) }
+        return try result.reduce(into: .init()) { a, b in a[b.assetHash] = try Int(string: b.amount) }
     }
     
     public func toNEP6Account() throws -> NEP6Account {

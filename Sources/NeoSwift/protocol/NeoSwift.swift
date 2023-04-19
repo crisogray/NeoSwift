@@ -38,17 +38,11 @@ public class NeoSwift {
     }
     
     public func getNetworkMagicNumberBytes() async throws -> Bytes {
-        if config.networkMagic == nil {
-            guard let magic = try await getVersion().send().getResult().protocol?.network else {
-                throw "Unable to read Network Magic Number from Version"
-            }
-            _ = try config.setNetworkMagic(magic)
-        }
-        let magicInt = config.networkMagic! & 0xFFFFFFFF
-        return Bytes(magicInt.bytes.prefix(4))
+        let magicInt = try await getNetworkMagicNumber() & 0xFFFFFFFF
+        return UInt32(magicInt).bigEndianBytes
     }
     
-    public func getNetworkMagicNumber() async throws -> Int? {
+    public func getNetworkMagicNumber() async throws -> Int {
         if config.networkMagic == nil {
             guard let magic = try await getVersion().send().getResult().protocol?.network else {
                 throw "Unable to read Network Magic Number from Version"
