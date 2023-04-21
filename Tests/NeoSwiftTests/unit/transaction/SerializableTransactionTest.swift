@@ -2,7 +2,7 @@
 import XCTest
 @testable import NeoSwift
 
-class TransactionTest: XCTestCase {
+class SerializableTransactionTest: XCTestCase {
     
     private var account1: Hash160!
     private var account2: Hash160!

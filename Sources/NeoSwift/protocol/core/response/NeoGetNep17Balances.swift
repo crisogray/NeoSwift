@@ -18,9 +18,9 @@ public class NeoGetNep17Balances: NeoGetTokenBalances<NeoGetNep17Balances.Nep17B
     
     public struct Nep17Balance: TokenBalance {
         
-        public let name: String
-        public let symbol: String
-        public let decimals: String
+        public let name: String?
+        public let symbol: String?
+        public let decimals: String?
         public let amount: String
         public let lastUpdatedBlock: Double
         public let assetHash: Hash160

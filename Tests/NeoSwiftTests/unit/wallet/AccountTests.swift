@@ -165,7 +165,21 @@ class AccountTests: XCTestCase {
         XCTAssertNil(account.verificationScript)
     }
     
-    // TODO: Get NEP-17 Balances
+    public func testGetNep17Balances() async {
+        let json = nep17BalancesOfDefaultAccount.data(using: .utf8)!
+        let mockUrlSession = MockURLSession().data(json)
+        let httpService = HttpService(url: URL(string: "http://127.0.0.1")!, urlSession: mockUrlSession)
+        let neoSwift = NeoSwift.build(httpService)
+        
+        let account = try! Account.fromAddress(defaultAccountAddress)
+        let balances = try! await account.getNep17Balances(neoSwift)
+        
+        XCTAssertEqual(balances.count, 2)
+        XCTAssert(try! balances.keys.contains(.init(gasTokenHash)))
+        XCTAssert(try! balances.keys.contains(.init(neoTokenHash)))
+        XCTAssert(balances.values.contains(300000000))
+        XCTAssert(balances.values.contains(5))
+    }
     
     public func testIsMultiSig() {
         let a = try! Account.fromAddress(defaultAccountAddress)
@@ -192,9 +206,24 @@ class AccountTests: XCTestCase {
         XCTAssertFalse(account.isLocked)
     }
     
-    // TODO: Test isDefault
+    public func testIsDefault() {
+        let account = try! Account.fromAddress(defaultAccountAddress)
+        let wallet = try! Wallet.create().addAccounts([account])
+        XCTAssertFalse(account.isDefault)
+        
+        _ = try! wallet.defaultAccount(account.getScriptHash())
+        XCTAssertTrue(account.isDefault)
+    }
     
-    // TODO: Test Wallet Link
+    public func testWalletLink() {
+        let account = try! Account.fromAddress(defaultAccountAddress)
+        let wallet = try! Wallet.create()
+        XCTAssertNil(account.wallet)
+        
+        _ = try! wallet.addAccounts([account])
+        XCTAssertNotNil(account.wallet)
+        XCTAssertIdentical(wallet, account.wallet)
+    }
     
     public func testNilValuesWhenNotMultiSig() {
         let account = try! Account.fromAddress(defaultAccountAddress)

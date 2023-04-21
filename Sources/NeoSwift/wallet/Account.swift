@@ -18,7 +18,8 @@ public class Account {
     }
     
     public var isDefault: Bool {
-        return false // TODO: Wallet isDefault
+        guard let wallet = wallet else { return false }
+        return (try? wallet.isDefault(getScriptHash())) ?? false
     }
     
     public var isMultiSig: Bool {
@@ -56,6 +57,11 @@ public class Account {
     
     public func label(_ label: String) -> Account {
         self.label = label
+        return self
+    }
+    
+    public func wallet(_ wallet: Wallet?) -> Account {
+        self.wallet = wallet
         return self
     }
     

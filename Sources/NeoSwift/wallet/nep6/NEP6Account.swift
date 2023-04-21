@@ -46,4 +46,8 @@ public struct NEP6Account: Codable, Hashable {
         case _isDefault = "isdefault"
     }
     
+    public static func == (lhs: NEP6Account, rhs: NEP6Account) -> Bool {
+        return lhs.address == rhs.address
+    }
+    
 }
