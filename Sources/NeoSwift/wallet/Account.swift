@@ -129,7 +129,7 @@ public class Account {
             parameters.append(.init(paramName: "signature", type: .signature))
         }
         let script = verificationScript.script.base64Encoded
-        let contract = NEP6Contract(script: script, nep6Parameters: parameters, deployed: false)
+        let contract = NEP6Contract(script: script, nep6Parameters: parameters, isDeployed: false)
         return NEP6Account(address: address, label: label, isDefault: isDefault, lock: isLocked, key: encryptedPrivateKey, contract: contract, extra: nil)
     }
     

@@ -3,10 +3,11 @@ public struct NEP6Contract: Codable, Hashable {
     
     public let script: String?
     public let nep6Parameters: [NEP6Parameter]
-    public let deployed: Bool
+    public let isDeployed: Bool
     
     enum CodingKeys: String, CodingKey {
-        case script, deployed
+        case script
+        case isDeployed = "deployed"
         case nep6Parameters = "parameters"
     }
     

@@ -2,7 +2,7 @@
 public class Wallet {
     
     private static let DEFAULT_WALLET_NAME = "NeoSwiftWallet"
-    public static let CURRENT_VERSION = "1.0"
+    public static let CURRENT_VERSION = "3.0"
     
     public private(set) var name: String
     public private(set) var version: String
