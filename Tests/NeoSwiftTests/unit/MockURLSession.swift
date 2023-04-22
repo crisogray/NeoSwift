@@ -19,8 +19,14 @@ class MockURLSession: URLRequester {
     private var i = 0
     private var data: [Data]? = nil
     private var error: Error? = nil
+    private var dataMap: [String: Data]? = nil
     
     private var requestInterceptor: ((URLRequest) -> Void)?
+    
+    public func data(_ dataMap: [String : Data]) -> MockURLSession {
+        self.dataMap = dataMap
+        return self
+    }
     
     public func data(_ data: Data...) -> MockURLSession {
         self.data = data
@@ -40,6 +46,11 @@ class MockURLSession: URLRequester {
     public func data(from request: URLRequest) async throws -> (Data, URLResponse?) {
         if let requestInterceptor = requestInterceptor {
             requestInterceptor(request)
+        }
+        if let dataMap = dataMap {
+            let requestBody = String(data: request.httpBody!, encoding: .utf8)!
+            let method = requestBody.components(separatedBy: "method\":\"")[1].components(separatedBy: "\"")[0]
+            return (dataMap[method]!, nil)
         }
         if let error = error {
             throw error

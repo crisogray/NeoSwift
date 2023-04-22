@@ -87,11 +87,9 @@ public class SerializableTransaction {
             if let contains = getBlock.block?.transactions?.contains(where: { $0.hash == self.txId }) { return !contains }
             return true
         }
-        let inversePredicate = { (getBlock: NeoGetBlock) -> Bool in return !predicate(getBlock) }
         return neoSwift!.catchUpToLatestAndSubscribeToNewBlocksPublisher(blockCountWhenSent, true)
             .prefix(while: predicate)
-            .filter(inversePredicate)
-            .tryMap { try $0.getResult().index }
+            .tryMap { try! $0.getResult().index }
             .eraseToAnyPublisher()
     }
     

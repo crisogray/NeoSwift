@@ -2,7 +2,7 @@
 import Combine
 import Foundation
 
-public class NeoSwift {
+open class NeoSwift: Neo, NeoSwiftRx {
     
     public var config: NeoSwiftConfig
     
@@ -16,7 +16,7 @@ public class NeoSwift {
         return JsonRpc2_0Rx(neoSwift: self, executorService: .global(qos: .background))
     }()
     
-    required init(config: NeoSwiftConfig, neoSwiftService: NeoSwiftService) {
+    required public init(config: NeoSwiftConfig, neoSwiftService: NeoSwiftService) {
         self.config = config
         self.neoSwiftService = neoSwiftService
     }
@@ -51,10 +51,6 @@ public class NeoSwift {
         }
         return config.networkMagic!
     }
-    
-}
-
-extension NeoSwift: Neo {
     
     // MARK: Blockchain Methods
     
@@ -392,10 +388,6 @@ extension NeoSwift: Neo {
     }
  
     public func shutdown() { }
-
-}
-
-extension NeoSwift: NeoSwiftRx {
     
     // MARK: NeoSwiftRx
     
@@ -415,7 +407,7 @@ extension NeoSwift: NeoSwiftRx {
         return neoSwiftRx.catchUpToLatestBlockPublisher(startBlock, fullTransactionObjects, onCaughtUpPublisher: .init(Empty()))
     }
     
-    public func catchUpToLatestAndSubscribeToNewBlocksPublisher(_ startBlock: Int, _ fullTransactionObjects: Bool) -> AnyPublisher<NeoGetBlock, Error> {
+    open func catchUpToLatestAndSubscribeToNewBlocksPublisher(_ startBlock: Int, _ fullTransactionObjects: Bool) -> AnyPublisher<NeoGetBlock, Error> {
         return neoSwiftRx.catchUpToLatestAndSubscribeToNewBlocksPublisher(startBlock, fullTransactionObjects, config.pollingInterval)
     }
     

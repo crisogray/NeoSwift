@@ -18,7 +18,7 @@ public struct Transaction: Codable, Hashable {
     public let blockTime: Int?
     public let vmState: NeoVMStateType?
     
-    init(hash: Hash256, size: Int, version: Int, nonce: Int, sender: String, sysFee: String, netFee: String, validUntilBlock: Int, signers: [TransactionSigner], attributes: [TransactionAttribute], script: String, witnesses: [NeoWitness], blockHash: Hash256? = nil, confirmations: Int? = nil, blockTime: Int? = nil, vmState: NeoVMStateType? = nil) {
+    public init(hash: Hash256, size: Int, version: Int, nonce: Int, sender: String, sysFee: String, netFee: String, validUntilBlock: Int, signers: [TransactionSigner], attributes: [TransactionAttribute], script: String, witnesses: [NeoWitness], blockHash: Hash256? = nil, confirmations: Int? = nil, blockTime: Int? = nil, vmState: NeoVMStateType? = nil) {
         self.hash = hash
         self.size = size
         self.version = version

@@ -24,6 +24,9 @@ public extension Int {
         else { return 9 }
     }
     
+    var toUnsigned: Int {
+        return self & 0xffffffff
+    }
 }
 
 public extension Numeric {

@@ -76,7 +76,8 @@ public class TransactionBuilder {
     }
     
     public func signers(_ signers: [Signer]) throws -> TransactionBuilder {
-        guard Set(signers).count == signers.count else {
+        let hashes = signers.map(\.signerHash)
+        guard Set(hashes).count == hashes.count else {
             throw "Cannot add multiple signers concerning the same account."
         }
         try throwIfMaxAttributesExceeded(signers.count, attributes.count)
@@ -110,17 +111,18 @@ public class TransactionBuilder {
         return self
     }
     
-    public func attributes(_ attributes: TransactionAttribute...) throws {
+    public func attributes(_ attributes: TransactionAttribute...) throws -> TransactionBuilder {
         return try self.attributes(attributes)
     }
     
-    public func attributes(_ attributes: [TransactionAttribute]) throws {
+    public func attributes(_ attributes: [TransactionAttribute]) throws -> TransactionBuilder {
         try throwIfMaxAttributesExceeded(signers.count, self.attributes.count + attributes.count)
         attributes.forEach { attr in
             if attr != .highPriority || !isHighPriority {
                 self.attributes.append(attr)
             }
         }
+        return self
     }
     
     public func getUnsignedTransaction() async throws -> SerializableTransaction {
@@ -129,7 +131,7 @@ public class TransactionBuilder {
         }
         if validUntilBlock == nil {
             let currentBlockCount = try await neoSwift.getBlockCount().send().getResult()
-            try _ = validUntilBlock(currentBlockCount + neoSwift.maxValidUntilBlockIncrement)
+            try _ = validUntilBlock(currentBlockCount + neoSwift.maxValidUntilBlockIncrement - 1)
         }
         guard !signers.isEmpty else {
             throw "Cannot create a transaction without signers. At least one signer with witness scope fee-only or higher is required."
@@ -145,12 +147,12 @@ public class TransactionBuilder {
         let networkFee = try await calcNetworkFee() + additionalNetworkFee
         let fees = systemFee + networkFee
         
-        let gasBalance = try await neoSwift.invokeFunction(Self.GAS_TOKEN_HASH, Self.BALANCE_OF_FUNCTION, [.hash160(signers[0].signerHash)], []).send().getResult().stack[0].integer!
         
-        if let feeError = feeError, fees > gasBalance {
+        if let feeError = feeError, try await !canSendCoverFees(fees) {
             throw feeError
-        } else if let consumer = consumer, fees > gasBalance {
-            consumer(fees, gasBalance)
+        } else if let consumer = consumer {
+            let gasBalance = try await getSenderGasBalance()
+            if fees > gasBalance { consumer(fees, gasBalance) }
         }
         
         return SerializableTransaction(neoSwift: neoSwift, version: version, nonce: nonce,
@@ -165,7 +167,6 @@ public class TransactionBuilder {
             .map(Hash160.fromPublicKey)
         return signers.map(\.signerHash).contains(where: committee.contains)
             || signersContainMultiSigWithCommitteeMember(committee)
-        
     }
     
     private func signersContainMultiSigWithCommitteeMember(_ committee: [Hash160]) -> Bool {
@@ -212,6 +213,14 @@ public class TransactionBuilder {
         return try await neoSwift.calculateNetworkFee(tx.toArray().noPrefixHex).send().getResult().networkFee
     }
     
+    private func getSenderGasBalance() async throws -> Int {
+        return try await neoSwift.invokeFunction(Self.GAS_TOKEN_HASH, Self.BALANCE_OF_FUNCTION, [.hash160(signers[0].signerHash)], []).send().getResult().stack[0].integer!
+    }
+    
+    private func canSendCoverFees(_ fees: Int) async throws -> Bool {
+        return try await getSenderGasBalance() >= fees
+    }
+    
     private func createFakeVerificationScript(_ account: Account) throws -> VerificationScript {
         if account.isMultiSig {
             return try VerificationScript((0..<account.getNrOfParticipants()).map { _ in try ECPublicKey(Self.DUMMY_PUB_KEY) },
@@ -221,10 +230,10 @@ public class TransactionBuilder {
     }
     
     public func callInvokeScript() async throws -> NeoInvokeScript {
-        guard !signers.isEmpty else {
+        guard let script = script, !script.isEmpty else {
             throw "Cannot make an 'invokescript' call without the script being configured."
         }
-        return try await neoSwift.invokeScript(script?.noPrefixHex ?? "", []).send()
+        return try await neoSwift.invokeScript(script.noPrefixHex, signers).send()
     }
     
     public func sign() async throws -> SerializableTransaction {

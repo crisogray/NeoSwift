@@ -99,6 +99,10 @@ public class Counter {
         return v
     }
     
+    func set(_ i: Int) {
+        queue.sync { value = i }
+    }
+    
     func reset() {
         queue.sync { value = 1 }
     }

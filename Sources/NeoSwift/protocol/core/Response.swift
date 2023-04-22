@@ -13,6 +13,14 @@ public class Response<T: Codable>: Codable, HasRawResponse {
     public let error: Error?
     public var rawResponse: String?
     
+    public init(_ result: T) {
+        self.id = 1
+        self.jsonrpc = "2.0"
+        self.result = result
+        self.error = nil
+        self.rawResponse = nil
+    }
+    
     public var hasError: Bool {
         return error != nil
     }

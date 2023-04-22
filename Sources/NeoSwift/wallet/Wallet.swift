@@ -60,7 +60,6 @@ public class Wallet {
     }
     
     public func addAccounts(_ accounts: [Account]) throws -> Wallet {
-        
         let accounts = try accounts.filter { try !accountsMap.keys.contains($0.getScriptHash()) }
         if let account = accounts.first(where: { $0.wallet != nil }) {
             throw "The account \(account.address) is already contained in a wallet. Please remove this account from its containing wallet before adding it to another wallet."
