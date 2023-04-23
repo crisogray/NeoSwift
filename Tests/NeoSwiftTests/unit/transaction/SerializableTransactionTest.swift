@@ -260,9 +260,7 @@ class SerializableTransactionTest: XCTestCase {
         let expectedMultiSigWitness = try! Witness.creatMultiSigWitness([sig4, sig5, sig6], multiSigAccount.verificationScript!)
         XCTAssertEqual(dummyTx.witnesses, [expectedMultiSigWitness, expectedMultiSigWitness])
     }
-    
-    // TODO: ContractParametersContext
-    
+        
     public func testContractParameterContextJson() async {
         let service = HttpService(url: URL(string: "http://localhost:40332")!)
         let neoSwift = NeoSwift(config: .init(networkMagic: 769), neoSwiftService: service)

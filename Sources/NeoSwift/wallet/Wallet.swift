@@ -1,4 +1,6 @@
 
+import Foundation
+
 public class Wallet {
     
     private static let DEFAULT_WALLET_NAME = "NeoSwiftWallet"
@@ -100,8 +102,39 @@ public class Wallet {
         let accounts = try accountsMap.values.map { try $0.toNEP6Account() }
         return .init(name: name, version: version, scrypt: scryptParams, accounts: accounts, extra: nil)
     }
+        
+    public static func fromNEP6Wallet(_ file: URL) throws -> Wallet {
+        let data = try Data(contentsOf: file)
+        let nep6Wallet = try JSONDecoder().decode(NEP6Wallet.self, from: data)
+        return try fromNEP6Wallet(nep6Wallet)
+    }
     
-    // TODO: NEP6Wallet Methods
+    public static func fromNEP6Wallet(_ nep6Wallet: NEP6Wallet) throws -> Wallet {
+        let accounts = try nep6Wallet.accounts.map(Account.fromNEP6Account)
+        let defaultAccount = nep6Wallet.accounts.first(where: \.isDefault)
+        guard let defaultAccount = defaultAccount else {
+            throw "The NEP-6 wallet does not contain any default account."
+        }
+        let defaultHash = try Account.fromNEP6Account(defaultAccount).getScriptHash()
+        return try Wallet()
+            .name(nep6Wallet.name)
+            .version(nep6Wallet.version)
+            .scryptParams(nep6Wallet.scrypt)
+            .addAccounts(accounts)
+            .defaultAccount(defaultHash)
+    }
+    
+    public func saveNEP6Wallet(_ destination: URL) throws -> Wallet {
+        let nep6Wallet = try toNEP6Wallet()
+        let data = try JSONEncoder().encode(nep6Wallet)
+        var destination = destination
+        if destination.hasDirectoryPath {
+            print(destination)
+            destination = destination.appendingPathComponent("\(name).json")
+        }
+        try data.write(to: destination)
+        return self
+    }
     
     public func getNep17TokenBalances(_ neoSwift: NeoSwift) async throws -> [Hash160: Int] {
         var balances: [Hash160: Int] = [:]
@@ -125,7 +158,9 @@ public class Wallet {
         return wallet
     }
     
-    // TODO: NEP6Wallet create
+    public static func create(_ password: String, _ destination: URL) throws -> Wallet {
+        return try create(password).saveNEP6Wallet(destination)
+    }
     
     public static func withAccounts(_ accounts: [Account]) throws -> Wallet {
         guard !accounts.isEmpty else {

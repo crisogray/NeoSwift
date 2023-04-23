@@ -147,7 +147,11 @@ class ContractParameterTests: XCTestCase {
         assertContractParameter(p, hash, .hash160)
     }
     
-    // TODO: Test Hash160 from account
+    public func testHash160FromAccount() {
+        let account = try! Account.create()
+        let p = try! ContractParameter.hash160(account)
+        assertContractParameter(p, account.scriptHash!, .hash160)
+    }
     
     public func testHash256() {
         let hash = try! Hash256("576f6f6c6f576f6f6c6f576f6f6c6f576f6f6c6ff6c6f576f6f6c6f576f6f6cf")
@@ -292,12 +296,14 @@ class ContractParameterTests: XCTestCase {
         p = try! ContractParameter.mapToContractParameter(hash160)
         assertContractParameter(p, hash160, .hash160)
         
+        let account = try! Account.create()
+        p = try! ContractParameter.mapToContractParameter(account)
+        assertContractParameter(p, account.scriptHash!, .hash160)
+        
         let hash256 = try! Hash256("03b4af8d061b6b320cce6c63bc4ec7894dce107b03b4af8d061b6b320cce6c63")
         p = try! ContractParameter.mapToContractParameter(hash256)
         assertContractParameter(p, hash256, .hash256)
-        
-        // TODO: From Account
-        
+                
         let keyPair = try! ECKeyPair.createEcKeyPair()
         p = try! ContractParameter.mapToContractParameter(keyPair.publicKey)
         assertContractParameter(p, try! keyPair.publicKey.getEncoded(compressed: true), .publicKey)

@@ -5,59 +5,9 @@ import XCTest
 
 class NEP6WalletTests: XCTestCase {
  
-    let json = """
-{
-  "name": "Wallet",
-  "version": "3.0",
-  "scrypt": {
-    "n": 16384,
-    "r": 8,
-    "p": 8
-  },
-  "accounts": [
-    {
-      "address": "NLnyLtep7jwyq1qhNPkwXbJpurC4jUT8ke",
-      "label": "Account1",
-      "isDefault": true,
-      "lock": false,
-      "key": "6PYVEi6ZGdsLoCYbbGWqoYef7VWMbKwcew86m5fpxnZRUD8tEjainBgQW1",
-      "contract": {
-        "script": "DCECJJQloGtaH45hM/x5r6LCuEML+TJyl/F2dh33no2JKcULQZVEDXg=",
-        "parameters": [
-          {
-            "name": "signature",
-            "type": "Signature"
-          }
-        ],
-        "deployed": false
-      },
-      "extra": null
-    },
-    {
-      "address": "NWcx4EfYdfqn5jNjDz8AHE6hWtWdUGDdmy",
-      "label": "Account2",
-      "isdefault": false,
-      "lock": false,
-      "key": "6PYSQWBqZE5oEFdMGCJ3xR7bz6ezz814oKE7GqwB9i5uhtUzkshe9B6YGB",
-      "contract": {
-        "script": "DCEDHMqqRt98SU9EJpjIwXwJMR42FcLcBCy9Ov6rpg+kB0ALQZVEDXg=",
-        "parameters": [
-          {
-            "name": "signature",
-            "type": "Signature"
-          }
-        ],
-        "deployed": false
-      },
-      "extra": null
-    }
-  ],
-  "extra": null
-}
-"""
-    
     public func testReadWallet() {
-        let wallet = try! JSONDecoder().decode(NEP6Wallet.self, from: json.data(using: .utf8)!)
+        let data = try! Data(contentsOf: Bundle.module.url(forResource: "wallet", withExtension: "json")!)
+        let wallet = try! JSONDecoder().decode(NEP6Wallet.self, from: data)
         XCTAssertEqual(wallet.name, "Wallet")
         XCTAssertEqual(wallet.version, Wallet.CURRENT_VERSION)
         XCTAssertEqual(wallet.scrypt, .DEFAULT)

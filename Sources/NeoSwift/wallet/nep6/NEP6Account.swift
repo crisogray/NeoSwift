@@ -2,14 +2,14 @@
 public struct NEP6Account: Codable, Hashable {
     
     public let address: String
-    public let label: String
+    public let label: String?
     public let isDefault: Bool
     public let lock: Bool
     public let key: String?
     public let contract: NEP6Contract?
     public let extra: [String : AnyHashable]?
     
-    init(address: String, label: String, isDefault: Bool, lock: Bool, key: String?, contract: NEP6Contract?, extra: [String : AnyHashable]?) {
+    init(address: String, label: String?, isDefault: Bool, lock: Bool, key: String?, contract: NEP6Contract?, extra: [String : AnyHashable]?) {
         self.address = address
         self.label = label
         self.isDefault = isDefault
@@ -22,10 +22,10 @@ public struct NEP6Account: Codable, Hashable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.address = try container.decode(String.self, forKey: .address)
-        self.label = try container.decode(String.self, forKey: .label)
+        self.label = try? container.decode(String.self, forKey: .label)
         self.isDefault = try (try? container.decode(Bool.self, forKey: .isDefault)) ?? container.decode(Bool.self, forKey: ._isDefault)
         self.lock = try container.decode(Bool.self, forKey: .lock)
-        self.key = try container.decode(String.self, forKey: .key)
+        self.key = try? container.decode(String.self, forKey: .key)
         self.contract = try? container.decode(NEP6Contract.self, forKey: .contract)
         self.extra = try container.decodeIfPresent([String : AnyHashable].self, forKey: .extra)
     }

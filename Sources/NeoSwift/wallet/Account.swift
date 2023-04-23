@@ -5,7 +5,7 @@ public class Account {
     
     public private(set) var keyPair: ECKeyPair?
     public let address: String
-    public private(set) var label: String
+    public private(set) var label: String?
     public let verificationScript: VerificationScript?
     public private(set) var isLocked: Bool = false
     public private(set) var encryptedPrivateKey: String? = nil
@@ -26,7 +26,7 @@ public class Account {
         return signingThreshold != nil && nrOfParticipants != nil
     }
     
-    init(address: String, label: String, verificationScript: VerificationScript? = nil, signingThreshold: Int? = nil, nrOfParticipants: Int? = nil) {
+    init(address: String, label: String?, verificationScript: VerificationScript? = nil, signingThreshold: Int? = nil, nrOfParticipants: Int? = nil) {
         self.address = address
         self.label = label
         self.verificationScript = verificationScript
@@ -43,7 +43,7 @@ public class Account {
         self.nrOfParticipants = nrOfParticipants
     }
     
-    init(keyPair: ECKeyPair? = nil, address: String, label: String, verificationScript: VerificationScript?, isLocked: Bool, encryptedPrivateKey: String? = nil, wallet: Wallet? = nil, signingThreshold: Int?, nrOfParticipants: Int?) {
+    init(keyPair: ECKeyPair? = nil, address: String, label: String?, verificationScript: VerificationScript?, isLocked: Bool, encryptedPrivateKey: String? = nil, wallet: Wallet? = nil, signingThreshold: Int?, nrOfParticipants: Int?) {
         self.keyPair = keyPair
         self.address = address
         self.label = label

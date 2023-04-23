@@ -42,8 +42,39 @@ class WalletTests: XCTestCase {
         _ = try! wallet.removeAccount(account)
         XCTAssertFalse(try! wallet.holdsAccount(account.getScriptHash()))
     }
+        
+    public func testCreateWalletFromNEP6File() {
+        let url = Bundle.module.url(forResource: "wallet", withExtension: "json")!
+        let nep6Wallet = try! JSONDecoder().decode(NEP6Wallet.self, from: Data(contentsOf: url))
+        let wallet = try! Wallet.fromNEP6Wallet(url)
+        
+        XCTAssertEqual(wallet.name, "Wallet")
+        XCTAssertEqual(wallet.version, Wallet.CURRENT_VERSION)
+        XCTAssertEqual(wallet.accounts.count, 2)
+        XCTAssertEqual(wallet.scryptParams, .DEFAULT)
+        
+        let account1 = try! wallet.getAccount(.fromAddress("NLnyLtep7jwyq1qhNPkwXbJpurC4jUT8ke"))!
+        XCTAssertEqual(account1.address, "NLnyLtep7jwyq1qhNPkwXbJpurC4jUT8ke")
+        XCTAssertEqual(account1.label, "Account1")
+        XCTAssertFalse(account1.isLocked)
+        XCTAssertEqual(account1.encryptedPrivateKey, "6PYVEi6ZGdsLoCYbbGWqoYef7VWMbKwcew86m5fpxnZRUD8tEjainBgQW1")
+        XCTAssertEqual(nep6Wallet.accounts[0].contract?.script, "DCECJJQloGtaH45hM/x5r6LCuEML+TJyl/F2dh33no2JKcULQZVEDXg=")
+        
+        let account2 = try! wallet.getAccount(.fromAddress("NWcx4EfYdfqn5jNjDz8AHE6hWtWdUGDdmy"))!
+        XCTAssertEqual(account2.address, "NWcx4EfYdfqn5jNjDz8AHE6hWtWdUGDdmy")
+        XCTAssertEqual(account2.label, "Account2")
+        XCTAssertFalse(account2.isLocked)
+        XCTAssertEqual(account2.encryptedPrivateKey, "6PYSQWBqZE5oEFdMGCJ3xR7bz6ezz814oKE7GqwB9i5uhtUzkshe9B6YGB")
+        XCTAssertEqual(nep6Wallet.accounts[1].contract?.script, "DCEDHMqqRt98SU9EJpjIwXwJMR42FcLcBCy9Ov6rpg+kB0ALQZVEDXg=")
+    }
     
-    // TODO: NEP6File tests
+    public func testCreateWalletFromNEP6File_noDefaultAccount() {
+        let url = Bundle.module.url(forResource: "wallet_noDefaultAccount", withExtension: "json")!
+        XCTAssertThrowsError(try Wallet.fromNEP6Wallet(url)) { error in
+            XCTAssertEqual(error.localizedDescription, "The NEP-6 wallet does not contain any default account.")
+        }
+    }
+
     
     public func testAddAccount() {
         let account = try! Account.create()
@@ -142,8 +173,21 @@ class WalletTests: XCTestCase {
             XCTAssertEqual(error.localizedDescription, "Account private key is available but not encrypted.")
         }
     }
+        
+    public func testFromNEP6WalletToNEP6Wallet() {
+        let data = try! Data(contentsOf: Bundle.module.url(forResource: "wallet", withExtension: "json")!)
+        let nep6Wallet = try! JSONDecoder().decode(NEP6Wallet.self, from: data)
+        
+        let wallet = try! Wallet.fromNEP6Wallet(nep6Wallet)
+        XCTAssertEqual(nep6Wallet, try! wallet.toNEP6Wallet())
+    }
     
-    // TODO: NEP6 File Tests
+    public func testFromNEP6WalletFileToNEP6Wallet() {
+        let url = Bundle.module.url(forResource: "wallet", withExtension: "json")!
+        let nep6Wallet = try! JSONDecoder().decode(NEP6Wallet.self, from: Data(contentsOf: url))
+        let wallet = try! Wallet.fromNEP6Wallet(url)
+        XCTAssertEqual(nep6Wallet, try! wallet.toNEP6Wallet())
+    }
     
     public func testCreateGenericWallet() {
         let wallet = try! Wallet.create()
@@ -154,8 +198,64 @@ class WalletTests: XCTestCase {
         XCTAssertNotNil(wallet.accounts.first?.keyPair)
     }
     
-    // TODO: More NEP6 File Tests
-
+    public func testCreateGenericWalletAndSaveItToDir_withCustomName() {
+        let tempDirectory = FileManager.default.temporaryDirectory
+        
+        let wallet1 = try! Wallet.create().name("customWalletName")
+        try! wallet1.encryptAllAccounts("12345678")
+        _ = try! wallet1.saveNEP6Wallet(tempDirectory)
+        
+        XCTAssertEqual(wallet1.name, "customWalletName")
+        XCTAssertEqual(wallet1.version, Wallet.CURRENT_VERSION)
+        XCTAssertEqual(wallet1.scryptParams, .DEFAULT)
+        XCTAssertEqual(wallet1.accounts.count, 1)
+        
+        let wallet2 = try! Wallet.fromNEP6Wallet(tempDirectory.appendingPathComponent("customWalletName.json"))
+        try! wallet2.decryptAllAccounts("12345678")
+        
+        try! XCTAssertEqual(wallet1.toNEP6Wallet(), wallet2.toNEP6Wallet())
+    }
+    
+    public func testCreateGenericWalletAndSaveItToDir_withDefaultName() {
+        let tempDirectory = FileManager.default.temporaryDirectory
+        
+        let wallet1 = try! Wallet.create()
+        try! wallet1.encryptAllAccounts("12345678")
+        _ = try! wallet1.saveNEP6Wallet(tempDirectory)
+        
+        XCTAssertEqual(wallet1.name, "NeoSwiftWallet")
+        XCTAssertEqual(wallet1.version, Wallet.CURRENT_VERSION)
+        XCTAssertEqual(wallet1.scryptParams, .DEFAULT)
+        XCTAssertEqual(wallet1.accounts.count, 1)
+        
+        let wallet2 = try! Wallet.fromNEP6Wallet(tempDirectory.appendingPathComponent("NeoSwiftWallet.json"))
+        try! wallet2.decryptAllAccounts("12345678")
+        
+        try! XCTAssertEqual(wallet1.toNEP6Wallet(), wallet2.toNEP6Wallet())
+    }
+    
+    public func testCreateGenericWalletAndSaveToFileWithPasswordAndDestination() {
+        let tempFile = FileManager.default.temporaryDirectory.appendingPathComponent("neoSwiftTest.json")
+        
+        let wallet1 = try! Wallet.create("12345678", tempFile)
+        XCTAssertEqual(wallet1.name, "NeoSwiftWallet")
+        XCTAssertEqual(wallet1.version, Wallet.CURRENT_VERSION)
+        XCTAssertEqual(wallet1.scryptParams, .DEFAULT)
+        XCTAssertEqual(wallet1.accounts.count, 1)
+        XCTAssert(FileManager.default.fileExists(atPath: tempFile.relativePath))
+        
+        let wallet2 = try! Wallet.fromNEP6Wallet(tempFile)
+        try! wallet2.decryptAllAccounts("12345678")
+        
+        XCTAssertEqual(wallet1.name, wallet2.name)
+        XCTAssertEqual(wallet1.version, wallet2.version)
+        XCTAssertEqual(wallet1.scryptParams, wallet2.scryptParams)
+        XCTAssertEqual(wallet1.accounts.count, wallet2.accounts.count)
+        XCTAssertNotNil(wallet2.accounts.first?.keyPair)
+        XCTAssert(FileManager.default.fileExists(atPath: tempFile.relativePath))
+        try! XCTAssertEqual(wallet1.toNEP6Wallet(), wallet2.toNEP6Wallet())
+    }
+    
     public func testCreateGenericWalletWithPassword() {
         let wallet = try! Wallet.create("12345678")
         XCTAssertEqual(wallet.name, "NeoSwiftWallet")

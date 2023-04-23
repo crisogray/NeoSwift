@@ -97,7 +97,29 @@ class AccountTests: XCTestCase {
         }
     }
     
-    // TODO: Test load from files
+    public func testLoadAccountFromNEP6() {
+        let url = Bundle.module.url(forResource: "account", withExtension: "json")!
+        let nep6Account = try! JSONDecoder().decode(NEP6Account.self, from: Data(contentsOf: url))
+        let account = try! Account.fromNEP6Account(nep6Account)
+        
+        XCTAssertFalse(account.isDefault)
+        XCTAssertFalse(account.isLocked)
+        XCTAssertEqual(account.address, defaultAccountAddress)
+        XCTAssertEqual(account.verificationScript?.script, defaultAccountVerificationScript.bytesFromHex)
+    }
+    
+    public func testLoadMultiSigAccountFromNEP6() {
+        let url = Bundle.module.url(forResource: "multiSigAccount", withExtension: "json")!
+        let nep6Account = try! JSONDecoder().decode(NEP6Account.self, from: Data(contentsOf: url))
+        let account = try! Account.fromNEP6Account(nep6Account)
+        
+        XCTAssertFalse(account.isDefault)
+        XCTAssertFalse(account.isLocked)
+        XCTAssertEqual(account.address, committeeAccountAddress)
+        XCTAssertEqual(account.verificationScript?.script, committeeAccountVerificationScript.bytesFromHex)
+        XCTAssertEqual(account.nrOfParticipants, 1)
+        XCTAssertEqual(account.signingThreshold, 1)
+    }
     
     public func testToNep6AccountWithOnlyAnAddress() {
         let account = try! Account.fromAddress(defaultAccountAddress)

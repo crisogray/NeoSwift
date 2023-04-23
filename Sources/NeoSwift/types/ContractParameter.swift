@@ -87,8 +87,10 @@ public struct ContractParameter: Codable, Hashable {
         return ContractParameter(type: .hash160, value: value)
     }
     
-    // TODO: Hash160 from Account
-    
+    public static func hash160(_ account: Account) throws -> ContractParameter {
+        return try ContractParameter(type: .hash160, value: account.getScriptHash())
+    }
+        
     public static func hash256(_ value: Hash256) -> ContractParameter {
         return ContractParameter(type: .hash256, value: value)
     }
@@ -136,7 +138,7 @@ public struct ContractParameter: Codable, Hashable {
         return ContractParameter(type: .map, value: map)
     }
     
-    public static func mapToContractParameter(_ value: AnyHashable?) throws -> ContractParameter {
+    public static func mapToContractParameter(_ value: Any?) throws -> ContractParameter {
         switch value {
         case nil: return any(nil)
         case is ContractParameter: return value as! ContractParameter
@@ -148,8 +150,8 @@ public struct ContractParameter: Codable, Hashable {
         case is Bytes: return byteArray(value as! Bytes)
         case is String: return string(value as! String)
         case is Hash160: return hash160(value as! Hash160)
+        case is Account: return try hash160(value as! Account)
         case is Hash256: return hash256(value as! Hash256)
-            // TODO: ACCOUNT
         case is ECPublicKey: return try publicKey(value as! ECPublicKey)
         case is Sign.SignatureData: return try signature(value as! Sign.SignatureData)
         case is [AnyHashable]: return try array(value as! [AnyHashable])
