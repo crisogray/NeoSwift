@@ -17,19 +17,28 @@ class MockURLSession: URLRequester {
 """.data(using: .utf8)!
     
     private var i = 0
+    private var dataIs: [String: Int] = [:]
     private var data: [Data]? = nil
+    private var dataMap: [String: [Data]]? = nil
     private var error: Error? = nil
-    private var dataMap: [String: Data]? = nil
     
     private var requestInterceptor: ((URLRequest) -> Void)?
     
     public func data(_ dataMap: [String : Data]) -> MockURLSession {
-        self.dataMap = dataMap
+        if self.dataMap != nil { dataMap.forEach { self.dataMap![$0] = [$1] } }
+        else { self.dataMap = dataMap.mapValues { [$0] } }
+        return self
+    }
+    
+    public func data(_ dataMap: [String : [Data]]) -> MockURLSession {
+        if self.dataMap != nil { dataMap.forEach { self.dataMap![$0] = $1 } }
+        else { self.dataMap = dataMap }
         return self
     }
     
     public func data(_ data: Data...) -> MockURLSession {
-        self.data = data
+        if self.data == nil { self.data = data }
+        else { self.data!.append(contentsOf: data) }
         return self
     }
     
@@ -50,7 +59,10 @@ class MockURLSession: URLRequester {
         if let dataMap = dataMap {
             let requestBody = String(data: request.httpBody!, encoding: .utf8)!
             let method = requestBody.components(separatedBy: "method\":\"")[1].components(separatedBy: "\"")[0]
-            return (dataMap[method]!, nil)
+            let i = dataIs[method] ?? 0
+            let data = i >= dataMap[method]!.count ? dataMap[method]![0] : dataMap[method]![i]
+            dataIs[method] = i + 1
+            return (data, nil)
         }
         if let error = error {
             throw error

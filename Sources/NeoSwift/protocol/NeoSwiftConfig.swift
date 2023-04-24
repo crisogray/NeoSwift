@@ -13,7 +13,7 @@ public class NeoSwiftConfig {
     public private(set) var blockInterval: Int = DEFAULT_BLOCK_TIME
     public private(set) var maxValidUntilBlockIncrement: Int = MAX_VALID_UNTIL_BLOCK_INCREMENT_BASE / DEFAULT_BLOCK_TIME
     public private(set) var pollingInterval: Int = DEFAULT_BLOCK_TIME
-    public private(set) var scheduledExecutorService: DispatchQueue = .global()
+    public private(set) var scheduledExecutorService: DispatchQueue
     public private(set) var allowsTransmissionOnFault: Bool = false
     
     public static let MAINNET_NNS_CONTRACT_HASH = try! Hash160("0x50ac1c37690cc2cfc594472833cf57505d5f46de")
@@ -22,12 +22,12 @@ public class NeoSwiftConfig {
     public private(set) var nnsResolver = MAINNET_NNS_CONTRACT_HASH
         
     public init(networkMagic: Int? = nil,
-         blockInterval: Int = DEFAULT_BLOCK_TIME,
-         maxValidUntilBlockIncrement: Int = MAX_VALID_UNTIL_BLOCK_INCREMENT_BASE / DEFAULT_BLOCK_TIME,
-         pollingInterval: Int = DEFAULT_BLOCK_TIME,
-         scheduledExecutorService: DispatchQueue = .global(),
-         allowsTransmissionOnFault: Bool = false,
-         nnsResolver: Hash160 = MAINNET_NNS_CONTRACT_HASH
+                blockInterval: Int = DEFAULT_BLOCK_TIME,
+                maxValidUntilBlockIncrement: Int = MAX_VALID_UNTIL_BLOCK_INCREMENT_BASE / DEFAULT_BLOCK_TIME,
+                pollingInterval: Int = DEFAULT_BLOCK_TIME,
+                scheduledExecutorService: DispatchQueue = .global(qos: .background),
+                allowsTransmissionOnFault: Bool = false,
+                nnsResolver: Hash160 = MAINNET_NNS_CONTRACT_HASH
     ) {
         self.networkMagic = networkMagic
         self.blockInterval = blockInterval

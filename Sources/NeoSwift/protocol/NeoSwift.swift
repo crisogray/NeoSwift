@@ -2,7 +2,7 @@
 import Combine
 import Foundation
 
-open class NeoSwift: Neo, NeoSwiftRx {
+public class NeoSwift: Neo, NeoSwiftRx {
     
     public var config: NeoSwiftConfig
     
@@ -13,7 +13,7 @@ open class NeoSwift: Neo, NeoSwiftRx {
     
     internal let neoSwiftService: NeoSwiftService
     private lazy var neoSwiftRx: JsonRpc2_0Rx = {
-        return JsonRpc2_0Rx(neoSwift: self, executorService: .global(qos: .background))
+        return JsonRpc2_0Rx(neoSwift: self, executorService: config.scheduledExecutorService)
     }()
     
     required public init(config: NeoSwiftConfig, neoSwiftService: NeoSwiftService) {
@@ -407,7 +407,7 @@ open class NeoSwift: Neo, NeoSwiftRx {
         return neoSwiftRx.catchUpToLatestBlockPublisher(startBlock, fullTransactionObjects, onCaughtUpPublisher: .init(Empty()))
     }
     
-    open func catchUpToLatestAndSubscribeToNewBlocksPublisher(_ startBlock: Int, _ fullTransactionObjects: Bool) -> AnyPublisher<NeoGetBlock, Error> {
+    public func catchUpToLatestAndSubscribeToNewBlocksPublisher(_ startBlock: Int, _ fullTransactionObjects: Bool) -> AnyPublisher<NeoGetBlock, Error> {
         return neoSwiftRx.catchUpToLatestAndSubscribeToNewBlocksPublisher(startBlock, fullTransactionObjects, config.pollingInterval)
     }
     

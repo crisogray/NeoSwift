@@ -4,11 +4,6 @@ import XCTest
 
 class RequestTests: XCTestCase {
     
-    override func setUp() {
-        super.setUp()
-        NeoSwiftConfig.REQUEST_COUNTER.reset()
-    }
-    
     // MARK: Blockchain Methods
     
     public func testGetBestBlockHash() async {
@@ -1218,6 +1213,7 @@ class RequestTests: XCTestCase {
             }
             XCTAssertEqual(String(data: body, encoding: .ascii)!, expected)
         }
+        NeoSwiftConfig.REQUEST_COUNTER.reset()
         let httpService = HttpService(urlSession: mockUrlSession)
         let neoSwift = NeoSwift.build(httpService)
         try! await makeRequest(neoSwift)
@@ -1230,6 +1226,7 @@ class RequestTests: XCTestCase {
             }
             XCTAssertEqual(String(data: body, encoding: .ascii)!, expected)
         }
+        NeoSwiftConfig.REQUEST_COUNTER.reset()
         let httpService = HttpService(urlSession: mockUrlSession)
         let neoSwift: NeoSwiftExpress = NeoSwiftExpress.build(httpService)
         try! await makeRequest(neoSwift)
