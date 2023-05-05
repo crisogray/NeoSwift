@@ -146,7 +146,7 @@ public class ScriptBuilder {
     }
         
     public static func buildContractCallAndUnwrapIterator(_ contractHash: Hash160, _ method: String, _ params: [ContractParameter],
-                                                          _ callFlags: CallFlags = .all, _ maxIteratorResultItems: Int) -> Bytes {
+                                                        _ maxIteratorResultItems: Int, _ callFlags: CallFlags = .all) -> Bytes {
         let b = ScriptBuilder().pushInteger(maxIteratorResultItems)
         _ = b.contractCall(contractHash, method: method, params: params, callFlags: callFlags)
             .opCode(.newArray0)

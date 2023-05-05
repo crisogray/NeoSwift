@@ -21,7 +21,7 @@ let nep17BalancesOfDefaultAccountJson = """
     "address": "NUrPrFLETzoe7N2FLi2dqTvLwc9L2Em84K"
   }
 }
-"""
+""".data(using: .utf8)!
 
 let nep17BalancesOfCommitteeAccountJson = """
 {
@@ -43,7 +43,7 @@ let nep17BalancesOfCommitteeAccountJson = """
     "address": "NWcx4EfYdfqn5jNjDz8AHE6hWtWdUGDdmy"
   }
 }
-"""
+""".data(using: .utf8)!
 
 // MARK: Invoke Script
 
@@ -64,7 +64,7 @@ let invokeScriptNecessaryMockJson = """
     ]
   }
 }
-"""
+""".data(using: .utf8)!
 
 let invokeScriptSymbolNeoJson = """
 {
@@ -83,7 +83,7 @@ let invokeScriptSymbolNeoJson = """
     ]
   }
 }
-"""
+""".data(using: .utf8)!
 
 let invokeScriptTransferFixedSysFeeJson = """
 {
@@ -102,7 +102,7 @@ let invokeScriptTransferFixedSysFeeJson = """
     ]
   }
 }
-"""
+""".data(using: .utf8)!
 
 let invokeScriptInvalidJson = """
 {
@@ -116,7 +116,7 @@ let invokeScriptInvalidJson = """
     "stack": []
   }
 }
-"""
+""".data(using: .utf8)!
 
 let invokeScriptExceptionJson = """
 {
@@ -130,7 +130,7 @@ let invokeScriptExceptionJson = """
     "stack": []
   }
 }
-"""
+""".data(using: .utf8)!
 
 let invokeScriptTransferJson = """
 {
@@ -149,7 +149,7 @@ let invokeScriptTransferJson = """
     ]
   }
 }
-"""
+""".data(using: .utf8)!
 
 let invokeScriptFaultJson = """
 {
@@ -164,7 +164,7 @@ let invokeScriptFaultJson = """
     "stack": []
   }
 }
-"""
+""".data(using: .utf8)!
 
 // MARK: Invoke Function
 
@@ -185,9 +185,9 @@ let invokeFunctionTransferNeoJson = """
     ]
   }
 }
-"""
+""".data(using: .utf8)!
 
-let invokeFunctionBalanceOf1000000 = """
+let invokeFunctionBalanceOf1000000Json = """
 {
   "jsonrpc": "2.0",
   "id": 1,
@@ -204,7 +204,82 @@ let invokeFunctionBalanceOf1000000 = """
     ]
   }
 }
-"""
+""".data(using: .utf8)!
+
+let invokeFunctionDecimalsNep17Json = """
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "script": "EMAfDAhkZWNpbWFscwwUxqHCSluH+4zNesX3lI/+Um1OAfdBYn1bUg==",
+    "state": "HALT",
+    "gasconsumed": "998970",
+    "stack": [
+      {
+        "type": "Integer",
+        "value": "2"
+      }
+    ]
+  }
+}
+""".data(using: .utf8)!
+
+let invokeFunctionDecimalsGasJson = """
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "script": "EMAfDAhkZWNpbWFscwwUKLOtq3Jp+cIYHbPLdB6/VRkw4nBBYn1bUg==",
+    "state": "HALT",
+    "gasconsumed": "998970",
+    "exception": null,
+    "stack": [
+      {
+        "type": "Integer",
+        "value": "8"
+      }
+    ]
+  }
+}
+""".data(using: .utf8)!
+
+let invokeFunctionTotalSupplyJson = """
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "script": "EMAfDAt0b3RhbFN1cHBseQwUg6sGea1VwFChOtQ/WTbqc/XrHvZBYn1bUg==",
+    "state": "HALT",
+    "gasconsumed": "1998970",
+    "exception": null,
+    "stack": [
+      {
+        "type": "Integer",
+        "value": "3000000000000000"
+      }
+    ]
+  }
+}
+""".data(using: .utf8)!
+
+let invokeFunctionSymbolJson = """
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "script": "EMAfDAZzeW1ib2wMFIOrBnmtVcBQoTrUP1k26nP16x72QWJ9W1I=",
+    "state": "HALT",
+    "gasconsumed": "998970",
+    "exception": null,
+    "stack": [
+      {
+        "type": "ByteString",
+        "value": "YW50"
+      }
+    ]
+  }
+}
+""".data(using: .utf8)!
 
 // MARK: Calculate Network Fee
 
@@ -216,17 +291,17 @@ let calculateNetworkFeeJson = """
     "networkfee": 1230610
   }
 }
-"""
+""".data(using: .utf8)!
 
 // MARK: Get Block Count
 
-let getBlockCountJson_1000 = """
+let getBlockCount_1000Json = """
 {
   "jsonrpc": "2.0",
   "id": 1,
   "result": 1000
 }
-"""
+""".data(using: .utf8)!
 
 // MARK: Get Committee
 
@@ -238,7 +313,7 @@ let getCommitteeJson = """
     "02c0b60c995bc092e866f15a37c176bb59b7ebacf069ba94c0ebf561cb8f956238"
   ]
 }
-"""
+""".data(using: .utf8)!
 
 // MARK: Send Raw Transaction
 
@@ -250,7 +325,7 @@ let sendRawTransactionJson = """
     "hash": "0x830816f0c801bcabf919dfa1a90d7b9a4f867482cb4d18d0631a5aa6daefab6a"
   }
 }
-"""
+""".data(using: .utf8)!
 
 // MARK: Get Application Log
 
@@ -299,7 +374,7 @@ let getApplicationLogJson = """
     ]
   }
 }
-"""
+""".data(using: .utf8)!
 
 let getApplicationLogUnkownJson = """
 {
@@ -310,4 +385,4 @@ let getApplicationLogUnkownJson = """
     "message": "Unknown transaction/blockhash"
   }
 }
-"""
+""".data(using: .utf8)!
