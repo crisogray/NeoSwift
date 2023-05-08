@@ -4,9 +4,9 @@ public struct Iterator<T> {
     public let neoSwift: NeoSwift
     public let sessionId: String
     public let iteratorId: String
-    public let mapper: (StackItem) -> T
+    public let mapper: (StackItem) throws -> T
     
-    public init(neoSwift: NeoSwift, sessionId: String, iteratorId: String, mapper: @escaping (StackItem) -> T = { $0 as! T }) {
+    public init(neoSwift: NeoSwift, sessionId: String, iteratorId: String, mapper: @escaping (StackItem) throws -> T = { $0 as! T }) {
         self.neoSwift = neoSwift
         self.sessionId = sessionId
         self.iteratorId = iteratorId

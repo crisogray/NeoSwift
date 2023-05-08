@@ -194,6 +194,13 @@ extension StackItem {
         }
     }
 
+    public func getString() throws -> String {
+        guard let string = string else {
+            throw "Cannot cast stack item \(jsonValue) to a string."
+        }
+        return string
+    }
+    
     var hexString: String? {
         switch self {
         case .byteString(let bytes), .buffer(let bytes): return bytes.noPrefixHex
@@ -208,6 +215,13 @@ extension StackItem {
         case .integer(let int): return BInt(int).asSignedBytes().reversed()
         default: return nil
         }
+    }
+    
+    public func getByteArray() throws -> Bytes {
+        guard let byteArray = byteArray else {
+            throw "Cannot cast stack item \(jsonValue) to a byte array."
+        }
+        return byteArray
     }
 
     var list: [StackItem]? {

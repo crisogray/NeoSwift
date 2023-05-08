@@ -19,6 +19,7 @@ struct NeoConstants {
     public static let PUBLIC_KEY_SIZE_COMPRESSED: Int = 33
     public static let SIGNATURE_SIZE: Int = 64
     public static let VERIFICATION_SCRIPT_SIZE: Int = 40
+    public static let MAX_ITERATOR_ITEMS_DEFAULT: Int = 100
 
     // MARK: Transactions & Contracts
 

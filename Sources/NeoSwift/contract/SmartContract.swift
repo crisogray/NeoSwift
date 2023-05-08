@@ -68,7 +68,7 @@ public class SmartContract {
         }
     }
     
-    public func callFunctionReturningIterator<T>(_ function: String, _ params: [ContractParameter] = [], _ mapper: @escaping (StackItem) -> T = { $0 }) async throws -> Iterator<T> {
+    public func callFunctionReturningIterator<T>(_ function: String, _ params: [ContractParameter], _ mapper: @escaping (StackItem) throws -> T = { $0 }) async throws -> Iterator<T> {
         let invocationResult = try await callInvokeFunction(function, params).getResult()
         try throwIfFaultState(invocationResult)
         guard let stackItem = invocationResult.stack.first, case .interopInterface = stackItem else {

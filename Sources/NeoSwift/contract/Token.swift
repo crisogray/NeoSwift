@@ -7,9 +7,9 @@ public class Token: SmartContract {
     private static let SYMBOL = "symbol"
     private static let DECIMALS = "decimals"
     
-    public private(set) var totalSupply: Int? = nil
-    public private(set) var decimals: Int? = nil
-    public private(set) var symbol: String? = nil
+    private var totalSupply: Int? = nil
+    private var decimals: Int? = nil
+    private var symbol: String? = nil
     
     public func getTotalSupply() async throws -> Int {
         if totalSupply == nil {
@@ -54,8 +54,8 @@ public class Token: SmartContract {
     
     // TODO: NeoNameService
     
-//    internal func resolveNNSTextRecord(_ name: String) -> Hash160 throws {
-//
-//    }
+    internal func resolveNNSTextRecord(_ name: NNSName) throws -> Hash160 {
+        return .ZERO
+    }
         
 }
