@@ -17,7 +17,7 @@ Alternatively, if using `Package.swift`, you can add the package by adding the f
 ```
 and add `”NeoSwift"` to the dependencies in your target.
 
-## Completed Functionality: Stage 1
+## Completed Functionality: Stages 1 & 2
 
 Although currently incomplete and in development, the SDK can be used as is for some lower-level functionality. 
 Below is the extent of the completed functionality for stage 1.
@@ -36,8 +36,24 @@ Below is the extent of the completed functionality for stage 1.
 * Verification & Invocation Scripts
 * Hash160/256 & Types
 
-## Remaining: Stages 2 & 3
-* Wallet: Account and Wallet classes
-* Protocol: API calls and responses
-* Transaction: Signer, Transaction and Witness classes
+*Wallet*
+* Account
+* Wallet
+* NEP6 Wallet
+* BIP 39 Mnemonic Account
+
+*Protocol*
+* Requests and response handling
+* HTTP/API connection
+* Reactive (Using Swift Combine) subscription to blockchain
+
+*Transaction*
+* Signers (Account and Contract)
+* Witnesses and witness scopes
+* Serializable transaction object and transaction builder
+
+## Remaining: Stage 3
 * Contract: Token Types (e.g. NEO, NFT, GAS, Fungible), Contract classes
+* In-code documentation
+* Demo Swift playground
+* Readme/overview documentation
