@@ -12,7 +12,7 @@ public class HttpService: Service {
 
     private var urlRequester: URLRequester
     
-    init(url: URL = HttpService.DEFAULT_URL, urlSession: URLRequester = URLSession.shared, includeRawResponses: Bool = false) {
+    public init(url: URL = HttpService.DEFAULT_URL, urlSession: URLRequester = URLSession.shared, includeRawResponses: Bool = false) {
         self.url = url
         self.urlRequester = urlSession
         self.includeRawResponses = includeRawResponses

@@ -10,7 +10,7 @@ public struct NNSName {
         return NNSName.isValidNNSName(name, false)
     }
     
-    init(name: String) throws {
+    public init(name: String) throws {
         guard NNSName.isValidNNSName(name, true) else {
             throw "'\(name)' is not a valid NNS name."
         }
@@ -41,7 +41,7 @@ public struct NNSName {
         
         public let root: String
         
-        init(root: String) throws {
+        public init(root: String) throws {
             guard NNSRoot.isValidNNSRoot(root) else {
                 throw "'\(root)' is not a valid NNS root."
             }

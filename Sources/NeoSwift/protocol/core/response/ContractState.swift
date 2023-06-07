@@ -5,7 +5,7 @@ public class ContractState: ExpressContractState {
     public let nef: ContractNef
     public let updateCounter: Int
     
-    init(id: Int, updateCounter: Int, hash: Hash160, nef: ContractNef, manifest: ContractManifest) {
+    public init(id: Int, updateCounter: Int, hash: Hash160, nef: ContractNef, manifest: ContractManifest) {
         self.id = id
         self.nef = nef
         self.updateCounter = updateCounter

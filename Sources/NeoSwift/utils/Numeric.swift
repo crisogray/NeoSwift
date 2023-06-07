@@ -4,9 +4,9 @@ import Foundation
 
 public extension BInt {
     
-    func toBytesPadded(length: Int) -> Bytes {
+    func toBytesPadded(length: Int) throws -> Bytes {
         let bytes = asMagnitudeBytes()
-        return bytes.toPadded(length: length)
+        return try bytes.toPadded(length: length)
     }
     
 }

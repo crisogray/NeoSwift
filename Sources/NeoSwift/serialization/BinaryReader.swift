@@ -12,7 +12,7 @@ public class BinaryReader {
     private let array: Bytes
     private var marker: Int = -1
     
-    init(_ input: Bytes) {
+    public init(_ input: Bytes) {
         array = input
     }
     

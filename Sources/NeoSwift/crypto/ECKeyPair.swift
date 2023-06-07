@@ -65,7 +65,7 @@ extension ECKeyPair: Equatable {
 public extension ECPrivateKey {
     
     var bytes: Bytes {
-        return s.toBytesPadded(length: NeoConstants.PRIVATE_KEY_SIZE)
+        return (try? s.toBytesPadded(length: NeoConstants.PRIVATE_KEY_SIZE)) ?? []
     }
     
     var int: BInt {

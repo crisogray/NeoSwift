@@ -6,17 +6,17 @@ public struct Witness: Hashable {
     public let invocationScript: InvocationScript
     public let verificationScript: VerificationScript
     
-    init() {
+    public init() {
         self.invocationScript = InvocationScript()
         self.verificationScript = VerificationScript()
     }
     
-    init(_ invocationScript: Bytes, _ verificationScript: Bytes) {
+    public init(_ invocationScript: Bytes, _ verificationScript: Bytes) {
         self.invocationScript = InvocationScript(invocationScript)
         self.verificationScript = VerificationScript(verificationScript)
     }
     
-    init(_ invocationScript: InvocationScript, _ verificationScript: VerificationScript) {
+    public init(_ invocationScript: InvocationScript, _ verificationScript: VerificationScript) {
         self.invocationScript = invocationScript
         self.verificationScript = verificationScript
     }
@@ -43,12 +43,12 @@ extension Witness {
         return Witness(InvocationScript.fromSignatures(Array(signatures[0..<threshold])), verificationScript)
     }
 
-    public static func createContractWitness(_ verifyParams: [ContractParameter]) -> Witness {
+    public static func createContractWitness(_ verifyParams: [ContractParameter]) throws -> Witness {
         if verifyParams.isEmpty {
             return Witness()
         }
         let builder = ScriptBuilder()
-        let _ = verifyParams.map(builder.pushParam(_:))
+        let _ = try verifyParams.map(builder.pushParam(_:))
         return Witness(builder.toArray(), [])
     }
     

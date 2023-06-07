@@ -34,13 +34,12 @@ public extension Bytes {
         return (script + checksum).base58Encoded
     }
     
-    func toPadded(length: Int, trailing: Bool = false) -> Bytes {
+    func toPadded(length: Int, trailing: Bool = false) throws -> Bytes {
         let firstZero = self.first == 0
         let srcOffset = firstZero ? 1 : 0
         let bytesLength = self.count - srcOffset
         guard bytesLength <= length else {
-            print("Input is too large to put in byte array of size \(length)")
-            return []
+            throw "Input is too large to put in byte array of size \(length)"
         }
         if trailing {
             return self[srcOffset..<bytesLength] + Bytes(repeating: 0, count: length - bytesLength)

@@ -8,12 +8,12 @@ class ScriptBuilderTests: XCTestCase {
     private let builder = ScriptBuilder()
     
     public func testPushArrayEmpty() {
-        _ = builder.pushArray([])
+        _ = try! builder.pushArray([])
         assertBuilder([OpCode.newArray0.opcode])
     }
     
     public func testPushParamEmptyArray() {
-        _ = builder.pushParam(ContractParameter(type: .array, value: [AnyHashable]()))
+        _ = try! builder.pushParam(ContractParameter(type: .array, value: [AnyHashable]()))
         assertBuilder([OpCode.newArray0.opcode])
     }
     
@@ -43,40 +43,40 @@ class ScriptBuilderTests: XCTestCase {
     }
     
     public func testPushInteger() {
-        _ = builder.pushInteger(0)
+        _ = try! builder.pushInteger(0)
         assertBuilder([OpCode.push0.opcode], firstN: 1)
         
-        _ = builder.pushInteger(1)
+        _ = try! builder.pushInteger(1)
         assertBuilder([OpCode.push1.opcode], firstN: 1)
         
-        _ = builder.pushInteger(16)
+        _ = try! builder.pushInteger(16)
         assertBuilder([OpCode.push16.opcode], firstN: 1)
         
-        _ = builder.pushInteger(17)
+        _ = try! builder.pushInteger(17)
         assertBuilder("0011".bytesFromHex, firstN: 2)
         
-        _ = builder.pushInteger(-800000)
+        _ = try! builder.pushInteger(-800000)
         assertBuilder([0xff, 0xf3, 0xcb, 0x00].reversed(), lastN: 4, length: 5)
         
-        _ = builder.pushInteger(-100000000000)
+        _ = try! builder.pushInteger(-100000000000)
         assertBuilder([0xff, 0xff, 0xff, 0xe8, 0xb7, 0x89, 0x18, 0x00].reversed(), lastN: 8, length: 9)
         
-        _ = builder.pushInteger(100000000000)
+        _ = try! builder.pushInteger(100000000000)
         assertBuilder([0x00, 0x00, 0x00, 0x17, 0x48, 0x76, 0xe8, 0x00].reversed(), lastN: 8, length: 9)
         
-        _ = builder.pushInteger(-(BInt.TEN ** 23))
+        _ = try! builder.pushInteger(-(BInt.TEN ** 23))
         assertBuilder("ffffffffffffead2fd381eb509800000".bytesFromHex.reversed(), lastN: 16, length: 17)
         
-        _ = builder.pushInteger(BInt.TEN ** 23)
+        _ = try! builder.pushInteger(BInt.TEN ** 23)
         assertBuilder("000000000000152d02c7e14af6800000".bytesFromHex.reversed(), lastN: 16, length: 17)
         
-        _ = builder.pushInteger(BInt.TEN ** 23)
+        _ = try! builder.pushInteger(BInt.TEN ** 23)
         assertBuilder("000000000000152d02c7e14af6800000".bytesFromHex.reversed(), lastN: 16, length: 17)
         
-        _ = builder.pushInteger(-(BInt.TEN ** 40))
+        _ = try! builder.pushInteger(-(BInt.TEN ** 40))
         assertBuilder("0xffffffffffffffffffffffffffffffe29cd60e3ca35b4054460a9f0000000000".bytesFromHex.reversed(), lastN: 32, length: 33)
         
-        _ = builder.pushInteger(BInt.TEN ** 40)
+        _ = try! builder.pushInteger(BInt.TEN ** 40)
         assertBuilder("0x0000000000000000000000000000001d6329f1c35ca4bfabb9f5610000000000".bytesFromHex.reversed(), lastN: 32, length: 33)
     }
     
@@ -106,7 +106,7 @@ class ScriptBuilderTests: XCTestCase {
             ContractParameter.integer(1): ContractParameter.string("first"),
             try! ContractParameter.byteArray("7365636f6e64"): ContractParameter.bool(true)
         ]
-        let expectedOne = ScriptBuilder()
+        let expectedOne = try! ScriptBuilder()
             .pushData("first")
             .pushInteger(1)
             .pushBoolean(true)
@@ -115,7 +115,7 @@ class ScriptBuilderTests: XCTestCase {
             .opCode(OpCode.packMap)
             .toArray().toHexString()
         
-        let expectedTwo = ScriptBuilder()
+        let expectedTwo = try! ScriptBuilder()
             .pushBoolean(true)
             .pushData("7365636f6e64".bytesFromHex)
             .pushData("first")
@@ -124,7 +124,7 @@ class ScriptBuilderTests: XCTestCase {
             .opCode(OpCode.packMap)
             .toArray().toHexString()
         
-        let actual = ScriptBuilder().pushMap(map).toArray().toHexString()
+        let actual = try! ScriptBuilder().pushMap(map).toArray().toHexString()
         XCTAssert(actual == expectedOne || actual == expectedTwo)
     }
     
@@ -134,7 +134,7 @@ class ScriptBuilderTests: XCTestCase {
             ContractParameter.integer(1): ContractParameter.string("first"),
             try! ContractParameter.byteArray("6e6573746564"): nestedMap
         ]
-        let expectedOne = ScriptBuilder()
+        let expectedOne = try! ScriptBuilder()
             .pushData("first")
             .pushInteger(1)
             .pushData("nestedFirst")
@@ -146,7 +146,7 @@ class ScriptBuilderTests: XCTestCase {
             .opCode(OpCode.packMap)
             .toArray().toHexString()
         
-        let expectedTwo = ScriptBuilder()
+        let expectedTwo = try! ScriptBuilder()
             .pushData("nestedFirst")
             .pushInteger(10)
             .pushInteger(1)
@@ -158,7 +158,7 @@ class ScriptBuilderTests: XCTestCase {
             .opCode(OpCode.packMap)
             .toArray().toHexString()
         
-        let actual = ScriptBuilder().pushMap(map).toArray().toHexString()
+        let actual = try! ScriptBuilder().pushMap(map).toArray().toHexString()
         XCTAssert(actual == expectedOne || actual == expectedTwo)
         
     }

@@ -6,6 +6,8 @@ public class ScriptBuilder {
     
     let writer = BinaryWriter()
     
+    public init() {}
+    
     public func opCode(_ opCodes: OpCode...) -> ScriptBuilder {
         opCodes.forEach { writer.writeByte($0.opcode) }
         return self
@@ -17,9 +19,9 @@ public class ScriptBuilder {
         return self
     }
     
-    public func contractCall(_ hash160: Hash160, method: String, params: [ContractParameter], callFlags: CallFlags = .all) -> ScriptBuilder {
-        _ = params.isEmpty ? opCode(.newArray0) : pushParams(params)
-        return pushInteger(Int(callFlags.value))
+    public func contractCall(_ hash160: Hash160, method: String, params: [ContractParameter], callFlags: CallFlags = .all) throws -> ScriptBuilder {
+        _ = params.isEmpty ? opCode(.newArray0) : try pushParams(params)
+        return try pushInteger(Int(callFlags.value))
             .pushData(method)
             .pushData(hash160.toLittleEndianArray())
             .sysCall(.systemContractCall)
@@ -31,12 +33,12 @@ public class ScriptBuilder {
         return self
     }
     
-    public func pushParams(_ params: [ContractParameter?]) -> ScriptBuilder {
-        params.forEach { _ = pushParam($0) }
-        return pushInteger(params.count).opCode(.pack)
+    public func pushParams(_ params: [ContractParameter?]) throws -> ScriptBuilder {
+        try params.forEach { _ = try pushParam($0) }
+        return try pushInteger(params.count).opCode(.pack)
     }
     
-    public func pushParam(_ param: ContractParameter?) -> ScriptBuilder {
+    public func pushParam(_ param: ContractParameter?) throws -> ScriptBuilder {
         guard let param = param, let value = param.value else {
             return opCode(.pushNull)
         }
@@ -44,21 +46,19 @@ public class ScriptBuilder {
         case .byteArray, .signature, .publicKey: return pushData(value as! Bytes)
         case .boolean: return pushBoolean(value as! Bool)
         case .integer:
-            if let bInt = value as? BInt { return pushInteger(bInt)}
-            else { return pushInteger(value as! Int) }
+            if let bInt = value as? BInt { return try pushInteger(bInt)}
+            else { return try pushInteger(value as! Int) }
         case .hash160: return pushData((value as! Hash160).toLittleEndianArray())
         case .hash256: return pushData((value as! Hash256).toLittleEndianArray())
         case .string: return pushData(value as! String)
-        case .array: return pushArray(value as! [ContractParameter])
-        case .map: return pushMap(value as! [ContractParameter: ContractParameter])
+        case .array: return try pushArray(value as! [ContractParameter])
+        case .map: return try pushMap(value as! [ContractParameter: ContractParameter])
         case .any: return self
-        default:
-            print("Parameter type '\(param.type.jsonValue)' not supported.")
-            return self
+        default: throw ("Parameter type '\(param.type.jsonValue)' not supported.")
         }
     }
     
-    public func pushInteger(_ i: BInt) -> ScriptBuilder {
+    public func pushInteger(_ i: BInt) throws -> ScriptBuilder {
         if i <= 16 && i >= -1 {
             return opCode(OpCode(rawValue: OpCode.push0.opcode + Byte(i.asInt()!))!)
         }
@@ -69,12 +69,11 @@ public class ScriptBuilder {
         else if bytes.count <= 8 { return opCode(.pushInt64, padNumber(i, 8)) }
         else if bytes.count <= 16 { return opCode(.pushInt128, padNumber(i, 16)) }
         else if bytes.count <= 32 { return opCode(.pushInt256, padNumber(i, 32)) }
-        print("The given number (\(i)) is out of range.")
-        return self
+        throw "The given number (\(i)) is out of range."
     }
     
-    public func pushInteger(_ i: Int) -> ScriptBuilder {
-        return pushInteger(BInt(i))
+    public func pushInteger(_ i: Int) throws -> ScriptBuilder {
+        return try pushInteger(BInt(i))
     }
     
     public func padNumber(_ v: BInt, _ length: Int) -> Bytes {
@@ -109,16 +108,16 @@ public class ScriptBuilder {
         return self
     }
     
-    public func pushArray(_ params: [ContractParameter]) -> ScriptBuilder {
-        return params.isEmpty ? opCode(.newArray0) : pushParams(params)
+    public func pushArray(_ params: [ContractParameter]) throws -> ScriptBuilder {
+        return params.isEmpty ? opCode(.newArray0) : try pushParams(params)
     }
     
-    public func pushMap(_ map: [ContractParameter: ContractParameter]) -> ScriptBuilder {
-        map.forEach { k, v in
-            _ = pushParam(v)
-            _ = pushParam(k)
+    public func pushMap(_ map: [ContractParameter: ContractParameter]) throws -> ScriptBuilder {
+        try map.forEach { k, v in
+            _ = try pushParam(v)
+            _ = try pushParam(k)
         }
-        return pushInteger(map.count).opCode(.packMap)
+        return try pushInteger(map.count).opCode(.packMap)
     }
     
     public func pack() -> ScriptBuilder {
@@ -134,21 +133,21 @@ public class ScriptBuilder {
     }
     
     public static func buildVerificationScript(_ pubKeys: [ECPublicKey], _ signingThreshold: Int) throws -> Bytes {
-        let builder = ScriptBuilder().pushInteger(signingThreshold)
+        let builder = try ScriptBuilder().pushInteger(signingThreshold)
         try pubKeys.sorted().forEach { _ = builder.pushData(try $0.getEncoded(compressed: true)) }
-        return builder.pushInteger(pubKeys.count).sysCall(.systemCryptoCheckMultisig).toArray()
+        return try builder.pushInteger(pubKeys.count).sysCall(.systemCryptoCheckMultisig).toArray()
     }
     
-    public static func buildContractHashScript(_ sender: Hash160, _ nefCheckSum: Int, _ contractName: String) -> Bytes {
-        return ScriptBuilder()
+    public static func buildContractHashScript(_ sender: Hash160, _ nefCheckSum: Int, _ contractName: String) throws -> Bytes {
+        return try ScriptBuilder()
             .opCode(.abort).pushData(sender.toLittleEndianArray())
             .pushInteger(nefCheckSum).pushData(contractName).toArray()
     }
         
     public static func buildContractCallAndUnwrapIterator(_ contractHash: Hash160, _ method: String, _ params: [ContractParameter],
-                                                        _ maxIteratorResultItems: Int, _ callFlags: CallFlags = .all) -> Bytes {
-        let b = ScriptBuilder().pushInteger(maxIteratorResultItems)
-        _ = b.contractCall(contractHash, method: method, params: params, callFlags: callFlags)
+                                                        _ maxIteratorResultItems: Int, _ callFlags: CallFlags = .all) throws -> Bytes {
+        let b = try ScriptBuilder().pushInteger(maxIteratorResultItems)
+        _ = try b.contractCall(contractHash, method: method, params: params, callFlags: callFlags)
             .opCode(.newArray0)
         
         let iteratorTraverseCycleStartOffset = b.writer.size

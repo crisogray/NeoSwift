@@ -8,7 +8,7 @@ class TransactionBuilderTests: XCTestCase {
     let NEO_TOKEN_SCRIPT_HASH = try! Hash160(neoTokenHash)
     let GAS_TOKEN_SCRIPT_HASH = try! Hash160(gasTokenHash)
     let NEP17_TRANSFER = "transfer"
-    lazy var SCRIPT_INVOKEFUNCTION_NEO_SYMBOL = { ScriptBuilder().contractCall(self.NEO_TOKEN_SCRIPT_HASH, method: "symbol", params: []).toArray().noPrefixHex }()
+    lazy var SCRIPT_INVOKEFUNCTION_NEO_SYMBOL = { try! ScriptBuilder().contractCall(self.NEO_TOKEN_SCRIPT_HASH, method: "symbol", params: []).toArray().noPrefixHex }()
     lazy var SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES = { self.SCRIPT_INVOKEFUNCTION_NEO_SYMBOL.bytesFromHex }()
     
     var account1: Account!
@@ -317,7 +317,7 @@ class TransactionBuilderTests: XCTestCase {
         let tx = try! await TransactionBuilder(neoSwift).script(SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES)
             .signers(ContractSigner.global(contracthash, .string("iamgroot"), .integer(2)), AccountSigner.calledByEntry(.create()))
             .validUntilBlock(1000).sign()
-        let invocationScript = ScriptBuilder().pushData("iamgroot").pushInteger(2).toArray()
+        let invocationScript = try! ScriptBuilder().pushData("iamgroot").pushInteger(2).toArray()
         XCTAssert(tx.witnesses.contains(.init(invocationScript, [])))
     }
     
@@ -329,7 +329,7 @@ class TransactionBuilderTests: XCTestCase {
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson,
                                  "getblockcount": blockCountJson, "sendrawtransaction": rawTransactionJson])
         
-        let script = ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
+        let script = try! ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
                                                   params: [.hash160(account1.scriptHash!),
                                                            .hash160(recipient), .integer(5),
                                                            .any(nil)]).toArray()
@@ -640,7 +640,7 @@ class TransactionBuilderTests: XCTestCase {
         let neoSwift = MockNeoSwift(config: .init(networkMagic: 769), neoSwiftService: HttpService(url: URL(string: "http://127.0.0.1")!, urlSession: mockUrlSession))
         neoSwift.overrideCatchUpToLatestAndSubscribeToNewBlocksPublisher = true
         
-        let script = ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
+        let script = try! ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
                                                        params: [.hash160(account1.scriptHash!),
                                                                 .hash160(recipient), .integer(5),
                                                                 .any(nil)]).toArray()
@@ -671,7 +671,7 @@ class TransactionBuilderTests: XCTestCase {
         let blockCountJson = getBlockCount_1000Json
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getblockcount": blockCountJson])
         
-        let script = ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
+        let script = try! ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
                                                   params: [.hash160(account1.scriptHash!),
                                                            .hash160(recipient), .integer(5),
                                                            .any(nil)]).toArray()
@@ -699,7 +699,7 @@ class TransactionBuilderTests: XCTestCase {
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson,
                                  "invokefunciton": functionJson, "getblockcount": blockCountJson,
                                  "sendrawtransaction": rawTransactionJson, "getapplicationlog": applicationLogJson])
-        let script = ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
+        let script = try! ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
                                                   params: [.hash160(account1.scriptHash!),
                                                            .hash160(account1.scriptHash!),
                                                            .integer(1), .any(nil)]).toArray()
@@ -721,7 +721,7 @@ class TransactionBuilderTests: XCTestCase {
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson,
                                  "invokefunciton": functionJson, "getblockcount": blockCountJson])
         
-        let script = ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
+        let script = try! ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
                                                   params: [.hash160(account1.scriptHash!),
                                                            .hash160(account1.scriptHash!),
                                                            .integer(1), .any(nil)]).toArray()
@@ -750,7 +750,7 @@ class TransactionBuilderTests: XCTestCase {
                                  "invokefunciton": functionJson, "getblockcount": blockCountJson,
                                  "sendrawtransaction": rawTransactionJson, "getapplicationlog": applicationLogJson])
         
-        let script = ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
+        let script = try! ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
                                                   params: [.hash160(account1.scriptHash!),
                                                            .hash160(account1.scriptHash!),
                                                            .integer(1), .any(nil)]).toArray()

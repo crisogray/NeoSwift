@@ -7,7 +7,7 @@ public struct ContractParametersContext: Codable {
     public let items: [String: ContextItem]
     public let network: Int
 
-    init(hash: String, data: String, items: [String : ContextItem]?, network: Int) {
+    public init(hash: String, data: String, items: [String : ContextItem]?, network: Int) {
         self.hash = hash
         self.data = data
         self.items = items ?? [:]
@@ -19,7 +19,7 @@ public struct ContractParametersContext: Codable {
         public let parameters: [ContractParameter]?
         public let signatures: [String : String]
         
-        init(script: String, parameters: [ContractParameter]?, signatures: [String : String]?) {
+        public init(script: String, parameters: [ContractParameter]?, signatures: [String : String]?) {
             self.script = script
             self.parameters = parameters
             self.signatures = signatures ?? [:]

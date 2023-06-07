@@ -14,15 +14,15 @@ public struct ContractParameter: Codable, Hashable {
         self.value = value
     }
     
-    init(name: String?, type: ContractParamterType) {
+    public init(name: String?, type: ContractParamterType) {
         self.init(name: name, type: type, value: nil)
     }
     
-    init(type: ContractParamterType) {
+    public init(type: ContractParamterType) {
         self.init(name: nil, type: type, value: nil)
     }
     
-    init(type: ContractParamterType, value: AnyHashable?) {
+    public init(type: ContractParamterType, value: AnyHashable?) {
         self.init(name: nil, type: type, value: value)
     }
  

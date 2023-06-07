@@ -1,7 +1,6 @@
 
 import BigInt
 import Foundation
-import SwiftECC
 
 public class Bip32ECKeyPair: ECKeyPair {
     
@@ -65,7 +64,7 @@ public class Bip32ECKeyPair: ECKeyPair {
     private func deriveChildKey(_ childNumber: Int32) throws -> Bip32ECKeyPair {
         var data: Bytes = []
         if Self.isHardened(childNumber) {
-            data = privateKey.int.toBytesPadded(length: 33)
+            data = try privateKey.int.toBytesPadded(length: 33)
         } else  {
             data = try publicKeyPoint.getEncoded(true)
         }

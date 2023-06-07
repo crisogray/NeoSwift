@@ -9,11 +9,11 @@ public class InvocationScript: NeoSerializable, Hashable {
         return script.count.varSize + script.count
     }
     
-    init() {
+    public init() {
         self.script = []
     }
     
-    init(_ script: Bytes) {
+    public init(_ script: Bytes) {
         self.script = script
     }
     

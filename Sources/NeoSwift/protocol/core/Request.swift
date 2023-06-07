@@ -9,7 +9,7 @@ public struct Request<T, U>: Codable where T: Response<U> {
     public let id: Int
     private var neoSwiftService: NeoSwiftService?
     
-    init(method: String, params: [AnyHashable], neoSwiftService: NeoSwiftService) {
+    public init(method: String, params: [AnyHashable], neoSwiftService: NeoSwiftService) {
         self.method = method
         self.params = params
         self.id = NeoSwiftConfig.REQUEST_COUNTER.getAndIncrement()

@@ -20,7 +20,7 @@ public class SmartContract {
         guard !function.isEmpty else {
             throw "The invocation function must not be empty."
         }
-        return ScriptBuilder().contractCall(scriptHash, method: function, params: params).toArray()
+        return try ScriptBuilder().contractCall(scriptHash, method: function, params: params).toArray()
     }
     
     public func callFunctionReturningString(_ function: String, _ params: [ContractParameter] = []) async throws -> String {
@@ -89,7 +89,7 @@ public class SmartContract {
     }
     
     public func callFunctionAndUnwrapIterator(_ function: String, _ params: [ContractParameter], _ maxIteratorResultItems: Int, _ signers: [Signer]) async throws -> [StackItem] {
-        let script = ScriptBuilder.buildContractCallAndUnwrapIterator(scriptHash, function, params, maxIteratorResultItems)
+        let script = try ScriptBuilder.buildContractCallAndUnwrapIterator(scriptHash, function, params, maxIteratorResultItems)
         let invocationResult = try await neoSwift.invokeScript(script.toHexString(), signers).send().getResult()
         try throwIfFaultState(invocationResult)
         return invocationResult.stack.first?.list ?? []

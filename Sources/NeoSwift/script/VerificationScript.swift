@@ -13,19 +13,19 @@ public class VerificationScript: NeoSerializable, Hashable {
         return try? Hash160.fromScript(script)
     }
     
-    init() {
+    public init() {
         self.script = []
     }
     
-    init(_ script: Bytes) {
+    public init(_ script: Bytes) {
         self.script = script
     }
     
-    init(_ publicKey: ECPublicKey) throws {
+    public init(_ publicKey: ECPublicKey) throws {
         self.script = try ScriptBuilder.buildVerificationScript(publicKey.getEncoded(compressed: true))
     }
     
-    init(_ publicKeys: [ECPublicKey], _ signingThreshold: Int) throws {
+    public init(_ publicKeys: [ECPublicKey], _ signingThreshold: Int) throws {
         guard signingThreshold >= 1 && signingThreshold <= publicKeys.count else {
             throw "Signing threshold must be at least 1 and not higher than the number of public keys."
         }

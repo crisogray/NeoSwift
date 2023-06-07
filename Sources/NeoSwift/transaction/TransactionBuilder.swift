@@ -23,7 +23,7 @@ public class TransactionBuilder {
         return attributes.contains(where: { return $0 == .highPriority })
     }
     
-    init(_ neoSwift: NeoSwift) {
+    public init(_ neoSwift: NeoSwift) {
         self.neoSwift = neoSwift
         nonce = Int.random(in: 0..<(2.toPowerOf(32)))
         version = NeoConstants.CURRENT_TX_VERSION
@@ -200,7 +200,7 @@ public class TransactionBuilder {
         var hasAtLeastOneSigningAccount = false
         for signer in signers {
             if let contractSigner = signer as? ContractSigner {
-                _ = tx.addWitness(.createContractWitness(contractSigner.verifyParams))
+                _ = try tx.addWitness(.createContractWitness(contractSigner.verifyParams))
             } else if let accountSigner = signer as? AccountSigner {
                 let verificationScript = try createFakeVerificationScript(accountSigner.account)
                 _ = tx.addWitness(.init([], verificationScript.script))
@@ -241,7 +241,7 @@ public class TransactionBuilder {
         let txBytes = try await transaction.getHashData()
         try transaction.signers.forEach { signer in
             if let contractSigner = signer as? ContractSigner {
-                _ = transaction.addWitness(.createContractWitness(contractSigner.verifyParams))
+                _ = try transaction.addWitness(.createContractWitness(contractSigner.verifyParams))
             } else if let accountSigner = signer as? AccountSigner {
                 let acc = accountSigner.account
                 guard !acc.isMultiSig else {

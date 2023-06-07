@@ -1,6 +1,5 @@
 
 import Foundation
-import SwiftECC
 
 public protocol NeoSerializable {
     var size: Int { get }

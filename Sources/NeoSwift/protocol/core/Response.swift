@@ -38,7 +38,7 @@ public class Response<T: Codable>: Codable, HasRawResponse {
         public let message: String
         public let data: String?
         
-        init(code: Int, message: String, data: String? = nil) {
+        public init(code: Int, message: String, data: String? = nil) {
             self.code = code
             self.message = message
             self.data = data

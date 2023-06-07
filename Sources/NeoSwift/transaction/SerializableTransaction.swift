@@ -18,7 +18,7 @@ public class SerializableTransaction {
     public private(set) var witnesses: [Witness]
     private var blockCountWhenSent: Int?
     
-    init(neoSwift: NeoSwift? = nil, version: Byte, nonce: Int, validUntilBlock: Int, signers: [Signer], systemFee: Int, networkFee: Int, attributes: [TransactionAttribute], script: Bytes, witnesses: [Witness], blockCountWhenSent: Int? = nil) {
+    public init(neoSwift: NeoSwift? = nil, version: Byte, nonce: Int, validUntilBlock: Int, signers: [Signer], systemFee: Int, networkFee: Int, attributes: [TransactionAttribute], script: Bytes, witnesses: [Witness], blockCountWhenSent: Int? = nil) {
         self.neoSwift = neoSwift
         self.version = version
         self.nonce = nonce

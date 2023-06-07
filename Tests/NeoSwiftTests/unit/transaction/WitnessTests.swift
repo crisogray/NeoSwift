@@ -107,12 +107,12 @@ class WitnessTests: XCTestCase {
     }
     
     func testContractWitnessNoParams() {
-        XCTAssertEqual(Witness.createContractWitness([]), Witness())
+        XCTAssertEqual(try! Witness.createContractWitness([]), Witness())
     }
     
     func testCreateContractWitness() {
-        let witness = Witness.createContractWitness([.integer(20), .string("test")])
-        let invocationScript = ScriptBuilder().pushInteger(20).pushData("test").toArray()
+        let witness = try! Witness.createContractWitness([.integer(20), .string("test")])
+        let invocationScript = try! ScriptBuilder().pushInteger(20).pushData("test").toArray()
         XCTAssertEqual(witness.invocationScript.script, invocationScript)
         XCTAssertEqual(witness.verificationScript.script, [])
     }

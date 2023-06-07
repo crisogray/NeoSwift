@@ -27,7 +27,6 @@ class ContractManifestTests: XCTestCase {
     public func testSerializeWithWildCardPermissionMethod() {
         let contractPermission = ContractManifest.ContractPermission(contract: "NeoToken", methods: ["*"])
         let contractManifest = ContractManifest(permissions: [contractPermission])
-        print(toJsonString(contractManifest))
         XCTAssert(toJsonString(contractManifest).contains("\"permissions\":[{\"methods\":\"*\",\"contract\":\"NeoToken\"}]"))
     }
     
@@ -39,7 +38,6 @@ class ContractManifestTests: XCTestCase {
     public func testSerializeWithPermissionsOneMethod() {
         let contractPermission = ContractManifest.ContractPermission(contract: "NeoToken", methods: ["method"])
         let contractManifest = ContractManifest(permissions: [contractPermission])
-        print(toJsonString(contractManifest))
         XCTAssert(toJsonString(contractManifest).contains("\"permissions\":[{\"methods\":[\"method\"],\"contract\":\"NeoToken\"}]"))
     }
     
@@ -48,7 +46,6 @@ class ContractManifestTests: XCTestCase {
         let contractPermission2 = ContractManifest.ContractPermission(contract: "GasToken", methods: ["method1", "method2"])
         let contractPermission3 = ContractManifest.ContractPermission(contract: "SomeToken", methods: ["*"])
         let contractManifest = ContractManifest(permissions: [contractPermission1, contractPermission2, contractPermission3])
-        print(toJsonString(contractManifest))
         XCTAssert(toJsonString(contractManifest).contains("\"permissions\":[{\"methods\":[\"method\"],\"contract\":\"NeoToken\"},{\"methods\":[\"method1\",\"method2\"],\"contract\":\"GasToken\"},{\"methods\":\"*\",\"contract\":\"SomeToken\"}]"))
     }
     

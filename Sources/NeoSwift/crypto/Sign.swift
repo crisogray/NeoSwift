@@ -30,7 +30,7 @@ public enum Sign {
         
         guard recId != -1 else { throw "Could not construct a recoverable key. This should never happen." }
         
-        return SignatureData(v: Byte(recId + 27),
+        return try SignatureData(v: Byte(recId + 27),
                              r: sig.r.toBytesPadded(length: 32),
                              s: sig.s.toBytesPadded(length: 32))
         
@@ -61,7 +61,7 @@ public enum Sign {
     }
     
     private static func decompressKey(xBN: BInt, yBit: Bool) throws -> ECPoint {
-        var compEnc = xBN.toBytesPadded(length: 1 + (NeoConstants.SECP256R1_DOMAIN.p.bitWidth + 7) / 8)
+        var compEnc = try xBN.toBytesPadded(length: 1 + (NeoConstants.SECP256R1_DOMAIN.p.bitWidth + 7) / 8)
         compEnc[0] = yBit ? 0x03 : 0x02
         return try NeoConstants.SECP256R1_DOMAIN.decodePoint(compEnc)
     }
@@ -130,17 +130,17 @@ public enum Sign {
             return r + s
         }
         
-        init(v: Byte, r: Bytes, s: Bytes) {
+        public init(v: Byte, r: Bytes, s: Bytes) {
             self.v = v
             self.r = r
             self.s = s
         }
         
-        convenience init(signature: Bytes) {
+        public convenience init(signature: Bytes) {
             self.init(v: 0, signature: signature)
         }
         
-        convenience init(v: Byte, signature: Bytes) {
+        public convenience init(v: Byte, signature: Bytes) {
             self.init(v: v, r: Bytes(signature[0..<32]), s: Bytes(signature[32..<64]))
         }
         

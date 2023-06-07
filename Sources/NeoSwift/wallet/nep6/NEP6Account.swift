@@ -9,7 +9,7 @@ public struct NEP6Account: Codable, Hashable {
     public let contract: NEP6Contract?
     public let extra: [String : AnyHashable]?
     
-    init(address: String, label: String?, isDefault: Bool, lock: Bool, key: String?, contract: NEP6Contract?, extra: [String : AnyHashable]?) {
+    public init(address: String, label: String?, isDefault: Bool, lock: Bool, key: String?, contract: NEP6Contract?, extra: [String : AnyHashable]?) {
         self.address = address
         self.label = label
         self.isDefault = isDefault

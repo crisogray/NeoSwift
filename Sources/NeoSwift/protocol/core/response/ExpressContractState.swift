@@ -4,7 +4,7 @@ public class ExpressContractState: Codable, Hashable {
     public let hash: Hash160
     public let manifest: ContractManifest
     
-    init(hash: Hash160, manifest: ContractManifest) {
+    public init(hash: Hash160, manifest: ContractManifest) {
         self.hash = hash
         self.manifest = manifest
     }

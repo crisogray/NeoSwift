@@ -20,7 +20,7 @@ public class Wallet {
         return accountsMap[defaultAccountHash]!
     }
     
-    init() {
+    public init() {
         name = Wallet.DEFAULT_WALLET_NAME
         version = Wallet.CURRENT_VERSION
         scryptParams = .DEFAULT
@@ -129,7 +129,6 @@ public class Wallet {
         let data = try JSONEncoder().encode(nep6Wallet)
         var destination = destination
         if destination.hasDirectoryPath {
-            print(destination)
             destination = destination.appendingPathComponent("\(name).json")
         }
         try data.write(to: destination)

@@ -1,17 +1,16 @@
 
 import BigInt
-import SwiftECC
 import XCTest
 @testable import NeoSwift
 
 class Bip32ECKeyPairTests: XCTestCase {
     
-    override func setUp() {
+    override class func setUp() {
         NeoConstants.startUsingCurveForTests(.EC256k1)
     }
     
     override class func tearDown() {
-        NeoConstants.stopUsingK1CurveForTests()
+        NeoConstants.stopUsingOtherCurveForTests()
     }
     
     public func testVectors1() {
@@ -153,7 +152,7 @@ class Bip32ECKeyPairTests: XCTestCase {
     private func serialize(pair: Bip32ECKeyPair, header: Int32, pub: Bool) -> Bytes {
         var buffer: Bytes = header.bytes + Byte(pair.depth)
         buffer += pair.parentFingerprint.bytes + pair.childNumber.bytes + pair.chainCode
-        buffer +=  pub ? try! pair.publicKeyPoint.getEncoded(true) : pair.privateKey.int.toBytesPadded(length: 33)
+        buffer += try! pub ? pair.publicKeyPoint.getEncoded(true) : pair.privateKey.int.toBytesPadded(length: 33)
         return buffer
     }
     

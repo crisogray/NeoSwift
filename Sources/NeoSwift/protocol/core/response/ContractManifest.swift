@@ -10,7 +10,7 @@ public struct ContractManifest: Codable, Hashable {
     @WildcardContainerSerialized @SingleValueOrNilArray public private(set) var trusts: [String]
     public let extra: [String : AnyHashable]?
     
-    init(name: String? = nil, groups: [ContractGroup] = [], features: [String : AnyHashable] = [:], supportedStandards: [String] = [], abi: ContractABI? = nil, permissions: [ContractPermission] = [], trusts: [String] = [], extra: [String : AnyHashable]? = nil) {
+    public init(name: String? = nil, groups: [ContractGroup] = [], features: [String : AnyHashable] = [:], supportedStandards: [String] = [], abi: ContractABI? = nil, permissions: [ContractPermission] = [], trusts: [String] = [], extra: [String : AnyHashable]? = nil) {
         self.name = name
         self.groups = groups
         self.features = features
@@ -27,7 +27,7 @@ public struct ContractManifest: Codable, Hashable {
     }
     
     public func createGroup(_ groupECKeyPair: ECKeyPair, _ deploymentSender: Hash160, _ nefCheckSum: Int) throws -> ContractGroup {
-        let contractHashBytes = ScriptBuilder.buildContractHashScript(deploymentSender, nefCheckSum, name ?? "")
+        let contractHashBytes = try ScriptBuilder.buildContractHashScript(deploymentSender, nefCheckSum, name ?? "")
         let signatureData = try Sign.signMessage(contractHashBytes, groupECKeyPair)
         return try ContractGroup(pubKey: groupECKeyPair.publicKey.getEncodedCompressedHex(), signature: signatureData.concatenated.base64Encoded)
     }
@@ -42,7 +42,7 @@ public struct ContractManifest: Codable, Hashable {
             case signature
         }
     
-        init(pubKey: String, signature: String) throws {
+        public init(pubKey: String, signature: String) throws {
             let pubKey = pubKey.cleanedHexPrefix
             guard pubKey.bytesFromHex.count == NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED else {
                 throw "The provided value is not a valid public key: \(pubKey)"

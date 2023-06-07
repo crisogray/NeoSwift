@@ -29,13 +29,12 @@ public class BinaryWriter {
         array += try v.getEncoded(true)
     }
     
-    public func writeFixedString(_ v: String, length: Int) {
+    public func writeFixedString(_ v: String, length: Int) throws {
         let bytes = v.bytes
         guard bytes.count <= length else {
-            print("String to write is longer than specified length")
-            return
+            throw "String to write is longer than specified length"
         }
-        array += bytes.toPadded(length: length, trailing: true)
+        array += try bytes.toPadded(length: length, trailing: true)
     }
     
     public func writeFloat(_ v: Float) {

@@ -26,7 +26,7 @@ public class Account {
         return signingThreshold != nil && nrOfParticipants != nil
     }
     
-    init(address: String, label: String?, verificationScript: VerificationScript? = nil, signingThreshold: Int? = nil, nrOfParticipants: Int? = nil) {
+    public init(address: String, label: String?, verificationScript: VerificationScript? = nil, signingThreshold: Int? = nil, nrOfParticipants: Int? = nil) {
         self.address = address
         self.label = label
         self.verificationScript = verificationScript
@@ -34,7 +34,7 @@ public class Account {
         self.nrOfParticipants = nrOfParticipants
     }
 
-    init(keyPair: ECKeyPair, _ signingThreshold: Int? = nil, nrOfParticipants: Int? = nil) throws {
+    public init(keyPair: ECKeyPair, _ signingThreshold: Int? = nil, nrOfParticipants: Int? = nil) throws {
         self.keyPair = keyPair
         self.address = try keyPair.getAddress()
         self.label = address
@@ -43,7 +43,7 @@ public class Account {
         self.nrOfParticipants = nrOfParticipants
     }
     
-    init(keyPair: ECKeyPair? = nil, address: String, label: String?, verificationScript: VerificationScript?, isLocked: Bool, encryptedPrivateKey: String? = nil, wallet: Wallet? = nil, signingThreshold: Int?, nrOfParticipants: Int?) {
+    public init(keyPair: ECKeyPair? = nil, address: String, label: String?, verificationScript: VerificationScript?, isLocked: Bool, encryptedPrivateKey: String? = nil, wallet: Wallet? = nil, signingThreshold: Int?, nrOfParticipants: Int?) {
         self.keyPair = keyPair
         self.address = address
         self.label = label

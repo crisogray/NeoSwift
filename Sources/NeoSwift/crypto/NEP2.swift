@@ -16,13 +16,13 @@ public class NEP2 {
               nep2Data[0] == NEP2_PREFIX_1, nep2Data[1] == NEP2_PREFIX_2, nep2Data[2] == NEP2_FLAGBYTE else {
             throw "Not valid NEP2 prefix."
         }
-        let addresshash = Bytes(nep2Data[3..<7]), encrypted = Bytes(nep2Data[7..<39])
-        let derivedKey = try generateDerivedScryptKey(password.bytes, addresshash, params)
+        let addressHash = Bytes(nep2Data[3..<7]), encrypted = Bytes(nep2Data[7..<39])
+        let derivedKey = try generateDerivedScryptKey(password.bytes, addressHash, params)
         let decryptedBytes = try performCypher(encrypted, Bytes(derivedKey.suffix(32)), decrypt: true)
         let plainPrivateKey = try Bytes(derivedKey.prefix(32)) ^ decryptedBytes
         let keyPair = try ECKeyPair.create(privateKey: plainPrivateKey)
         let newAddressHash = try getAddressHash(keyPair)
-        guard newAddressHash == addresshash else {
+        guard newAddressHash == addressHash else {
             throw "Calculated address hash does not match the one in the provided encrypted address."
         }
         return keyPair

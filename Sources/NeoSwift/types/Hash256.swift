@@ -11,18 +11,18 @@ public struct Hash256: StringDecodable, Hashable {
         return hash.noPrefixHex
     }
     
-    init() {
+    public init() {
         self.hash = Bytes(repeating: 0x00, count: NeoConstants.HASH256_SIZE)
     }
     
-    init(_ hash: Bytes) throws {
+    public init(_ hash: Bytes) throws {
         guard hash.count == NeoConstants.HASH256_SIZE else {
             throw "Hash must be \(NeoConstants.HASH256_SIZE) bytes long but was \(hash.count) bytes."
         }
         self.hash = hash
     }
     
-    init(_ hash: String) throws {
+    public init(_ hash: String) throws {
         guard hash.isValidHex else {
             throw "String argument is not hexadecimal."
         }

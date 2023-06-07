@@ -7,7 +7,8 @@ struct NeoConstants {
     
     // MARK: Cryptography
     
-    private(set) public static var SECP256R1_DOMAIN: Domain = .instance(curve: .EC256r1)
+    private static let DEFAULT_CURVE: ECCurve = .EC256r1
+    private(set) public static var SECP256R1_DOMAIN: Domain = .instance(curve: DEFAULT_CURVE)
     static let SECP256R1_HALF_CURVE_ORDER: BInt = SECP256R1_DOMAIN.order >> 1
 
     // MARK: Accounts, Addresses, Keys
@@ -33,8 +34,8 @@ struct NeoConstants {
         SECP256R1_DOMAIN = .instance(curve: instance)
     }
     
-    public static func stopUsingK1CurveForTests() {
-        SECP256R1_DOMAIN = .instance(curve: .EC256r1)
+    public static func stopUsingOtherCurveForTests() {
+        SECP256R1_DOMAIN = .instance(curve: DEFAULT_CURVE)
     }
     
 }

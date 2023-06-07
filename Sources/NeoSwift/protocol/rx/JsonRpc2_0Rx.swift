@@ -7,7 +7,7 @@ public class JsonRpc2_0Rx {
     private let neoSwift: NeoSwift
     private let executorService: DispatchQueue
     
-    init(neoSwift: NeoSwift, executorService: DispatchQueue) {
+    public init(neoSwift: NeoSwift, executorService: DispatchQueue) {
         self.neoSwift = neoSwift
         self.executorService = executorService
     }

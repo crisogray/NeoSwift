@@ -1,6 +1,5 @@
 
 import Foundation
-import SwiftECC
 
 public indirect enum WitnessCondition: Hashable {
     

@@ -31,7 +31,10 @@ public struct BlockIndexPolling {
                     return Array((currIndex + 1)...latestBlockIndex)
                 }
                 return nil
-            }.compactMap { $0 }.flatMap(\.publisher).eraseToAnyPublisher()
+            }
+            .compactMap { $0 }
+            .flatMap { $0.publisher.setFailureType(to: Error.self) }
+            .eraseToAnyPublisher()
     }
     
 }

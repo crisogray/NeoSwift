@@ -12,7 +12,7 @@ public class ScryptParams: Codable, Hashable {
     public let r: Int
     public let p: Int
     
-    init(_ n: Int, _ r: Int, _ p: Int) {
+    public init(_ n: Int, _ r: Int, _ p: Int) {
         self.n = n
         self.r = r
         self.p = p
