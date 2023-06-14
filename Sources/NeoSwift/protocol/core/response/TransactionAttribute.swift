@@ -32,7 +32,7 @@ extension TransactionAttribute: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let typeString = try container.decode(String.self, forKey: .type)
         guard let type = TransactionAttribute.fromJsonValue(typeString) else {
-            throw "\(String(describing: TransactionAttribute.self)) value type not found"
+            throw NeoSwiftError.illegalArgument("\(String(describing: TransactionAttribute.self)) value type not found")
         }
         switch type {
         case .highPriority: self = .highPriority
@@ -84,7 +84,7 @@ extension TransactionAttribute: NeoSerializable {
     
     public static func deserialize(_ reader: BinaryReader) throws -> TransactionAttribute {
         guard let type = TransactionAttribute.valueOf(reader.readByte()) else {
-            throw "The deserialized type does not match the type information in the serialized data."
+            throw NeoSwiftError.deserialization("The deserialized type does not match the type information in the serialized data.")
         }
         if case .highPriority = type { return type }
         else {

@@ -38,7 +38,7 @@ extension Witness {
                                             _ verificationScript: VerificationScript) throws -> Witness {
         let threshold = try verificationScript.getSigningThreshold()
         guard signatures.count >= threshold else {
-            throw "Not enough signatures provided for the required signing threshold."
+            throw NeoSwiftError.illegalArgument("Not enough signatures provided for the required signing threshold.")
         }
         return Witness(InvocationScript.fromSignatures(Array(signatures[0..<threshold])), verificationScript)
     }

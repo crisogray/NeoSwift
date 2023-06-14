@@ -81,7 +81,7 @@ public class BinaryReader {
         if byte == 0x02 || byte == 0x03 {
             return try byte + readBytes(32)
         }
-        throw "Failed parsing encoded EC point."
+        throw NeoSwiftError.deserialization("Failed parsing encoded EC point.")
     }
     
     public func readECPoint() throws -> ECPoint {
@@ -91,7 +91,7 @@ public class BinaryReader {
         case 0x00: encoded = [0x00]
         case 0x02, 0x03: encoded = try byte + readBytes(32)
         case 0x04: encoded = try byte + readBytes(64)
-        default: throw "Failed parsing EC point."
+        default: throw NeoSwiftError.deserialization()
         }
         return try NeoConstants.SECP256R1_DOMAIN.decodePoint(encoded)
     }
@@ -126,7 +126,7 @@ public class BinaryReader {
     
     public func readVarString() throws -> String {
         guard let string = try String(bytes: readVarBytes(), encoding: .utf8) else {
-            throw "Failed reading var String."
+            throw NeoSwiftError.deserialization("Failed reading var String.")
         }
         return string
     }
@@ -138,7 +138,7 @@ public class BinaryReader {
         case OpCode.pushData1.opcode: size = readUnsignedByte()
         case OpCode.pushData2.opcode: size = Int(readInt16())
         case OpCode.pushData4.opcode: size = Int(readInt32())
-        default: throw "Stream did not contain a PUSHDATA OpCode at the current position."
+        default: throw NeoSwiftError.deserialization("Stream did not contain a PUSHDATA OpCode at the current position.")
         }
         return try readBytes(size)
     }
@@ -163,14 +163,14 @@ public class BinaryReader {
     
     public func readPushString() throws -> String {
         guard let string = try String(bytes: readPushData(), encoding: .utf8) else {
-            throw "Couldn't parse PUSHINT OpCode"
+            throw NeoSwiftError.deserialization("Couldn't parse PUSHINT OpCode")
         }
         return string
     }
     
     public func readPushInt() throws -> Int {
         guard let int = try readPushBigInt().asInt() else {
-            throw "Couldn't parse PUSHINT OpCode"
+            throw NeoSwiftError.deserialization("Couldn't parse PUSHINT OpCode")
         }
         return int
     }
@@ -188,7 +188,7 @@ public class BinaryReader {
         case .pushInt64: count = 8
         case .pushInt128: count = 16
         case .pushInt256: count = 32
-        default: throw "Couldn't parse PUSHINT OpCode"
+        default: throw NeoSwiftError.deserialization("Couldn't parse PUSHINT OpCode")
         }
         return try BInt(signed: readBytes(count))
     }

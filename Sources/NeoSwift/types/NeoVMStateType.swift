@@ -20,12 +20,12 @@ public enum NeoVMStateType: String, Codable, CaseIterable {
         let container = try decoder.singleValueContainer()
         if let string = try? container.decode(String.self),
            let value = NeoVMStateType.fromJsonValue(string) {
-           self = value
+            self = value
         } else if let int = try? container.decode(Int.self),
                   let value = NeoVMStateType.fromIntValue(int) {
             self = value
         } else {
-            throw "\(String(describing: Self.self)) value type not found"
+            throw NeoSwiftError.illegalArgument()
         }
     }
     

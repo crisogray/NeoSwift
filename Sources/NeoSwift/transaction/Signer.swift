@@ -27,9 +27,9 @@ public class Signer {
 
     public func setAllowedContracts(_ allowedContracts: [Hash160]) throws -> Signer {
         if allowedContracts.isEmpty { return self }
-        else if scopes.contains(.global) { throw "Trying to set allowed contracts on a Signer with global scope." }
+        else if scopes.contains(.global) { throw TransactionError.signerConfiguration("Trying to set allowed contracts on a Signer with global scope.") }
         else if self.allowedContracts.count + allowedContracts.count > NeoConstants.MAX_SIGNER_SUBITEMS {
-            throw "Trying to set more than \(NeoConstants.MAX_SIGNER_SUBITEMS) allowed contracts on a signer."
+            throw TransactionError.signerConfiguration("Trying to set more than \(NeoConstants.MAX_SIGNER_SUBITEMS) allowed contracts on a signer.")
         }
         scopes = scopes.filter { $0 != .none }
         if !scopes.contains(.customContracts) { scopes.append(.customContracts) }
@@ -39,9 +39,9 @@ public class Signer {
     
     public func setAllowedGroups(_ allowedGroups: [ECPublicKey]) throws -> Signer {
         if allowedGroups.isEmpty { return self }
-        else if scopes.contains(.global) { throw "Trying to set allowed contract groups on a Signer with global scope." }
+        else if scopes.contains(.global) { throw TransactionError.signerConfiguration("Trying to set allowed contract groups on a Signer with global scope.") }
         else if self.allowedGroups.count + allowedGroups.count > NeoConstants.MAX_SIGNER_SUBITEMS {
-            throw "Trying to set more than \(NeoConstants.MAX_SIGNER_SUBITEMS) allowed contract groups on a signer."
+            throw TransactionError.signerConfiguration("Trying to set more than \(NeoConstants.MAX_SIGNER_SUBITEMS) allowed contract groups on a signer.")
         }
         scopes = scopes.filter { $0 != .none }
         if !scopes.contains(.customGroups) { scopes.append(.customGroups) }
@@ -51,9 +51,9 @@ public class Signer {
     
     public func setRules(_ rules: [WitnessRule]) throws -> Signer {
         if rules.isEmpty { return self }
-        else if scopes.contains(.global) { throw "Trying to set witness rules on a Signer with global scope." }
+        else if scopes.contains(.global) { throw TransactionError.signerConfiguration("Trying to set witness rules on a Signer with global scope.") }
         else if self.rules.count + rules.count > NeoConstants.MAX_SIGNER_SUBITEMS {
-            throw "Trying to set more than \(NeoConstants.MAX_SIGNER_SUBITEMS) allowed witness rules on a signer."
+            throw TransactionError.signerConfiguration("Trying to set more than \(NeoConstants.MAX_SIGNER_SUBITEMS) allowed witness rules on a signer.")
         }
         try rules.forEach { r in try checkDepth(r.condition, WitnessCondition.MAX_NESTING_DEPTH) }
         scopes = scopes.filter { $0 != .none }
@@ -64,7 +64,7 @@ public class Signer {
     
     private func checkDepth(_ condition: WitnessCondition, _ depth: Int) throws {
         guard depth >= 0 else {
-            throw "A maximum nesting depth of \(WitnessCondition.MAX_NESTING_DEPTH) is allowed for witness conditions."
+            throw TransactionError.signerConfiguration("A maximum nesting depth of \(WitnessCondition.MAX_NESTING_DEPTH) is allowed for witness conditions.")
         }
         switch condition {
         case .and(let expressions), .or(let expressions): try expressions.forEach { try checkDepth($0, depth - 1) }
@@ -137,7 +137,7 @@ extension Signer: NeoSerializable {
             default: break
             }
             guard count <= NeoConstants.MAX_SIGNER_SUBITEMS else {
-                throw "A signer's scope can only contain \(NeoConstants.MAX_SIGNER_SUBITEMS) \(errorLabel). The input data contained \(count)."
+                throw NeoSwiftError.deserialization("A signer's scope can only contain \(NeoConstants.MAX_SIGNER_SUBITEMS) \(errorLabel). The input data contained \(count).")
             }
         }
         return Signer(signerHash, scopes, allowedContracts, allowedGroups, rules) as! Self

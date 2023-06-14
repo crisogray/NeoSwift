@@ -17,14 +17,14 @@ public struct Hash160: StringDecodable, Hashable {
     
     public init(_ hash: Bytes) throws {
         guard hash.count == NeoConstants.HASH160_SIZE else {
-            throw "Hash must be \(NeoConstants.HASH160_SIZE) bytes long but was \(hash.count) bytes."
+            throw NeoSwiftError.illegalArgument("Hash must be \(NeoConstants.HASH160_SIZE) bytes long but was \(hash.count) bytes.")
         }
         self.hash = hash
     }
     
     public init(_ hash: String) throws {
         guard hash.isValidHex else {
-            throw "String argument is not hexadecimal."
+            throw NeoSwiftError.illegalArgument("String argument is not hexadecimal.")
         }
         try self.init(hash.bytesFromHex)
     }

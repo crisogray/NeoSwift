@@ -12,7 +12,7 @@ public struct NNSName {
     
     public init(name: String) throws {
         guard NNSName.isValidNNSName(name, true) else {
-            throw "'\(name)' is not a valid NNS name."
+            throw ContractError.invalidNeoName(name)
         }
         self.name = name
     }
@@ -43,7 +43,7 @@ public struct NNSName {
         
         public init(root: String) throws {
             guard NNSRoot.isValidNNSRoot(root) else {
-                throw "'\(root)' is not a valid NNS root."
+                throw ContractError.invalidNeoNameServiceRoot(root)
             }
             self.root = root
         }

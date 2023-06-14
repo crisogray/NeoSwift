@@ -45,10 +45,10 @@ public struct ContractManifest: Codable, Hashable {
         public init(pubKey: String, signature: String) throws {
             let pubKey = pubKey.cleanedHexPrefix
             guard pubKey.bytesFromHex.count == NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED else {
-                throw "The provided value is not a valid public key: \(pubKey)"
+                throw NeoSwiftError.illegalArgument("The provided value is not a valid public key: \(pubKey)")
             }
             guard !signature.base64Decoded.isEmpty else {
-                throw "Invalid signature: \(signature). Please provide a valid signature in base64 format."
+                throw NeoSwiftError.illegalArgument("Invalid signature: \(signature). Please provide a valid signature in base64 format.")
             }
             self.pubKey = pubKey
             self.signature = signature

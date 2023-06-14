@@ -67,10 +67,10 @@ public class SerializableTransaction {
     
     public func send() async throws -> NeoSendRawTransaction {
         guard signers.count == witnesses.count else {
-            throw "The transaction does not have the same number of signers and witnesses. For every signer there has to be one witness, even if that witness is empty."
+            throw TransactionError.transactionConfiguration("The transaction does not have the same number of signers and witnesses. For every signer there has to be one witness, even if that witness is empty.")
         }
         guard size <= NeoConstants.MAX_TRANSACTION_SIZE else {
-            throw "The transaction exceeds the maximum transaction size. The maximum size is \(NeoConstants.MAX_TRANSACTION_SIZE) bytes while the transaction has size \(size)."
+            throw TransactionError.transactionConfiguration("The transaction exceeds the maximum transaction size. The maximum size is \(NeoConstants.MAX_TRANSACTION_SIZE) bytes while the transaction has size \(size).")
         }
         let hex = toArray().noPrefixHex
         try throwIfNeoSwiftNil()
@@ -80,7 +80,7 @@ public class SerializableTransaction {
     
     public func track() async throws -> AnyPublisher<Int, Error> {
         guard let blockCountWhenSent = blockCountWhenSent else {
-            throw "Cannot subscribe before transaction has been sent."
+            throw NeoSwiftError.illegalState("Cannot subscribe before transaction has been sent.")
         }
         try throwIfNeoSwiftNil()
         let predicate = { (getBlock: NeoGetBlock) -> Bool in
@@ -95,7 +95,7 @@ public class SerializableTransaction {
     
     public func getApplicationLog() async throws -> NeoApplicationLog {
         guard blockCountWhenSent != nil else {
-            throw "Cannot get the application log before transaction has been sent."
+            throw NeoSwiftError.illegalState("Cannot get the application log before transaction has been sent.")
         }
         try throwIfNeoSwiftNil()
         return try await neoSwift!.getApplicationLog(getTxId()).send().getResult()
@@ -103,7 +103,7 @@ public class SerializableTransaction {
     
     public func throwIfNeoSwiftNil() throws {
         guard neoSwift != nil else {
-            throw "SerializableTransaction has not been assigned NeoSwift instance."
+            throw NeoSwiftError.illegalState("SerializableTransaction has not been assigned NeoSwift instance.")
         }
     }
     
@@ -166,7 +166,7 @@ extension SerializableTransaction: NeoSerializable {
     private static func readTransactionAttributes(_ reader: BinaryReader, _ signerSize: Int) throws -> [TransactionAttribute] {
         let nrOfAttributes = reader.readVarInt()
         guard nrOfAttributes + signerSize <= NeoConstants.MAX_TRANSACTION_ATTRIBUTES else {
-            throw "A transaction can hold at most \(NeoConstants.MAX_TRANSACTION_ATTRIBUTES) attributes (including signers). Input data had \(signerSize) attributes."
+            throw NeoSwiftError.deserialization("A transaction can hold at most \(NeoConstants.MAX_TRANSACTION_ATTRIBUTES) attributes (including signers). Input data had \(signerSize) attributes.")
         }
         return try (0..<nrOfAttributes).map { _ in try TransactionAttribute.deserialize(reader) }
     }
@@ -179,10 +179,10 @@ extension SerializableTransaction: NeoSerializable {
         
         let items: [String: ContractParametersContext.ContextItem] = try signers.map { signer in
             guard let accountSigner = signer as? AccountSigner else {
-                throw "Cannot handle contract signers"
+                throw NeoSwiftError.unsupportedOperation("Cannot handle contract signers")
             }
             guard let verificationScript = accountSigner.account.verificationScript else {
-                throw "Account on AccountSigner has no verification script"
+                throw NeoSwiftError.illegalState("Account on AccountSigner has no verification script")
             }
             var params: [ContractParameter] = []
             if let invocationScript = witnesses.first(where: { $0.verificationScript == verificationScript })?.invocationScript {

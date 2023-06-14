@@ -18,7 +18,7 @@ public enum CallFlags: CaseIterable {
     
     public static func fromValue(_ value: Byte) throws -> CallFlags {
         guard let c = CallFlags.allCases.first(where: { $0.value == value }) else {
-            throw "There exists no call flag with the provided byte value (%d)"
+            throw NeoSwiftError.illegalArgument("There exists no call flag with the provided byte value (%d)")
         }
         return c
     }

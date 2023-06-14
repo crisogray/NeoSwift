@@ -39,7 +39,7 @@ public extension Bytes {
         let srcOffset = firstZero ? 1 : 0
         let bytesLength = self.count - srcOffset
         guard bytesLength <= length else {
-            throw "Input is too large to put in byte array of size \(length)"
+            throw NeoSwiftError.illegalArgument("Input is too large to put in byte array of size \(length)")
         }
         if trailing {
             return self[srcOffset..<bytesLength] + Bytes(repeating: 0, count: length - bytesLength)
@@ -55,7 +55,7 @@ public extension Bytes {
     
     static func ^ (lhs: Bytes, rhs: Bytes) throws -> Bytes {
         guard lhs.count == rhs.count else {
-            throw "Arrays do not have the same length to perform the XOR operation."
+            throw NeoSwiftError.illegalArgument("Arrays do not have the same length to perform the XOR operation.")
         }
         return lhs.enumerated().map { $1 ^ rhs[$0] }
     }

@@ -26,8 +26,8 @@ public class Response<T: Codable>: Codable, HasRawResponse {
     }
     
     public func getResult() throws -> T {
-        guard !hasError else {
-            throw "The Neo node responded with an error: \(error!.string)"
+        if let error = error {
+            throw ProtocolError.rpcResponseError(error.string)
         }
         return result!
     }
@@ -55,7 +55,7 @@ public class Response<T: Codable>: Codable, HasRawResponse {
         }
         
         public var string: String {
-            return "Error{code=\(code), message=\(message), data=\(data)}"
+            return "Error{code=\(code), message=\(message), data=\(String(describing: data))}"
         }
 
     }

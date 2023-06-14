@@ -50,7 +50,7 @@ public extension String {
     
     func addressToScriptHash() throws -> Bytes {
         guard isValidAddress, let b58 = base58Decoded else {
-            throw "Not a valid NEO address."
+            throw NeoSwiftError.illegalArgument("Not a valid NEO address.")
         }
         return b58[1..<21].reversed()
     }
@@ -61,7 +61,3 @@ public extension String {
     
 }
 
-extension String: LocalizedError {
-    public var errorDescription: String? { return self }
-    public var localizedDescription: String? { return self }
-}

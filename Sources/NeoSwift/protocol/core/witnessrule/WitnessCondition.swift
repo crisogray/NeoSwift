@@ -73,7 +73,7 @@ extension WitnessCondition: Codable {
         let type = try container.decode(String.self, forKey: .type)
         switch type {
         case WitnessCondition.BOOLEAN_VALUE:
-            self = .boolean(try container.decode(SafeDecode<Bool>.self, forKey: .expression).value)//.boolean(stringToType(decoder, forKey: CodingKeys.expression))
+            self = .boolean(try container.decode(SafeDecode<Bool>.self, forKey: .expression).value)
         case WitnessCondition.NOT_VALUE:
             self = try .not(container.decode(WitnessCondition.self, forKey: CodingKeys.expression))
         case WitnessCondition.AND_VALUE, WitnessCondition.OR_VALUE:
@@ -88,7 +88,7 @@ extension WitnessCondition: Codable {
             let publicKey = try ECPublicKey(publicKeyString)
             self = type == WitnessCondition.GROUP_VALUE ? .group(publicKey) : .calledByGroup(publicKey)
         case WitnessCondition.CALLED_BY_ENTRY_VALUE: self = .calledByEntry
-        default: throw "Unable to deserialse WitnessCondition from JSON"
+        default: throw NeoSwiftError.illegalArgument("There exists no witness condition with the provided json value. The provided json value was \(type).")
         }
     }
     
@@ -154,7 +154,8 @@ extension WitnessCondition: NeoSerializable {
             let key = try ECPublicKey.deserialize(reader)
             return typeByte == GROUP_BYTE ? .group(key) : .calledByGroup(key)
         case CALLED_BY_ENTRY_BYTE: return .calledByEntry
-        default: throw "The deserialized type does not match the type information in the serialized data."
+        default:
+            throw NeoSwiftError.deserialization("The deserialized type does not match the type information in the serialized data.")
         }
     }
     

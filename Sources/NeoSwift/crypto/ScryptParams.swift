@@ -27,22 +27,9 @@ public class ScryptParams: Codable, Hashable {
     
     public required init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        guard let n: Int = (try? values.decode(Int.self, forKey: .n)) ??
-                (try? values.decode(Int.self, forKey: .cost)) else {
-            throw "No 'n' found in ScryptParams JSON"
-        }
-        guard let r: Int = (try? values.decode(Int.self, forKey: .r)) ??
-                (try? values.decode(Int.self, forKey: .blockSize)) ??
-                (try? values.decode(Int.self, forKey: ._blockSize)) else {
-            throw "No 'r' found in ScryptParams JSON"
-        }
-        guard let p: Int = (try? values.decode(Int.self, forKey: .p)) ??
-                (try? values.decode(Int.self, forKey: .parallel)) else {
-            throw "No 'p' found in ScryptParams JSON"
-        }
-        self.n = n
-        self.r = r
-        self.p = p
+        self.n = try ((try? values.decode(Int.self, forKey: .cost)) ?? values.decode(Int.self, forKey: .n))
+        self.r = try ((try? values.decode(Int.self, forKey: ._blockSize)) ?? (try? values.decode(Int.self, forKey: .blockSize)) ?? values.decode(Int.self, forKey: .r))
+        self.p = try ((try? values.decode(Int.self, forKey: .parallel)) ?? values.decode(Int.self, forKey: .p))
     }
     
     private enum CodingKeys: String, CodingKey {

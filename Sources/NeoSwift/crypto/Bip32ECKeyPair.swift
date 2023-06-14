@@ -20,10 +20,8 @@ public class Bip32ECKeyPair: ECKeyPair {
         self.depth = parent != nil ? parent!.depth + 1 : 0
         self.chainCode = chainCode
         self.parentFingerprint = parent != nil ? parent!.fingerprint : 0
-        guard let pKP = try? Sign.publicPointFromPrivateKey(privKey: privateKey),
-              let id = try? pKP.getEncoded(true).sha256ThenRipemd160() else {
-            throw "Error initialising Bip32ECKeyPair"
-        }
+        let pKP = try Sign.publicPointFromPrivateKey(privKey: privateKey)
+        let id = try pKP.getEncoded(true).sha256ThenRipemd160()
         self.publicKeyPoint = pKP
         self.identifier = id
         let a = Int32(id[3] & 0xFF), b = Int32(id[2] & 0xFF) << 8

@@ -52,14 +52,14 @@ public class NonFungibleToken: Token {
     
     private func throwIfDivisibleNFT() async throws {
         if try await getDecimals() != 0 {
-            throw "This method is only intended for non-divisible NFTs."
+            throw NeoSwiftError.illegalState("This method is only intended for non-divisible NFTs.")
         }
     }
     
     private func throwIfSenderIsNotOwner(_ from: Hash160, _ tokenId: Bytes) async throws {
         let tokenOwner = try await ownerOf(tokenId)
         if tokenOwner != from {
-            throw "The provided from account is not the owner of this token."
+            throw NeoSwiftError.illegalArgument("The provided from account is not the owner of this token.")
         }
     }
     
@@ -94,7 +94,7 @@ public class NonFungibleToken: Token {
     
     private func throwIfNonDivisibleNFT() async throws {
         if try await getDecimals() == 0 {
-            throw "This method is only intended for divisible NFTs."
+            throw NeoSwiftError.illegalState("This method is only intended for divisible NFTs.")
         }
     }
     
@@ -116,22 +116,24 @@ public class NonFungibleToken: Token {
     
     public func customProperties(_ tokenId: Bytes) async throws -> [String : StackItem] {
         let invocationResult = try await callInvokeFunction(NonFungibleToken.PROPERTIES, [.byteArray(tokenId)]).getResult()
-        return try deserializeProperties(mapStackItem(invocationResult), custom: true)
+        return try deserializeProperties(mapStackItem(invocationResult), isClass: true)
     }
     
-    private func deserializeProperties<T>(_ stackItem: StackItem, custom: Bool = false) throws -> [String : T] {
+    private func deserializeProperties<T>(_ stackItem: StackItem, isClass: Bool = false) throws -> [String : T] {
         return try stackItem.map!.reduce(into: .init()) { partialResult, keyValue in
             if case .any(let v) = stackItem, v == nil { return }
-            try partialResult[keyValue.key.getString()] = (custom ? keyValue.value as! T : keyValue.value.getString() as! T)
+            try partialResult[keyValue.key.getString()] = (isClass ? keyValue.value as! T : keyValue.value.getString() as! T)
         }
     }
     
     // MARK: Helpers
     
     internal func mapStackItem(_ invocationResult: InvocationResult) throws -> StackItem {
-        guard let stackItem = invocationResult.stack.first, case .map = stackItem else {
-            let item = String(describing: invocationResult.stack.first)
-            throw "Got stack item of type \(item) but expected \(StackItem.MAP_VALUE)."
+        guard let stackItem = invocationResult.stack.first else {
+            throw ContractError.emptyInvocationResultStack
+        }
+        guard case .map = stackItem else {
+            throw ContractError.unexpectedReturnType(stackItem.jsonValue, [StackItem.MAP_VALUE])
         }
         return stackItem
     }

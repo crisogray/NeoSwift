@@ -40,7 +40,7 @@ public struct ContractParameter: Codable, Hashable {
     
     public static func byteArray(_ value: String) throws -> ContractParameter {
         guard value.isValidHex else {
-            throw "Argument is not a valid hex number."
+            throw NeoSwiftError.illegalArgument("Argument is not a valid hex number.")
         }
         return ContractParameter(type: .byteArray, value: value.bytesFromHex)
     }
@@ -51,7 +51,7 @@ public struct ContractParameter: Codable, Hashable {
     
     public static func signature(_ value: Bytes) throws -> ContractParameter {
         guard value.count == NeoConstants.SIGNATURE_SIZE else {
-            throw "Signature is expected to have a length of \(NeoConstants.SIGNATURE_SIZE) bytes, but had \(value.count)."
+            throw NeoSwiftError.illegalArgument("Signature is expected to have a length of \(NeoConstants.SIGNATURE_SIZE) bytes, but had \(value.count).")
         }
         return ContractParameter(type: .signature, value: value)
     }
@@ -62,7 +62,7 @@ public struct ContractParameter: Codable, Hashable {
     
     public static func signature(_ value: String) throws -> ContractParameter {
         guard value.isValidHex else {
-            throw "Argument is not a valid hex number."
+            throw NeoSwiftError.illegalArgument("Argument is not a valid hex number.")
         }
         return try signature(value.bytesFromHex)
     }
@@ -105,7 +105,7 @@ public struct ContractParameter: Codable, Hashable {
     
     public static func publicKey(_ value: Bytes) throws -> ContractParameter {
         guard value.count == NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED else {
-            throw "Public key argument must be \(NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED) bytes but was \(value.count) bytes."
+            throw NeoSwiftError.illegalArgument("Public key argument must be \(NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED) bytes but was \(value.count) bytes.")
         }
         return ContractParameter(type: .publicKey, value: value)
     }
@@ -124,14 +124,14 @@ public struct ContractParameter: Codable, Hashable {
     
     public static func map(_ values: [AnyHashable: AnyHashable]) throws -> ContractParameter {
         guard !values.isEmpty else {
-            throw "At least one map entry is required to create a map contract parameter."
+            throw NeoSwiftError.illegalArgument("At least one map entry is required to create a map contract parameter.")
         }
         var map: [ContractParameter: ContractParameter] = [:]
         try values.forEach { k, v in
             guard let key = try? mapToContractParameter(k),
                   let value = try? mapToContractParameter(v),
                     key.type != .array && key.type != .map else {
-                throw "The provided map contains an invalid key. The keys cannot be of type array or map."
+                throw NeoSwiftError.illegalArgument("The provided map contains an invalid key. The keys cannot be of type array or map.")
             }
             map[key] = value
         }
@@ -156,7 +156,7 @@ public struct ContractParameter: Codable, Hashable {
         case is Sign.SignatureData: return try signature(value as! Sign.SignatureData)
         case is [AnyHashable]: return try array(value as! [AnyHashable])
         case is [AnyHashable: AnyHashable]: return try map(value as! [AnyHashable: AnyHashable])
-        default: throw "The provided object could not be casted into a supported contract parameter type."
+        default: throw NeoSwiftError.illegalArgument("The provided object could not be casted into a supported contract parameter type.")
         }
     }
     
@@ -177,7 +177,7 @@ public struct ContractParameter: Codable, Hashable {
         case .map:
             let map = value as! [ContractParameter : ContractParameter]
             try container.encode(map.map { ["key" : $0, "value": $1] }, forKey: .value)
-        default: throw "Parameter type '\(type.jsonValue)' not supported."
+        default: throw NeoSwiftError.unsupportedOperation("Parameter type '\(type.jsonValue)' not supported.")
         }
     }
     
@@ -185,7 +185,7 @@ public struct ContractParameter: Codable, Hashable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         self.name = try? values.decode(String.self, forKey: .name)
         guard let type = try ContractParamterType.fromJsonValue(values.decode(String.self, forKey: .type)) else {
-            throw "Invalid Contract Parameter Type"
+            throw NeoSwiftError.illegalArgument()
         }
         self.type = type
         if !values.contains(.value) {
@@ -211,7 +211,7 @@ public struct ContractParameter: Codable, Hashable {
             try values.decode([[String : ContractParameter]].self, forKey: .value)
                 .forEach { map[$0["key"]!] = $0["value"]! }
             value = map
-        default: throw "Parameter type '\(type.jsonValue)' not supported."
+        default: throw NeoSwiftError.unsupportedOperation("Parameter type '\(type.jsonValue)' not supported.")
         }
     }
     

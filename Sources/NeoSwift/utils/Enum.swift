@@ -9,7 +9,7 @@ public extension ByteEnum {
     
     static func throwingValueOf(_ byte: Byte) throws -> Self {
         guard let value = allCases.first(where: { $0.byte == byte }) else {
-            throw "\(String(describing: OracleResponseCode.self)) value type not found"
+            throw NeoSwiftError.illegalArgument("\(String(describing: OracleResponseCode.self)) value type not found")
         }
         return value
     }
@@ -34,7 +34,7 @@ public extension ByteEnum {
                   let value = Self.valueOf(Byte(int)) {
             self = value
         } else {
-            throw "\(String(describing: Self.self)) value type not found"
+            throw NeoSwiftError.illegalArgument("\(String(describing: Self.self)) value type not found")
         }
     }
     

@@ -38,7 +38,7 @@ public class Token: SmartContract {
     
     public static func toFractions(_ amount: Decimal, _ decimals: Int) throws -> Int {
         guard amount.scale <= decimals else {
-            throw "The provided amount has too many decimal points. Make sure the decimals of the provided amount do not exceed the supported token decimals."
+            throw NeoSwiftError.illegalArgument("The provided amount has too many decimal points. Make sure the decimals of the provided amount do not exceed the supported token decimals.")
         }
         
         return (amount * Decimal(10.toPowerOf(decimals)) as NSDecimalNumber).intValue

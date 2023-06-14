@@ -41,7 +41,7 @@ public class TransactionBuilder {
     
     public func nonce(_ nonce: Int) throws -> TransactionBuilder {
         guard nonce >= 0 && nonce < 2.toPowerOf(32) else {
-            throw "The value of the transaction nonce must be in the interval [0, 2^32]."
+            throw TransactionError.transactionConfiguration("The value of the transaction nonce must be in the interval [0, 2^32].")
         }
         self.nonce = nonce
         return self
@@ -49,7 +49,7 @@ public class TransactionBuilder {
     
     public func validUntilBlock(_ blockNr: Int) throws -> TransactionBuilder {
         guard blockNr >= 0 && blockNr < 2.toPowerOf(32) else {
-            throw "The block number up to which this transaction can be included cannot be less than zero or more than 2^32."
+            throw TransactionError.transactionConfiguration("The block number up to which this transaction can be included cannot be less than zero or more than 2^32.")
         }
         self.validUntilBlock = blockNr
         return self
@@ -61,10 +61,10 @@ public class TransactionBuilder {
     
     public func firstSigner(_ sender: Hash160) throws -> TransactionBuilder {
         guard !signers.contains(where: { $0.scopes.contains(.none) }) else {
-            throw "This transaction contains a signer with fee-only witness scope that will cover the fees. Hence, the order of the signers does not affect the payment of the fees."
+            throw NeoSwiftError.illegalState("This transaction contains a signer with fee-only witness scope that will cover the fees. Hence, the order of the signers does not affect the payment of the fees.")
         }
         guard let s = signers.first(where: { $0.signerHash == sender }) else {
-            throw "Could not find a signer with script hash \(sender.string). Make sure to add the signer before calling this method."
+            throw NeoSwiftError.illegalState("Could not find a signer with script hash \(sender.string). Make sure to add the signer before calling this method.")
         }
         signers.remove(at: signers.firstIndex(of: s)!)
         signers.insert(s, at: 0)
@@ -78,7 +78,7 @@ public class TransactionBuilder {
     public func signers(_ signers: [Signer]) throws -> TransactionBuilder {
         let hashes = signers.map(\.signerHash)
         guard Set(hashes).count == hashes.count else {
-            throw "Cannot add multiple signers concerning the same account."
+            throw TransactionError.transactionConfiguration("Cannot add multiple signers concerning the same account.")
         }
         try throwIfMaxAttributesExceeded(signers.count, attributes.count)
         self.signers = signers
@@ -87,7 +87,7 @@ public class TransactionBuilder {
     
     private func throwIfMaxAttributesExceeded(_ signerCount: Int, _ attributeCount: Int) throws {
         if signerCount + attributeCount > NeoConstants.MAX_TRANSACTION_ATTRIBUTES {
-            throw "A transaction cannot have more than \(NeoConstants.MAX_TRANSACTION_ATTRIBUTES) attributes (including signers)."
+            throw TransactionError.transactionConfiguration("A transaction cannot have more than \(NeoConstants.MAX_TRANSACTION_ATTRIBUTES) attributes (including signers).")
         }
     }
     
@@ -127,19 +127,19 @@ public class TransactionBuilder {
     
     public func getUnsignedTransaction() async throws -> SerializableTransaction {
         guard let script = script, !script.isEmpty else {
-            throw "Cannot build a transaction without a script."
+            throw TransactionError.transactionConfiguration("Cannot build a transaction without a script.")
         }
         if validUntilBlock == nil {
             let currentBlockCount = try await neoSwift.getBlockCount().send().getResult()
             try _ = validUntilBlock(currentBlockCount + neoSwift.maxValidUntilBlockIncrement - 1)
         }
         guard !signers.isEmpty else {
-            throw "Cannot create a transaction without signers. At least one signer with witness scope fee-only or higher is required."
+            throw NeoSwiftError.illegalState("Cannot create a transaction without signers. At least one signer with witness scope fee-only or higher is required.")
         }
         if isHighPriority {
             let isAllowed = try await isAllowedForHighPriority()
             if !isAllowed {
-                throw "This transaction does not have a committee member as signer. Only committee members can send transactions with high priority."
+                throw NeoSwiftError.illegalState("This transaction does not have a committee member as signer. Only committee members can send transactions with high priority.")
             }
         }
         
@@ -187,7 +187,7 @@ public class TransactionBuilder {
         let response = try await neoSwift.invokeScript(script?.noPrefixHex ?? "", self.signers).send()
         let result = try response.getResult()
         guard !result.hasStateFault || neoSwift.config.allowsTransmissionOnFault else {
-            throw "The vm exited due to the following exception: \(result.exception ?? "nil")"
+            throw TransactionError.transactionConfiguration("The vm exited due to the following exception: \(result.exception ?? "nil")")
         }
         return try Int(string: result.gasConsumed)
     }
@@ -208,7 +208,7 @@ public class TransactionBuilder {
             }
         }
         guard hasAtLeastOneSigningAccount else {
-            throw "A transaction requires at least one signing account (i.e. an AccountSigner). None was provided."
+            throw TransactionError.transactionConfiguration("A transaction requires at least one signing account (i.e. an AccountSigner). None was provided.")
         }
         return try await neoSwift.calculateNetworkFee(tx.toArray().noPrefixHex).send().getResult().networkFee
     }
@@ -231,7 +231,7 @@ public class TransactionBuilder {
     
     public func callInvokeScript() async throws -> NeoInvokeScript {
         guard let script = script, !script.isEmpty else {
-            throw "Cannot make an 'invokescript' call without the script being configured."
+            throw TransactionError.transactionConfiguration("Cannot make an 'invokescript' call without the script being configured.")
         }
         return try await neoSwift.invokeScript(script.noPrefixHex, signers).send()
     }
@@ -245,10 +245,10 @@ public class TransactionBuilder {
             } else if let accountSigner = signer as? AccountSigner {
                 let acc = accountSigner.account
                 guard !acc.isMultiSig else {
-                    throw "Transactions with multi-sig signers cannot be signed automatically."
+                    throw NeoSwiftError.illegalState("Transactions with multi-sig signers cannot be signed automatically.")
                 }
                 guard let keyPair = acc.keyPair else {
-                    throw "Cannot create transaction signature because account \(acc.address) does not hold a private key."
+                    throw TransactionError.transactionConfiguration("Cannot create transaction signature because account \(acc.address) does not hold a private key.")
                 }
                 _ = try transaction.addWitness(.create(txBytes, keyPair))
             }
@@ -258,7 +258,7 @@ public class TransactionBuilder {
     
     public func doIfSenderCannotCoverFees(_ consumer: @escaping (Int, Int) -> Void) throws -> TransactionBuilder {
         guard feeError == nil else {
-            throw "Cannot handle a consumer for this case, since an exception will be thrown if the sender cannot cover the fees."
+            throw NeoSwiftError.illegalState("Cannot handle a consumer for this case, since an exception will be thrown if the sender cannot cover the fees.")
         }
         self.consumer = consumer
         return self
@@ -266,7 +266,7 @@ public class TransactionBuilder {
     
     public func throwIfSenderCannotCoverFees(_ error: Error) throws -> TransactionBuilder {
         guard consumer == nil else {
-            throw "Cannot handle a supplier for this case, since a consumer will be executed if the sender cannot cover the fees."
+            throw NeoSwiftError.illegalState("Cannot handle a supplier for this case, since a consumer will be executed if the sender cannot cover the fees.")
         }
         feeError = error
         return self

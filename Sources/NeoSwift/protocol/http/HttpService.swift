@@ -28,7 +28,7 @@ public class HttpService: Service {
             let (data, _) = try await urlRequester.data(from: request)
             return data
         } catch let error as URLError {
-            throw "Invalid response received: \(error.errorCode); \(error.localizedDescription)"
+            throw ProtocolError.clientConnection("Invalid response received: \(error.errorCode); \(error.localizedDescription)")
         } catch { throw error }
     }
     

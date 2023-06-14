@@ -32,7 +32,7 @@ public class Wallet {
     
     public func defaultAccount(_ accountHash160: Hash160) throws -> Wallet {
         guard accountsMap.keys.contains(accountHash160) else {
-            throw "Cannot set default account on wallet. Wallet does not contain the account with script hash \(accountHash160.string)."
+            throw NeoSwiftError.illegalArgument("Cannot set default account on wallet. Wallet does not contain the account with script hash \(accountHash160.string).")
         }
         self.defaultAccountHash = accountHash160
         return self
@@ -64,7 +64,7 @@ public class Wallet {
     public func addAccounts(_ accounts: [Account]) throws -> Wallet {
         let accounts = try accounts.filter { try !accountsMap.keys.contains($0.getScriptHash()) }
         if let account = accounts.first(where: { $0.wallet != nil }) {
-            throw "The account \(account.address) is already contained in a wallet. Please remove this account from its containing wallet before adding it to another wallet."
+            throw NeoSwiftError.illegalArgument("The account \(account.address) is already contained in a wallet. Please remove this account from its containing wallet before adding it to another wallet.")
         }
         try accounts.forEach { account in
             try self.accountsMap[account.getScriptHash()] = account
@@ -80,7 +80,7 @@ public class Wallet {
     public func removeAccount(_ accountHash: Hash160) throws -> Bool {
         guard accountsMap.keys.contains(accountHash) else { return false }
         guard accountsMap.count > 1 else {
-            throw "The account \(accountHash.toAddress()) is the only account in the wallet. It cannot be removed."
+            throw NeoSwiftError.illegalState("The account \(accountHash.toAddress()) is the only account in the wallet. It cannot be removed.")
         }
         _ = accountsMap[accountHash]?.wallet(nil)
         if accountHash == defaultAccount?.scriptHash {
@@ -113,7 +113,7 @@ public class Wallet {
         let accounts = try nep6Wallet.accounts.map(Account.fromNEP6Account)
         let defaultAccount = nep6Wallet.accounts.first(where: \.isDefault)
         guard let defaultAccount = defaultAccount else {
-            throw "The NEP-6 wallet does not contain any default account."
+            throw NeoSwiftError.illegalArgument("The NEP-6 wallet does not contain any default account.")
         }
         let defaultHash = try Account.fromNEP6Account(defaultAccount).getScriptHash()
         return try Wallet()
@@ -163,7 +163,7 @@ public class Wallet {
     
     public static func withAccounts(_ accounts: [Account]) throws -> Wallet {
         guard !accounts.isEmpty else {
-            throw "No accounts provided to initialize a wallet."
+            throw NeoSwiftError.illegalState("No accounts provided to initialize a wallet.")
         }
         return try Wallet().addAccounts(accounts).defaultAccount(accounts.first!.getScriptHash())
     }

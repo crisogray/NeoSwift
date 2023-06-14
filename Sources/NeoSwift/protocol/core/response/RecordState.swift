@@ -11,7 +11,7 @@ public struct RecordState: Codable, Hashable {
               let byte = list[1].integer,
               let recordType = RecordType.valueOf(Byte(byte)),
               let data = list[2].string else {
-            throw "Could not deserialise RecordState from the stack item."
+            throw NeoSwiftError.illegalArgument("Could not deserialise RecordState from the stack item.")
         }
         return RecordState(name: name, recordType: recordType, data: data)
     }

@@ -75,14 +75,14 @@ public extension ECPrivateKey {
     convenience init(_ key: BInt) throws {
         let keyString = key.asString(radix: 16, uppercase: false)
         guard keyString.count <= NeoConstants.PRIVATE_KEY_SIZE * 2 else {
-            throw "Private key must fit into \(NeoConstants.PRIVATE_KEY_SIZE) bytes, but required \(keyString.count / 2) bytes."
+            throw NeoSwiftError.illegalArgument("Private key must fit into \(NeoConstants.PRIVATE_KEY_SIZE) bytes, but required \(keyString.count / 2) bytes.")
         }
         try self.init(domain: NeoConstants.SECP256R1_DOMAIN, s: key)
     }
     
     convenience init(_ key: Bytes) throws {
         guard key.count == NeoConstants.PRIVATE_KEY_SIZE else {
-            throw "Private key byte array must have length of \(NeoConstants.PRIVATE_KEY_SIZE) but had length \(key.count)"
+            throw NeoSwiftError.illegalArgument("Private key byte array must have length of \(NeoConstants.PRIVATE_KEY_SIZE) but had length \(key.count)")
         }
         try self.init(domain: NeoConstants.SECP256R1_DOMAIN, s: key.bInt)
     }
@@ -108,12 +108,8 @@ public extension ECPublicKey {
     }
     
     convenience init(_ publicKey: Bytes) throws {
-        do {
-            try self.init(domain: NeoConstants.SECP256R1_DOMAIN,
-                          w: NeoConstants.SECP256R1_DOMAIN.decodePoint(publicKey))
-        } catch let decodeError as SwiftECC.ECException {
-            throw decodeError.description
-        }
+        try self.init(domain: NeoConstants.SECP256R1_DOMAIN,
+                      w: NeoConstants.SECP256R1_DOMAIN.decodePoint(publicKey))
     }
     
     convenience init(_ publicKey: BInt) throws {

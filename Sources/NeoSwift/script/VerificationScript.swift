@@ -27,10 +27,10 @@ public class VerificationScript: NeoSerializable, Hashable {
     
     public init(_ publicKeys: [ECPublicKey], _ signingThreshold: Int) throws {
         guard signingThreshold >= 1 && signingThreshold <= publicKeys.count else {
-            throw "Signing threshold must be at least 1 and not higher than the number of public keys."
+            throw NeoSwiftError.illegalArgument("Signing threshold must be at least 1 and not higher than the number of public keys.")
         }
         guard publicKeys.count <= NeoConstants.MAX_PUBLIC_KEYS_PER_MULTISIG_ACCOUNT else {
-            throw "At max \(NeoConstants.MAX_PUBLIC_KEYS_PER_MULTISIG_ACCOUNT) public keys can take part in a multi-sig account"
+            throw NeoSwiftError.illegalArgument("At max \(NeoConstants.MAX_PUBLIC_KEYS_PER_MULTISIG_ACCOUNT) public keys can take part in a multi-sig account")
         }
         self.script = try ScriptBuilder.buildVerificationScript(publicKeys, signingThreshold)
     }
@@ -38,7 +38,7 @@ public class VerificationScript: NeoSerializable, Hashable {
     public func getSigningThreshold() throws -> Int {
         if isSingleSigScript() { return 1 }
         else if isMultiSigScript() { return try BinaryReader(script).readPushInt() }
-        throw "The signing threshold cannot be determined because this script does not apply to the format of a signature verification script."
+        throw TransactionError.scriptFormat("The signing threshold cannot be determined because this script does not apply to the format of a signature verification script.")
     }
     
     public func getNrOfAccounts() throws -> Int {
@@ -104,7 +104,7 @@ public class VerificationScript: NeoSerializable, Hashable {
                 return keys
             }
         } catch {}
-        throw "The verification script is in an incorrect format. No public keys can be read from it."
+        throw TransactionError.scriptFormat("The verification script is in an incorrect format. No public keys can be read from it.")
     }
     
     public func serialize(_ writer: BinaryWriter) {

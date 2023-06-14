@@ -10,11 +10,8 @@ extension StringDecodable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        if let string = try? container.decode(String.self) {
-            try self.init(string: string)
-        } else {
-            throw "Did not encounter string when attempting to decode \(String(describing: Self.self)) from JSON string"
-        }
+        let string = try container.decode(String.self)
+        try self.init(string: string)
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -35,10 +32,10 @@ public class SafeDecode<T: StringDecodable>: Codable {
     public required init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(T.self) { self.value = value }
-        else if let string = try? container.decode(String.self), let value = try? T(string: string) {
+        else {
+            let string = try container.decode(String.self)
+            let value = try T(string: string)
             self.value = value
-        } else {
-            throw "Unable to decode \(String(describing: T.self)) from JSON"
         }
     }
 
@@ -75,7 +72,7 @@ extension Bool: StringDecodable {
     
     public init(string: String) throws {
         guard let bool = Bool(string) else {
-            throw "Unable to decode Bool from JSON"
+            throw NeoSwiftError.illegalArgument("Unable to decode Bool from JSON string '\(string)'")
         }
         self = bool
     }
@@ -90,7 +87,7 @@ extension Int: StringDecodable {
     
     public init(string: String) throws {
         guard let int = Int(string) else {
-            throw "Unable to decode Int from JSON"
+            throw NeoSwiftError.illegalArgument("Unable to decode Int from JSON string '\(string)'")
         }
         self = int
     }
@@ -123,7 +120,7 @@ extension AnyHashable: Codable {
         else if let value = try? container.decode(Bool.self) { self = value }
         else if let value = try? container.decode([AnyHashable].self) { self = value }
         else if let value = try? container.decode([AnyHashable : AnyHashable].self) { self = value }
-        else { throw "Unable to decode AnyHashable" }
+        else { throw NeoSwiftError.illegalArgument("Unable to decode AnyHashable") }
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -142,7 +139,7 @@ extension AnyHashable: Codable {
         case is [TransactionSigner]: try container.encode(self as! [TransactionSigner])
         case is TransactionSendToken: try container.encode(self as! TransactionSendToken)
         case is [TransactionSendToken]: try container.encode(self as! [TransactionSendToken])
-        default: throw "Unable to encode AnyHashable \(self)"
+        default: throw NeoSwiftError.illegalArgument("Unable to encode AnyHashable \(self)")
         }
     }
     

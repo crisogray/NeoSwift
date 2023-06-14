@@ -41,7 +41,7 @@ public class ScriptReader {
         case 1: return reader.readUnsignedByte()
         case 2: return Int(reader.readInt16())
         case 4: return Int(reader.readInt32())
-        default: throw "Only operand prefix sizes 1, 2, and 4 are supported, but got \(size.prefixSize)."
+        default: throw NeoSwiftError.unsupportedOperation("Only operand prefix sizes 1, 2, and 4 are supported, but got \(size.prefixSize).")
         }
     }
     

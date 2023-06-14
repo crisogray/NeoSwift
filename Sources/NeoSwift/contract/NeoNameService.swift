@@ -90,7 +90,7 @@ public class NeoNameService: NonFungibleToken {
     
     public func renew(_ name: NNSName, _ years: Int) async throws -> TransactionBuilder {
         guard years > 0 && years <= 10 else {
-            throw "Domain names can only be renewed by at least 1, and at most 10 years."
+            throw NeoSwiftError.illegalArgument("Domain names can only be renewed by at least 1, and at most 10 years.")
         }
         try await checkDomainNameAvailability(name, false)
         return try invokeFunction(NeoNameService.RENEW, [.string(name.name), .integer(years)])
@@ -108,12 +108,10 @@ public class NeoNameService: NonFungibleToken {
     public func getRecord(_ name: NNSName, _ type: RecordType) throws -> TransactionBuilder {
         do {
             return try invokeFunction(NeoNameService.GET_RECORD, [.string(name.name), .integer(type.byte)])
-        } catch {
-            if error.localizedDescription.contains("Got stack item of type") {
-                throw "Could not get a record of type '\(type)' for the domain name '\(name.name)'."
-            } else if error.localizedDescription.contains("The invocation resulted in a FAULT VM state.") {
-                throw "The domain name '\(name.name)' might not be registered or is in an invalid format."
-            } else { throw error }
+        } catch ContractError.unresolvableDomainName {
+            throw NeoSwiftError.illegalArgument("Could not get a record of type '\(type)' for the domain name '\(name)'.")
+        } catch ProtocolError.invocationFaultSate {
+            throw NeoSwiftError.illegalArgument("The domain name '\(name.name)' might not be registered or is in an invalid format.")
         }
     }
     
@@ -134,19 +132,16 @@ public class NeoNameService: NonFungibleToken {
         do {
             return try await callFunctionReturningString(NeoNameService.RESOLVE, [.string(name.name), .integer(type.byte)])
         } catch {
-            if error.localizedDescription.contains("Got stack item of type") ||
-                error.localizedDescription.contains("The invocation resulted in a FAULT VM state.") {
-                throw "The provided domain name '\(name.name)' could not be resolved."
-            } else { throw error }
+            throw ContractError.unresolvableDomainName(name.name)
         }
     }
     
     private func checkDomainNameAvailability(_ name: NNSName, _ shouldBeAvailable: Bool) async throws {
         let isAvailable = try await isAvailable(name)
         if shouldBeAvailable && !isAvailable {
-            throw "The domain name '\(name.name)' is already taken."
+            throw NeoSwiftError.illegalArgument("The domain name '\(name.name)' is already taken.")
         } else if !shouldBeAvailable && isAvailable {
-            throw "The domain name '\(name.name)' is not registered."
+            throw NeoSwiftError.illegalArgument("The domain name '\(name.name)' is not registered.")
         }
     }
     
@@ -163,9 +158,11 @@ public class NeoNameService: NonFungibleToken {
         try throwIfFaultState(invocationResult)
         let map = try mapStackItem(invocationResult).map!
         guard let name = map[NeoNameService.NAME_PROPERTY]?.string else {
-            throw "Name or expiration property not found in stack item"
+            throw NeoSwiftError.illegalState("'name' property not found in stack item")
         }
-        let expiration = map[NeoNameService.EXPIRATION_PROPERTY]?.integer
+        guard let expiration = map[NeoNameService.EXPIRATION_PROPERTY]?.integer else {
+            throw NeoSwiftError.illegalState("'expiration' property not found in stack item")
+        }
         if let adminAddress = map[NeoNameService.ADMIN_PROPERTY]?.address {
             return try NameState(name: name, expiration: expiration, admin: Hash160.fromAddress(adminAddress))
         }

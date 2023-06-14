@@ -415,7 +415,7 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testDoIfSenderCannotCoverFees_alreadySpecifiedASupplier() {
-        let builder = try! TransactionBuilder(neoSwift).throwIfSenderCannotCoverFees("")
+        let builder = try! TransactionBuilder(neoSwift).throwIfSenderCannotCoverFees(NeoSwiftError.illegalState())
         XCTAssertThrowsError(try builder.doIfSenderCannotCoverFees({ _, _ in })) { error in
             XCTAssert(error.localizedDescription.contains("Cannot handle a consumer for this case, since an exception"))
         }
@@ -434,7 +434,7 @@ class TransactionBuilderTests: XCTestCase {
         
         let transactionBuilder = try! TransactionBuilder(neoSwift).script(script).validUntilBlock(2000000)
             .signers(AccountSigner.calledByEntry(account1))
-            .throwIfSenderCannotCoverFees("test throwIfSenderCannotCoverFees")
+            .throwIfSenderCannotCoverFees(NeoSwiftError.illegalState("test throwIfSenderCannotCoverFees"))
         do {
             _ = try await transactionBuilder.getUnsignedTransaction()
             XCTFail("No exception")
@@ -445,7 +445,7 @@ class TransactionBuilderTests: XCTestCase {
     
     public func testThrowIfSenderCannotCoverFees_alreadySpecifiedAConsumer() {
         let builder = try! TransactionBuilder(neoSwift).doIfSenderCannotCoverFees({ _, _ in })
-        XCTAssertThrowsError(try builder.throwIfSenderCannotCoverFees("")) { error in
+        XCTAssertThrowsError(try builder.throwIfSenderCannotCoverFees(NeoSwiftError.illegalState())) { error in
             XCTAssert(error.localizedDescription.contains("Cannot handle a supplier for this case, since a consumer"))
         }
     }
@@ -649,7 +649,7 @@ class TransactionBuilderTests: XCTestCase {
             .script(script).nonce(0)
             .signers(AccountSigner.calledByEntry(account1))
             .sign()
-        
+
         let blockNum = Counter()
         var cancellables: Set<AnyCancellable> = []
         let expectation = XCTestExpectation()
@@ -661,7 +661,7 @@ class TransactionBuilderTests: XCTestCase {
             case .failure(let error): XCTFail(error.localizedDescription)
             }
         }, receiveValue: blockNum.set).store(in: &cancellables)
-        _ = XCTWaiter.wait(for: [expectation], timeout: 100)
+        _ = await XCTWaiter.fulfillment(of: [expectation], timeout: 100)
         XCTAssertEqual(blockNum.value, 1002)
     }
     

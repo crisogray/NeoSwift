@@ -45,7 +45,7 @@ public class NeoSwift: Neo, NeoSwiftRx {
     public func getNetworkMagicNumber() async throws -> Int {
         if config.networkMagic == nil {
             guard let magic = try await getVersion().send().getResult().protocol?.network else {
-                throw "Unable to read Network Magic Number from Version"
+                throw NeoSwiftError.illegalState("Unable to read Network Magic Number from Version")
             }
             _ = try config.setNetworkMagic(magic)
         }

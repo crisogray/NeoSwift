@@ -54,7 +54,7 @@ public class NeoSwiftConfig {
     
     public func setNetworkMagic(_ magic: Int) throws -> NeoSwiftConfig {
         guard magic <= 0xFFFFFFFF && magic >= 0 else {
-            throw "The network magic number must fit into a 32-bit unsigned integer, i.e., it must be positive and not greater than 0xFFFFFFFF."
+            throw NeoSwiftError.illegalArgument("The network magic number must fit into a 32-bit unsigned integer, i.e., it must be positive and not greater than 0xFFFFFFFF.")
         }
         self.networkMagic = magic
         return self

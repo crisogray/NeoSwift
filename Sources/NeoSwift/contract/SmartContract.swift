@@ -18,7 +18,7 @@ public class SmartContract {
     
     public func buildInvokeFunctionScript(_ function: String, _ params: [ContractParameter]) throws -> Bytes {
         guard !function.isEmpty else {
-            throw "The invocation function must not be empty."
+            throw NeoSwiftError.illegalArgument("The invocation function must not be empty.")
         }
         return try ScriptBuilder().contractCall(scriptHash, method: function, params: params).toArray()
     }
@@ -26,8 +26,11 @@ public class SmartContract {
     public func callFunctionReturningString(_ function: String, _ params: [ContractParameter] = []) async throws -> String {
         let invocationResult = try await callInvokeFunction(function, params).getResult()
         try throwIfFaultState(invocationResult)
-        guard let stackItem = invocationResult.stack.first, case .byteString = stackItem else {
-            throw "Got stack item of type \(String(describing: invocationResult.stack.first?.jsonValue)) but expected \(StackItem.BYTE_STRING_VALUE)."
+        guard let stackItem = invocationResult.stack.first else {
+            throw ContractError.emptyInvocationResultStack
+        }
+        guard case .byteString = stackItem else {
+            throw ContractError.unexpectedReturnType(stackItem.jsonValue, [StackItem.BYTE_STRING_VALUE])
         }
         return stackItem.string!
     }
@@ -35,8 +38,11 @@ public class SmartContract {
     public func callFunctionReturningInt(_ function: String, _ params: [ContractParameter] = []) async throws -> Int {
         let invocationResult = try await callInvokeFunction(function, params).getResult()
         try throwIfFaultState(invocationResult)
-        guard let stackItem = invocationResult.stack.first, case .integer = stackItem else {
-            throw "Got stack item of type \(String(describing: invocationResult.stack.first?.jsonValue)) but expected \(StackItem.INTEGER_VALUE)."
+        guard let stackItem = invocationResult.stack.first else {
+            throw ContractError.emptyInvocationResultStack
+        }
+        guard case .integer = stackItem else {
+            throw ContractError.unexpectedReturnType(stackItem.jsonValue, [StackItem.INTEGER_VALUE])
         }
         return stackItem.integer!
     }
@@ -47,7 +53,8 @@ public class SmartContract {
         let stackItem = invocationResult.stack.first
         switch stackItem {
         case .boolean, .integer, .byteString, .buffer: return stackItem!.boolean!
-        default: throw "Got stack item of type \(String(describing: stackItem?.jsonValue)) but expected \(StackItem.BYTE_STRING_VALUE)."
+        case nil: throw ContractError.emptyInvocationResultStack
+        default: throw ContractError.unexpectedReturnType(stackItem!.jsonValue, [StackItem.BYTE_STRING_VALUE])
         }
     }
     
@@ -59,23 +66,26 @@ public class SmartContract {
     
     public func extractScriptHash(_ item: StackItem) throws -> Hash160 {
         guard case .byteString = item else {
-            throw "Got stack item of type \(item.jsonValue) but expected \(StackItem.BYTE_STRING_VALUE)."
+            throw ContractError.unexpectedReturnType(item.jsonValue, [StackItem.BYTE_STRING_VALUE])
         }
         do {
             return try Hash160(item.hexString!.reversedHex)
         } catch {
-            throw "Return type did not contain script hash in expected format. \(error.localizedDescription)"
+            throw ContractError.unexpectedReturnType("Return type did not contain script hash in expected format. \(error.localizedDescription)")
         }
     }
     
     public func callFunctionReturningIterator<T>(_ function: String, _ params: [ContractParameter], _ mapper: @escaping (StackItem) throws -> T = { $0 }) async throws -> Iterator<T> {
         let invocationResult = try await callInvokeFunction(function, params).getResult()
         try throwIfFaultState(invocationResult)
-        guard let stackItem = invocationResult.stack.first, case .interopInterface = stackItem else {
-            throw "Got stack item of type \(String(describing: invocationResult.stack.first?.jsonValue)) but expected \(StackItem.INTEROP_INTERFACE_VALUE)."
+        guard let stackItem = invocationResult.stack.first else {
+            throw ContractError.emptyInvocationResultStack
+        }
+        guard case .interopInterface = stackItem else {
+            throw ContractError.unexpectedReturnType(stackItem.jsonValue, [StackItem.INTEROP_INTERFACE_VALUE])
         }
         guard let sessionId = invocationResult.sessionId else {
-            throw "No session id was found. The connected Neo node might not support sessions."
+            throw NeoSwiftError.illegalState("No session id was found. The connected Neo node might not support sessions.")
         }
         return .init(neoSwift: neoSwift, sessionId: sessionId, iteratorId: stackItem.iteratorId!, mapper: mapper)
     }
@@ -97,14 +107,14 @@ public class SmartContract {
     
     public func callInvokeFunction(_ function: String, _ params: [ContractParameter] = [], _ signers: [Signer] = []) async throws -> NeoInvokeFunction {
         guard !function.isEmpty else {
-            throw "The invocation function must not be null or empty."
+            throw NeoSwiftError.illegalArgument("The invocation function must not be null or empty.")
         }
         return try await neoSwift.invokeFunction(scriptHash, function, params, signers).send()
     }
     
     public func throwIfFaultState(_ invocationResult: InvocationResult) throws {
         if invocationResult.hasStateFault {
-            throw "The invocation resulted in a FAULT VM state. The VM exited due to the following exception: \(String(describing: invocationResult.exception))"
+            throw ProtocolError.invocationFaultSate(String(describing: invocationResult.exception))
         }
     }
     

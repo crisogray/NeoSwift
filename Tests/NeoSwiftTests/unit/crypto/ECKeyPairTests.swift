@@ -22,9 +22,7 @@ class ECKeyPairTests: XCTestCase {
     
     public func testNewPublicKeyFromStringWithInvalidSize() {
         let tooSmall = String(encodedPoint.dropLast(2))
-        XCTAssertThrowsError(try ECPublicKey(tooSmall)) { error in
-            XCTAssertEqual(error.localizedDescription, "Point decode exception")
-        }
+        XCTAssertThrowsError(try ECPublicKey(tooSmall))
     }
     
     public func testNewPublicKeyFromPointWithHexPrefix() {

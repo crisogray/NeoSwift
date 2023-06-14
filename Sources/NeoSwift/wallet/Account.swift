@@ -77,14 +77,14 @@ public class Account {
     public func decryptPrivateKey(_ password: String, _ scryptParams: ScryptParams = .DEFAULT) throws {
         if keyPair != nil { return }
         if encryptedPrivateKey == nil {
-            throw "The account does not hold an encrypted private key."
+            throw WalletError.accountState("The account does not hold an encrypted private key.")
         }
         keyPair = try NEP2.decrypt(password, encryptedPrivateKey!, scryptParams)
     }
     
     public func encryptPrivateKey(_ password: String, _ scryptParams: ScryptParams = .DEFAULT) throws {
         if keyPair == nil {
-            throw "The account does not hold a decrypted private key."
+            throw WalletError.accountState("The account does not hold a decrypted private key.")
         }
         encryptedPrivateKey = try NEP2.encrypt(password, keyPair!, scryptParams)
         keyPair = nil
@@ -96,14 +96,14 @@ public class Account {
     
     public func getSigningThreshold() throws -> Int {
         guard isMultiSig, let signingThreshold = signingThreshold else {
-            throw "Cannot get signing threshold from account \(address), because it is not multi-sig."
+            throw WalletError.accountState("Cannot get signing threshold from account \(address), because it is not multi-sig.")
         }
         return signingThreshold
     }
     
     public func getNrOfParticipants() throws -> Int {
         guard isMultiSig, let nrOfParticipants = nrOfParticipants else {
-            throw "Cannot get number of participants from account \(address), because it is not multi-sig."
+            throw WalletError.accountState("Cannot get number of participants from account \(address), because it is not multi-sig.")
         }
         return nrOfParticipants
     }
@@ -115,7 +115,7 @@ public class Account {
     
     public func toNEP6Account() throws -> NEP6Account {
         if keyPair != nil && encryptedPrivateKey == nil {
-            throw "Account private key is available but not encrypted."
+            throw WalletError.accountState("Account private key is available but not encrypted.")
         }
         guard let verificationScript = verificationScript else {
             return NEP6Account(address: address, label: label, isDefault: isDefault, lock: isLocked, key: encryptedPrivateKey, contract: nil, extra: nil)
@@ -180,7 +180,7 @@ public class Account {
     }
     
     public static func fromAddress(_ address: String) throws -> Account {
-        if !address.isValidAddress { throw "Invalid address." }
+        if !address.isValidAddress { throw NeoSwiftError.illegalArgument("Invalid address.") }
         return Account(address: address, label: address)
     }
     
@@ -192,7 +192,7 @@ public class Account {
         do {
             return try Account(keyPair: .createEcKeyPair())
         } catch {
-            throw "Failed to create a new EC key pair."
+            throw NeoSwiftError.runtime("Failed to create a new EC key pair.")
         }
     }
     

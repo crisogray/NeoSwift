@@ -54,7 +54,7 @@ public class ScriptBuilder {
         case .array: return try pushArray(value as! [ContractParameter])
         case .map: return try pushMap(value as! [ContractParameter: ContractParameter])
         case .any: return self
-        default: throw ("Parameter type '\(param.type.jsonValue)' not supported.")
+        default: throw NeoSwiftError.illegalArgument("Parameter type '\(param.type.jsonValue)' not supported.")
         }
     }
     
@@ -69,7 +69,7 @@ public class ScriptBuilder {
         else if bytes.count <= 8 { return opCode(.pushInt64, padNumber(i, 8)) }
         else if bytes.count <= 16 { return opCode(.pushInt128, padNumber(i, 16)) }
         else if bytes.count <= 32 { return opCode(.pushInt256, padNumber(i, 32)) }
-        throw "The given number (\(i)) is out of range."
+        throw NeoSwiftError.illegalArgument("The given number (\(i)) is out of range.")
     }
     
     public func pushInteger(_ i: Int) throws -> ScriptBuilder {

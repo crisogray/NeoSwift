@@ -67,6 +67,15 @@ public indirect enum StackItem: Hashable {
     case map(_ value: [StackItem : StackItem])
     case interopInterface(_ iteratorId: String, _ interfaceName: String)
     
+    // TODO: Move to ProtocolError
+    public struct CastError: LocalizedError {
+        let item, targetType: String
+        
+        public var errorDescription: String? {
+            return "Cannot cast stack item \(item) to a \(targetType)."
+        }
+    }
+    
 }
 
 extension StackItem: Codable {
@@ -94,7 +103,7 @@ extension StackItem: Codable {
             let id = try container.decode(String.self, forKey: .id)
             let interface = try container.decode(String.self, forKey: .interface)
             self = .interopInterface(id, interface)
-        default: throw "Unable to decode StackItem"
+        default: throw NeoSwiftError.illegalArgument("There exists no stack item with the provided json value. The provided json value was \(type).")
         }
     }
     
@@ -196,7 +205,7 @@ extension StackItem {
 
     public func getString() throws -> String {
         guard let string = string else {
-            throw "Cannot cast stack item \(jsonValue) to a string."
+            throw CastError(item: jsonValue, targetType: "string")
         }
         return string
     }
@@ -219,7 +228,7 @@ extension StackItem {
     
     public func getByteArray() throws -> Bytes {
         guard let byteArray = byteArray else {
-            throw "Cannot cast stack item \(jsonValue) to a byte array."
+            throw CastError(item: jsonValue, targetType: "byte array")
         }
         return byteArray
     }
