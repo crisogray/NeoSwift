@@ -629,7 +629,7 @@ class TransactionBuilderTests: XCTestCase {
         }
     }
     
-    public func testTrackingTransactionShouldReturnCorrectBlock() async {
+    public func testTrackingTransactionShouldReturnCorrectBlock() {
         let invokeJson = invokeScriptTransferFixedSysFeeJson
         let rawTransactionJson = sendRawTransactionJson
         let networkFeeJson = calculateNetworkFeeJson
@@ -645,23 +645,27 @@ class TransactionBuilderTests: XCTestCase {
                                                                 .hash160(recipient), .integer(5),
                                                                 .any(nil)]).toArray()
         
-        let tx = try! await TransactionBuilder(neoSwift)
-            .script(script).nonce(0)
-            .signers(AccountSigner.calledByEntry(account1))
-            .sign()
-
-        let blockNum = Counter()
-        var cancellables: Set<AnyCancellable> = []
         let expectation = XCTestExpectation()
-        
-        _ = try! await tx.send()
-        _ = try! await tx.track().sink(receiveCompletion: { completion in
-            switch completion {
-            case .finished: expectation.fulfill()
-            case .failure(let error): XCTFail(error.localizedDescription)
-            }
-        }, receiveValue: blockNum.set).store(in: &cancellables)
-        _ = await XCTWaiter.fulfillment(of: [expectation], timeout: 100)
+        let blockNum = Counter()
+
+        Task {
+            
+            let tx = try! await TransactionBuilder(neoSwift)
+                .script(script).nonce(0)
+                .signers(AccountSigner.calledByEntry(account1))
+                .sign()
+            
+            var cancellables: Set<AnyCancellable> = []
+            
+            _ = try! await tx.send()
+            _ = try! await tx.track().sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished: expectation.fulfill()
+                case .failure(let error): XCTFail(error.localizedDescription)
+                }
+            }, receiveValue: blockNum.set).store(in: &cancellables)
+        }
+        _ = XCTWaiter.wait(for: [expectation], timeout: 100)
         XCTAssertEqual(blockNum.value, 1002)
     }
     
