@@ -649,7 +649,6 @@ class TransactionBuilderTests: XCTestCase {
         let blockNum = Counter()
 
         Task {
-            
             let tx = try! await TransactionBuilder(neoSwift)
                 .script(script).nonce(0)
                 .signers(AccountSigner.calledByEntry(account1))

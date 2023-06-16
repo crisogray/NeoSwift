@@ -11,12 +11,12 @@ public class SmartContract {
         self.neoSwift = neoSwift
     }
     
-    public func invokeFunction(_ function: String, _ params: [ContractParameter]) throws -> TransactionBuilder {
+    public func invokeFunction(_ function: String, _ params: [ContractParameter?]) throws -> TransactionBuilder {
         let script = try buildInvokeFunctionScript(function, params)
         return TransactionBuilder(neoSwift).script(script)
     }
     
-    public func buildInvokeFunctionScript(_ function: String, _ params: [ContractParameter]) throws -> Bytes {
+    public func buildInvokeFunctionScript(_ function: String, _ params: [ContractParameter?]) throws -> Bytes {
         guard !function.isEmpty else {
             throw NeoSwiftError.illegalArgument("The invocation function must not be empty.")
         }

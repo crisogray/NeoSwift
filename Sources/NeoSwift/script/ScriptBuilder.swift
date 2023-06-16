@@ -19,7 +19,7 @@ public class ScriptBuilder {
         return self
     }
     
-    public func contractCall(_ hash160: Hash160, method: String, params: [ContractParameter], callFlags: CallFlags = .all) throws -> ScriptBuilder {
+    public func contractCall(_ hash160: Hash160, method: String, params: [ContractParameter?], callFlags: CallFlags = .all) throws -> ScriptBuilder {
         _ = params.isEmpty ? opCode(.newArray0) : try pushParams(params)
         return try pushInteger(Int(callFlags.value))
             .pushData(method)

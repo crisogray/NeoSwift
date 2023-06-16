@@ -35,7 +35,7 @@ class TokenTests: XCTestCase {
         let invokeJson = invokeFunctionTotalSupplyJson
         _ = mockUrlSession.data(invokeJson)
         let totalSupply = try! await someToken.getTotalSupply()
-        XCTAssertEqual(totalSupply, 3000000000000000)
+        XCTAssertEqual(totalSupply, 3_000_000_000_000_000)
     }
     
     public func testToFractions() async {

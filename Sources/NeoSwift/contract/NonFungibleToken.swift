@@ -27,7 +27,7 @@ public class NonFungibleToken: Token {
     }
     
     public func transfer(_ to: Hash160, _ tokenId: Bytes, _ data: ContractParameter? = nil) throws -> TransactionBuilder {
-        return try invokeFunction(NonFungibleToken.TRANSFER, add(data, to: [.hash160(to), .byteArray(tokenId)]))
+        return try invokeFunction(NonFungibleToken.TRANSFER, [.hash160(to), .byteArray(tokenId), data])
     }
     
     public func transfer(_ from: Account, _ to: NNSName, _ tokenId: Bytes, _ data: ContractParameter? = nil) async throws -> TransactionBuilder {
@@ -37,12 +37,12 @@ public class NonFungibleToken: Token {
     
     public func transfer(_ to: NNSName, _ tokenId: Bytes, _ data: ContractParameter? = nil) async throws -> TransactionBuilder {
         try await throwIfDivisibleNFT()
-        return try transfer(resolveNNSTextRecord(to), tokenId, data)
+        return try await transfer(resolveNNSTextRecord(to), tokenId, data)
     }
     
     public func buildNonDivisibleTransferScript(_ to: Hash160, _ tokenId: Bytes, _ data: ContractParameter) async throws -> Bytes {
         try await throwIfDivisibleNFT()
-        return try buildInvokeFunctionScript(NonFungibleToken.TRANSFER, add(data, to: [.hash160(to), .byteArray(tokenId)]))
+        return try buildInvokeFunctionScript(NonFungibleToken.TRANSFER, [.hash160(to), .byteArray(tokenId), data])
     }
     
     public func ownerOf(_ tokenId: Bytes) async throws -> Hash160 {
@@ -71,7 +71,7 @@ public class NonFungibleToken: Token {
     
     public func transfer(_ from: Hash160, _ to: Hash160, _ amount: Int, _ tokenId: Bytes, _ data: ContractParameter? = nil) async throws -> TransactionBuilder {
         try await throwIfNonDivisibleNFT()
-        return try invokeFunction(NonFungibleToken.TRANSFER, add(data, to: [.hash160(from), .hash160(to), .integer(amount), .byteArray(tokenId)]))
+        return try invokeFunction(NonFungibleToken.TRANSFER, [.hash160(from), .hash160(to), .integer(amount), .byteArray(tokenId), data])
     }
     
     public func transfer(_ from: Account, _ to: NNSName, _ amount: Int, _ tokenId: Bytes, _ data: ContractParameter? = nil) async throws -> TransactionBuilder {
@@ -84,7 +84,7 @@ public class NonFungibleToken: Token {
     }
     
     public func buildDivisibleTransferScript(_ from: Hash160, _ to: Hash160, _ amount: Int, _ tokenId: Bytes, _ data: ContractParameter? = nil) throws -> Bytes {
-        return try buildInvokeFunctionScript(NonFungibleToken.TRANSFER, add(data, to: [.hash160(from), .hash160(to), .integer(amount), .byteArray(tokenId)]))
+        return try buildInvokeFunctionScript(NonFungibleToken.TRANSFER, [.hash160(from), .hash160(to), .integer(amount), .byteArray(tokenId), data])
     }
     
     public func ownersOf(_ tokenId: Bytes) async throws -> Iterator<Hash160> {
@@ -136,12 +136,6 @@ public class NonFungibleToken: Token {
             throw ContractError.unexpectedReturnType(stackItem.jsonValue, [StackItem.MAP_VALUE])
         }
         return stackItem
-    }
-    
-    private func add(_ data: ContractParameter?, to params: [ContractParameter]) -> [ContractParameter] {
-        var params: [ContractParameter] = params
-        if let data = data { params.append(data) }
-        return params
     }
     
 }

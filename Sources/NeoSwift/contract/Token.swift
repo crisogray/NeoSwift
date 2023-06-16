@@ -51,11 +51,10 @@ public class Token: SmartContract {
     public static func toDecimals(_ amount: Int, _ decimals: Int) throws -> Decimal {
         return Decimal(amount) * (decimals < 0 ? pow(Decimal(10), -decimals) : (1 / pow(Decimal(10), decimals)))
     }
-    
-    // TODO: NeoNameService
-    
-    internal func resolveNNSTextRecord(_ name: NNSName) throws -> Hash160 {
-        return .ZERO
+        
+    internal func resolveNNSTextRecord(_ name: NNSName) async throws -> Hash160 {
+        let resolvedAddress = try await NeoNameService(neoSwift: neoSwift).resolve(name, .txt)
+        return try .fromAddress(resolvedAddress)
     }
         
 }

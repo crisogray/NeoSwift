@@ -13,7 +13,7 @@ public struct NeoBlock: Codable, Hashable {
     public let witnesses: [NeoWitness]?
     public let transactions: [Transaction]?
     public let confirmations: Int
-    public let nextBlockHash: Hash256
+    public let nextBlockHash: Hash256?
     
     public init(hash: Hash256, size: Int, version: Int, prevBlockHash: Hash256, merkleRootHash: Hash256, time: Int, index: Int, primary: Int?, nextConsensus: String, witnesses: [NeoWitness]?, transactions: [Transaction]?, confirmations: Int, nextBlockHash: Hash256) {
         self.hash = hash

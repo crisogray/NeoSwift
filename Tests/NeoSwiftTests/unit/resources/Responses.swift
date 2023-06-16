@@ -206,6 +206,25 @@ let invokeFunctionBalanceOf1000000Json = """
 }
 """.data(using: .utf8)!
 
+let invokeFunctionBalanceOf300000000Json = """
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "script": "DBQGSl3MDxYsg0c9Aok46V+3dhMechHAHwwJYmFsYW5jZU9mDBQos62rcmn5whgds8t0Hr9VGTDicEFifVtS",
+    "state": "HALT",
+    "gasconsumed": "1999210",
+    "exception": null,
+    "stack": [
+      {
+        "type": "Integer",
+        "value": "300000000"
+      }
+    ]
+  }
+}
+""".data(using: .utf8)!
+
 let invokeFunctionDecimalsNep17Json = """
 {
   "jsonrpc": "2.0",
@@ -383,6 +402,69 @@ let getApplicationLogUnkownJson = """
   "error": {
     "code": -100,
     "message": "Unknown transaction/blockhash"
+  }
+}
+""".data(using: .utf8)!
+
+// MARK: Designation
+
+let designation_getByRoleJson = """
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "script": "AFUUEsAME2dldERlc2lnbmF0ZWRCeVJvbGUMFHrqSTmbXwbayYBXmTi/aXBMPwfAQWJ9W1I=",
+    "state": "HALT",
+    "gasconsumed": "1999210",
+    "exception": null,
+    "stack": [
+      {
+        "type": "Array",
+        "value": [
+          {
+            "type": "ByteString",
+            "value": "AiSUJaBrWh+OYTP8ea+iwrhDC/kycpfxdnYd956NiSnF"
+          }
+        ]
+      }
+    ]
+  }
+}
+""".data(using: .utf8)!
+
+let designation_getByRole_emptyJson = """
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "script": "EhQSwAwTZ2V0RGVzaWduYXRlZEJ5Um9sZQwUeupJOZtfBtrJgFeZOL9pcEw/B8BBYn1bUg==",
+    "state": "HALT",
+    "gasconsumed": "1999210",
+    "exception": null,
+    "stack": [
+      {
+        "type": "Array",
+        "value": []
+      }
+    ]
+  }
+}
+""".data(using: .utf8)!
+
+let designation_designateAsRoleJson = """
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "script": "DCECJJQloGtaH45hM/x5r6LCuEML+TJyl/F2dh33no2JKcURwBgSwAwPZGVzaWduYXRlQXNSb2xlDBR66kk5m18G2smAV5k4v2lwTD8HwEFifVtS",
+    "state": "HALT",
+    "gasconsumed": "1014810",
+    "exception": null,
+    "stack": [
+      {
+        "type": "Any"
+      }
+    ]
   }
 }
 """.data(using: .utf8)!
