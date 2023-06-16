@@ -30,8 +30,8 @@ class MockURLSession: URLRequester {
         return self
     }
     
-    public func data(_ dataMap: [String : [Data]]) -> MockURLSession {
-        if self.dataMap != nil { dataMap.forEach { self.dataMap![$0] = $1 } }
+    public func data(_ dataMap: [String : [Data]], hardReset: Bool = false) -> MockURLSession {
+        if self.dataMap != nil && !hardReset { dataMap.forEach { self.dataMap![$0] = $1 } }
         else { self.dataMap = dataMap }
         return self
     }

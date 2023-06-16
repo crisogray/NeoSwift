@@ -6,14 +6,14 @@ class NNSNameTests: XCTestCase {
     
     public func testInvalidName() {
         let invalidName = "neo..neo"
-        XCTAssertThrowsError(try NNSName(name: invalidName)) { error in
+        XCTAssertThrowsError(try NNSName(invalidName)) { error in
             XCTAssertEqual(error.localizedDescription, "'\(invalidName)' is not a valid NNS name.")
         }
     }
     
     public func testSecondLevelDomain() {
-        XCTAssertFalse(try! NNSName(name: "third.level.neo").isSecondLevelDomain)
-        XCTAssertTrue(try! NNSName(name: "level.neo").isSecondLevelDomain)
+        XCTAssertFalse(try! NNSName("third.level.neo").isSecondLevelDomain)
+        XCTAssertTrue(try! NNSName("level.neo").isSecondLevelDomain)
     }
     
     public func testInvalidLength() {
@@ -61,7 +61,7 @@ class NNSNameTests: XCTestCase {
     
     public func testGetBytes() {
         let name = "neow3j.neo"
-        let nnsName = try! NNSName(name: name)
+        let nnsName = try! NNSName(name)
         XCTAssertEqual(nnsName.name, name)
         XCTAssertEqual(nnsName.bytes, name.bytes)
     }

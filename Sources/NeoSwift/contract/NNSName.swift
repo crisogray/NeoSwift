@@ -10,7 +10,7 @@ public struct NNSName {
         return NNSName.isValidNNSName(name, false)
     }
     
-    public init(name: String) throws {
+    public init(_ name: String) throws {
         guard NNSName.isValidNNSName(name, true) else {
             throw ContractError.invalidNeoName(name)
         }

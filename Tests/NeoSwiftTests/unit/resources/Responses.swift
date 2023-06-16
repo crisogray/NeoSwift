@@ -300,6 +300,26 @@ let invokeFunctionSymbolJson = """
 }
 """.data(using: .utf8)!
 
+let invokeFunctionResolveNNS_txtJson = """
+{
+  "jsonrpc": "2.0",
+  "id": 253,
+  "result": {
+    "script": "IAwKbmVvdzNqLm5lbxLAHwwHcmVzb2x2ZQwUcyzMHmaY7IHOfhqoytdkwpneR1lBYn1bUg==",
+    "state": "HALT",
+    "gasconsumed": "16153860",
+    "exception": null,
+    "notifications": [],
+    "stack": [
+      {
+        "type": "ByteString",
+        "value": "TlRYSmdRcnF4blNGRnFLZTNvQmVqbm56am1zNjFZemI4cg=="
+      }
+    ]
+  }
+}
+""".data(using: .utf8)!
+
 // MARK: Calculate Network Fee
 
 let calculateNetworkFeeJson = """
