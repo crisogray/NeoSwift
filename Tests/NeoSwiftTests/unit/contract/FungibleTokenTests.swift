@@ -27,13 +27,14 @@ class FungibleTokenTests: XCTestCase {
     }
     
     public func testTransferFromAccount() async {
-        let invokeJson = invokeScriptTransferJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
-        let decimalsJson = invokeFunctionDecimalsGasJson
-        let balanceOfJson = invokeFunctionBalanceOf300000000Json
-        _ = mockUrlSession.data(["invokescript": [invokeJson], "calculatenetworkfee": [networkFeeJson],
-                                 "getblockcount": [blockCountJson], "invokefunction": [decimalsJson]])
+        let invokeJson = JSON.from("invokescript_transfer")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
+        let decimalsJson = JSON.from("invokefunction_decimals_gas")
+        let balanceOfJson = JSON.from("invokefunction_balanceOf_300000000")
+        _ = mockUrlSession
+            .data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getblockcount": blockCountJson])
+            .invokeFunctions(["decimals": decimalsJson, "balanceOf": balanceOfJson])
         
         let expectedScript = try! await ScriptBuilder()
             .contractCall(.init(gasTokenHash),
@@ -57,21 +58,21 @@ class FungibleTokenTests: XCTestCase {
     }
     
     public func testGetBalanceOfAccount_address() async {
-        let balanceOfJson = invokeFunctionBalanceOf300000000Json
+        let balanceOfJson = JSON.from("invokefunction_balanceOf_300000000")
         _ = mockUrlSession.data(["invokefunction": balanceOfJson])
         let balance = try! await gasToken.getBalanceOf(account1.getScriptHash())
         XCTAssertEqual(balance, 300_000_000)
     }
     
     public func testGetBalanceOfAccount_account() async {
-        let balanceOfJson = invokeFunctionBalanceOf300000000Json
+        let balanceOfJson = JSON.from("invokefunction_balanceOf_300000000")
         _ = mockUrlSession.data(["invokefunction": balanceOfJson])
         let balance = try! await gasToken.getBalanceOf(account1)
         XCTAssertEqual(balance, 300_000_000)
     }
     
     public func testGetBalanceOfWallet() async {
-        let balanceOfJson = invokeFunctionBalanceOf300000000Json
+        let balanceOfJson = JSON.from("invokefunction_balanceOf_300000000")
         _ = mockUrlSession.data(["invokefunction": balanceOfJson])
         let balance = try! await gasToken.getBalanceOf(.withAccounts([account1, account2]))
         XCTAssertEqual(balance, 600_000_000)
@@ -86,15 +87,16 @@ class FungibleTokenTests: XCTestCase {
     // MARK: Transfer with NNS Recipient
     
     public func testTransferToNNSName() async {
-        let invokeJson = invokeScriptTransferJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
-        let decimalsJson = invokeFunctionDecimalsGasJson
-        let balanceOfJson = invokeFunctionBalanceOf300000000Json
-        let resolveJson = invokeFunctionResolveNNS_txtJson
-        _ = mockUrlSession.data(["invokescript": [invokeJson], "calculatenetworkfee": [networkFeeJson],
-                                 "getblockcount": [blockCountJson], "invokefunction": [resolveJson]])
-        
+        let invokeJson = JSON.from("invokescript_transfer")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
+        let decimalsJson = JSON.from("invokefunction_decimals_gas")
+        let balanceOfJson = JSON.from("invokefunction_balanceOf_300000000")
+        let resolveJson = JSON.from("nns_resolve_typeTXT")
+        _ = mockUrlSession
+            .data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getblockcount": blockCountJson])
+            .invokeFunctions(["decimals": decimalsJson, "balanceOf": balanceOfJson, "resolve": resolveJson])
+
         let amount = 300_000_000
         let nnsName = try! NNSName("neow3j.neo")
         let recipient = try! Hash160.fromAddress("NTXJgQrqxnSFFqKe3oBejnnzjms61Yzb8r")
@@ -113,9 +115,6 @@ class FungibleTokenTests: XCTestCase {
         let tx = try! await gasToken.transfer(account1, nnsName, amount).getUnsignedTransaction()
         XCTAssertEqual(tx.script, expectedScript)
         XCTAssert((tx.signers[0] as! AccountSigner).account === account1)
-
-        _ = mockUrlSession.data(["invokescript": [invokeJson], "calculatenetworkfee": [networkFeeJson], "getblockcount": [blockCountJson],
-                                 "invokefunction": [resolveJson]], hardReset: true)
         
         let builder = try! await gasToken.transfer(account1.getScriptHash(), nnsName, 300_000_000)
         XCTAssertEqual(builder.script, expectedScript)

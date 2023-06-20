@@ -121,7 +121,7 @@ public class NonFungibleToken: Token {
     
     private func deserializeProperties<T>(_ stackItem: StackItem, isClass: Bool = false) throws -> [String : T] {
         return try stackItem.map!.reduce(into: .init()) { partialResult, keyValue in
-            if case .any(let v) = stackItem, v == nil { return }
+            if case .any(let v) = keyValue.value, v == nil { return }
             try partialResult[keyValue.key.getString()] = (isClass ? keyValue.value as! T : keyValue.value.getString() as! T)
         }
     }

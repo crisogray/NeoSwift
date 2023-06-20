@@ -1,0 +1,43 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "script": "EMAfDA1nZXRDYW5kaWRhdGVzDBTGocJKW4f7jM16xfeUj/5SbU4B90FifVtS",
+    "state": "HALT",
+    "gasconsumed": "100999150",
+    "exception": null,
+    "stack": [
+      {
+        "type": "Array",
+        "value": [
+          {
+            "type": "Struct",
+            "value": [
+              {
+                "type": "ByteString",
+                "value": "AsC2DJlbwJLoZvFaN8F2u1m366zwabqUwOv1YcuPlWI4"
+              },
+              {
+                "type": "Integer",
+                "value": "0"
+              }
+            ]
+          },
+          {
+            "type": "Struct",
+            "value": [
+              {
+                "type": "ByteString",
+                "value": "Ahjn1NqATAxtuTTdWEjbzyGSCbsJgTXIE6jWlDcXUfXz"
+              },
+              {
+                "type": "Integer",
+                "value": "0"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -28,9 +28,6 @@ let package = Package(
                                .product(name: "Scrypt", package: "swift-scrypt")]),
         .testTarget(name: "NeoSwiftTests",
                     dependencies: ["NeoSwift", "BigInt", "SwiftECC"],
-                    resources: [.process("unit/resources/account.json"),
-                                .process("unit/resources/multiSigAccount.json"),
-                                .process("unit/resources/wallet.json"),
-                                .process("unit/resources/wallet_noDefaultAccount.json")]),
+                    resources: [.process("unit/resources/")]),
     ]
 )

@@ -299,8 +299,8 @@ class WalletTests: XCTestCase {
     }
     
     public func testGetNep17Balances() async {
-        let defaultJson = nep17BalancesOfDefaultAccountJson
-        let committeeJson = nep17BalancesOfCommitteeAccountJson
+        let defaultJson = JSON.from("getnep17balances_ofDefaultAccount")
+        let committeeJson = JSON.from("getnep17balances_ofCommitteeAccount")
         let mockUrlSession = MockURLSession().data(committeeJson, defaultJson)
         let httpService = HttpService(url: URL(string: "http://127.0.0.1")!, urlSession: mockUrlSession)
         let neoSwift = NeoSwift.build(httpService)

@@ -20,9 +20,16 @@ class MockURLSession: URLRequester {
     private var dataIs: [String: Int] = [:]
     private var data: [Data]? = nil
     private var dataMap: [String: [Data]]? = nil
+    private var invokeFunctions: [String: Data]? = nil
     private var error: Error? = nil
     
     private var requestInterceptor: ((URLRequest) -> Void)?
+    
+    public func invokeFunctions(_ map: [String : Data]) -> MockURLSession {
+        self.invokeFunctions = map
+        if dataMap == nil { dataMap = .init() }
+        return self
+    }
     
     public func data(_ dataMap: [String : Data]) -> MockURLSession {
         if self.dataMap != nil { dataMap.forEach { self.dataMap![$0] = [$1] } }
@@ -59,10 +66,21 @@ class MockURLSession: URLRequester {
         if let dataMap = dataMap {
             let requestBody = String(data: request.httpBody!, encoding: .utf8)!
             let method = requestBody.components(separatedBy: "method\":\"")[1].components(separatedBy: "\"")[0]
-            let i = dataIs[method] ?? 0
-            let data = i >= dataMap[method]!.count ? dataMap[method]![0] : dataMap[method]![i]
-            dataIs[method] = i + 1
-            return (data, nil)
+            if method == "invokefunction", let invokeFunctions = invokeFunctions {
+                for function in invokeFunctions.keys {
+                    print(function, requestBody)
+                    let paramsRegex = try! NSRegularExpression(pattern: ".*\"params\":.*\(function).*")
+                    if paramsRegex.firstMatch(in: requestBody, range: .init(location: 0, length: requestBody.utf16.count)) != nil {
+                        return (invokeFunctions[function]!, nil)
+                    }
+                }
+                return (.init(), nil)
+            } else {
+                let i = dataIs[method] ?? 0
+                let data = i >= dataMap[method]!.count ? dataMap[method]![0] : dataMap[method]![i]
+                dataIs[method] = i + 1
+                return (data, nil)
+            }
         }
         if let error = error {
             throw error

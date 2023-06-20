@@ -27,8 +27,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testBuildTransactionWithCorrectNonce() async {
-        let invokeJson = invokeScriptNecessaryMockJson
-        let networkFeeJson = calculateNetworkFeeJson
+        let invokeJson = JSON.from("invokescript_necessary_mock")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson])
         
         var nonce = Int.random(in: 0..<(2.toPowerOf(32)))
@@ -79,9 +79,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testAutomaticallySetNonce() async {
-        let blockCountJson = getBlockCount_1000Json
-        let invokeJson = invokeScriptNecessaryMockJson
-        let networkFeeJson = calculateNetworkFeeJson
+        let blockCountJson = JSON.from("getblockcount_1000")
+        let invokeJson = JSON.from("invokescript_necessary_mock")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getblockcount": blockCountJson])
         
         let tx = try! await TransactionBuilder(neoSwift)
@@ -114,10 +114,10 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testAttributesHighPriority() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let committeeJson = getCommitteeJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let committeeJson = JSON.from("getcommittee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getcommittee": committeeJson, "getblockcount": blockCountJson])
         
         let tx = try! await TransactionBuilder(neoSwift).script(SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES)
@@ -126,10 +126,10 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testAttributesHighPriorityCommittee() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let committeeJson = getCommitteeJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let committeeJson = JSON.from("getcommittee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getcommittee": committeeJson, "getblockcount": blockCountJson])
         
         let multiSigAccount = try! Account.createMultiSigAccount([account2.keyPair!.publicKey, account1.keyPair!.publicKey], 1)
@@ -139,8 +139,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testAttributesHighPriorityNotCommitteeMember() async {
-        let committeeJson = getCommitteeJson
-        let blockCountJson = getBlockCount_1000Json
+        let committeeJson = JSON.from("getcommittee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["getcommittee": committeeJson, "getblockcount": blockCountJson])
         
         let builder = try! TransactionBuilder(neoSwift).script(SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES)
@@ -155,10 +155,10 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testAttributesHighPriorityOnlyAddedOnce() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let committeeJson = getCommitteeJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let committeeJson = JSON.from("getcommittee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getcommittee": committeeJson, "getblockcount": blockCountJson])
         
         let tx = try! await TransactionBuilder(neoSwift).script(SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES)
@@ -193,9 +193,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testAutomaticSettingOfValidUntilBlockVariable() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getblockcount": blockCountJson])
         
         let tx = try! await TransactionBuilder(neoSwift).script(SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES)
@@ -204,8 +204,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testAutomaticSettingOfSystemFeeAndNetworkFee() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let networkFeeJson = calculateNetworkFeeJson
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson])
         
         let tx = try! await TransactionBuilder(neoSwift).script(SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES)
@@ -215,8 +215,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testFailTryingToSignTransactionWithAccountMissingAPrivateKey() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let networkFeeJson = calculateNetworkFeeJson
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson])
         
         let builder = try! TransactionBuilder(neoSwift)
@@ -231,9 +231,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testFailAutomaticallySigningWithMultiSigAccountSigner() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getblockcount": blockCountJson])
         
         let builder = try! TransactionBuilder(neoSwift).script(SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES)
@@ -247,8 +247,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testFailWithNoSigningAccount() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "getblockcount": blockCountJson])
         
         let builder = try! TransactionBuilder(neoSwift).script(SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES)
@@ -262,9 +262,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testFailSigningWithAccountWithoutECKeyPair() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getblockcount": blockCountJson])
         
         let accountWithoutKeyPair = try! Account.fromVerificationScript(account1.verificationScript!)
@@ -279,8 +279,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testSignTransactionWithAdditionalSigners() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let networkFeeJson = calculateNetworkFeeJson
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson])
         
         let tx = try! await TransactionBuilder(neoSwift).script(SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES)
@@ -294,8 +294,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testFailSendingTransactionBecauseItDoesntContainTheRightNumberOfWitnesses() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let networkFeeJson = calculateNetworkFeeJson
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson])
         
         let tx = try! await TransactionBuilder(neoSwift).script(SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES)
@@ -309,8 +309,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testContractWitness() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let networkFeeJson = calculateNetworkFeeJson
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson])
         
         let contracthash = try! Hash160("e87819d005b730645050f89073a4cd7bf5f6bd3c")
@@ -322,10 +322,10 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testSendInvokeFunction() async {
-        let invokeJson = invokeScriptTransferFixedSysFeeJson
-        let rawTransactionJson = sendRawTransactionJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_transfer_with_fixed_sysfee")
+        let rawTransactionJson = JSON.from("sendrawtransaction")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson,
                                  "getblockcount": blockCountJson, "sendrawtransaction": rawTransactionJson])
         
@@ -342,8 +342,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testTransferNeoFromNormalAccount() async {
-        let invokeJson = invokeScriptTransferFixedSysFeeJson
-        let networkFeeJson = calculateNetworkFeeJson
+        let invokeJson = JSON.from("invokescript_transfer_with_fixed_sysfee")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson])
         
         let expectedVerificationScript = account1.verificationScript!.script
@@ -376,7 +376,7 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testInvokingWithParamsShouldProduceTheCorrectRequest() async {
-        let invokeJson = invokeFunctionTransferNeoJson
+        let invokeJson = JSON.from("invokefunction_transfer_neo")
         _ = mockUrlSession.data(["invokefunction": invokeJson])
         
         let invokeFunction = try! await neoSwift.invokeFunction(NEO_TOKEN_SCRIPT_HASH, NEP17_TRANSFER,
@@ -388,9 +388,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testDoIfSenderCannotCoverFees() async {
-        let invokeJson = invokeScriptTransferFixedSysFeeJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let functionJson = invokeFunctionBalanceOf1000000Json
+        let invokeJson = JSON.from("invokescript_transfer_with_fixed_sysfee")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let functionJson = JSON.from("invokefunction_balanceOf_1000000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "invokefunction": functionJson])
         
         let netFee = 1230610
@@ -422,9 +422,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testThrowIfSenderCannotCoverFees() async {
-        let invokeJson = invokeScriptTransferFixedSysFeeJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let functionJson = invokeFunctionBalanceOf1000000Json
+        let invokeJson = JSON.from("invokescript_transfer_with_fixed_sysfee")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let functionJson = JSON.from("invokefunction_balanceOf_1000000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "invokefunction": functionJson])
         
         let script = try! ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
@@ -451,7 +451,7 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testInvokeScript() async {
-        let invokeJson = invokeScriptSymbolNeoJson
+        let invokeJson = JSON.from("invokescript_symbol_neo")
         _ = mockUrlSession.data(["invokescript": invokeJson])
                 
         let response = try! await TransactionBuilder(neoSwift).script(SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES).callInvokeScript()
@@ -459,7 +459,7 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testInvokeScriptWithoutSettingScript() async {
-        let invokeJson = invokeScriptSymbolNeoJson
+        let invokeJson = JSON.from("invokescript_symbol_neo")
         _ = mockUrlSession.data(["invokescript": invokeJson])
 
         do {
@@ -480,8 +480,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testBuildWithInvalidScript() async {
-        let invokeJson = invokeScriptInvalidJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_invalidscript")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "getblockcount": blockCountJson])
         
         let builder = try! TransactionBuilder(neoSwift)
@@ -497,8 +497,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testBuildWithScript_vmFaults() async {
-        let invokeJson = invokeScriptExceptionJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_exception")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "getblockcount": blockCountJson])
         
         let builder = try! TransactionBuilder(neoSwift)
@@ -514,9 +514,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testGetUnsignedTransaction() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let blockCountJson = getBlockCount_1000Json
-        let networkFeeJson = calculateNetworkFeeJson
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let blockCountJson = JSON.from("getblockcount_1000")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "getblockcount": blockCountJson, "calculatenetworkfee": networkFeeJson])
         
         let tx = try! await TransactionBuilder(neoSwift)
@@ -530,9 +530,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testVersion() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let blockCountJson = getBlockCount_1000Json
-        let networkFeeJson = calculateNetworkFeeJson
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let blockCountJson = JSON.from("getblockcount_1000")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "getblockcount": blockCountJson, "calculatenetworkfee": networkFeeJson])
         
         let tx = try! await TransactionBuilder(neoSwift)
@@ -545,9 +545,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testAdditionalNetworkFee() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let blockCountJson = getBlockCount_1000Json
-        let networkFeeJson = calculateNetworkFeeJson
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let blockCountJson = JSON.from("getblockcount_1000")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "getblockcount": blockCountJson, "calculatenetworkfee": networkFeeJson])
         
         let baseNetworkFee = 1230610
@@ -567,9 +567,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testAdditionalSystemFee() async {
-        let invokeJson = invokeScriptSymbolNeoJson
-        let blockCountJson = getBlockCount_1000Json
-        let networkFeeJson = calculateNetworkFeeJson
+        let invokeJson = JSON.from("invokescript_symbol_neo")
+        let blockCountJson = JSON.from("getblockcount_1000")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
         _ = mockUrlSession.data(["invokescript": invokeJson, "getblockcount": blockCountJson, "calculatenetworkfee": networkFeeJson])
         
         let baseSystemFee = 984060
@@ -630,10 +630,10 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testTrackingTransactionShouldReturnCorrectBlock() {
-        let invokeJson = invokeScriptTransferFixedSysFeeJson
-        let rawTransactionJson = sendRawTransactionJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_transfer_with_fixed_sysfee")
+        let rawTransactionJson = JSON.from("sendrawtransaction")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson,
                                  "getblockcount": blockCountJson, "sendrawtransaction": rawTransactionJson])
         
@@ -669,9 +669,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testTrackingTransaction_txNotSent() async {
-        let invokeJson = invokeScriptTransferFixedSysFeeJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_transfer_with_fixed_sysfee")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getblockcount": blockCountJson])
         
         let script = try! ScriptBuilder().contractCall(NEO_TOKEN_SCRIPT_HASH, method: NEP17_TRANSFER,
@@ -693,12 +693,12 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testGetAppliationLog() async {
-        let functionJson = invokeFunctionBalanceOf1000000Json
-        let invokeJson = invokeScriptTransferJson
-        let rawTransactionJson = sendRawTransactionJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
-        let applicationLogJson = getApplicationLogJson
+        let functionJson = JSON.from("invokefunction_balanceOf_1000000")
+        let invokeJson = JSON.from("invokescript_transfer")
+        let rawTransactionJson = JSON.from("sendrawtransaction")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
+        let applicationLogJson = JSON.from("getapplicationlog")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson,
                                  "invokefunciton": functionJson, "getblockcount": blockCountJson,
                                  "sendrawtransaction": rawTransactionJson, "getapplicationlog": applicationLogJson])
@@ -717,10 +717,10 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testGetApplicationLog_txNotSent() async {
-        let functionJson = invokeFunctionBalanceOf1000000Json
-        let invokeJson = invokeScriptTransferJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
+        let functionJson = JSON.from("invokefunction_balanceOf_1000000")
+        let invokeJson = JSON.from("invokescript_transfer")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson,
                                  "invokefunciton": functionJson, "getblockcount": blockCountJson])
         
@@ -743,12 +743,12 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testGetApplicationLog_notExisting() async{
-        let functionJson = invokeFunctionBalanceOf1000000Json
-        let invokeJson = invokeScriptTransferJson
-        let rawTransactionJson = sendRawTransactionJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
-        let applicationLogJson = getApplicationLogUnkownJson
+        let functionJson = JSON.from("invokefunction_balanceOf_1000000")
+        let invokeJson = JSON.from("invokescript_transfer")
+        let rawTransactionJson = JSON.from("sendrawtransaction")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
+        let applicationLogJson = JSON.from("getapplicationlog_unknowntx")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson,
                                  "invokefunciton": functionJson, "getblockcount": blockCountJson,
                                  "sendrawtransaction": rawTransactionJson, "getapplicationlog": applicationLogJson])
@@ -771,9 +771,9 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testTransmissionOnFault() async {
-        let invokeJson = invokeScriptFaultJson
-        let networkFeeJson = calculateNetworkFeeJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_fault")
+        let networkFeeJson = JSON.from("calculatenetworkfee")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "calculatenetworkfee": networkFeeJson, "getblockcount": blockCountJson])
         
         neoSwift.allowTransmissionOnFault()
@@ -796,8 +796,8 @@ class TransactionBuilderTests: XCTestCase {
     }
     
     public func testPreventTransmissionOnFault() async {
-        let invokeJson = invokeScriptFaultJson
-        let blockCountJson = getBlockCount_1000Json
+        let invokeJson = JSON.from("invokescript_fault")
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["invokescript": invokeJson, "getblockcount": blockCountJson])
         
         XCTAssertFalse(neoSwift.config.allowsTransmissionOnFault)

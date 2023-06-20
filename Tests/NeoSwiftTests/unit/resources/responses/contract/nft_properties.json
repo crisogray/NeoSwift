@@ -1,0 +1,37 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "script": "",
+    "state": "HALT",
+    "gasconsumed": "",
+    "exception": null,
+    "stack": [
+      {
+        "type": "Map",
+        "value": [
+          {
+            "key": {
+              "type": "ByteString",
+              "value": "bmFtZQ=="
+            },
+            "value": {
+              "type": "ByteString",
+              "value": "QSBuYW1l"
+            }
+          },
+          {
+            "key": {
+              "type": "ByteString",
+              "value": "ZGVzY3JpcHRpb24="
+            },
+            "value": {
+              "type": "ByteString",
+              "value": "QSBkZXNjcmlwdGlvbg=="
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

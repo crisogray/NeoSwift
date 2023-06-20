@@ -1,0 +1,16 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "script": "DCECwLYMmVvAkuhm8Vo3wXa7WbfrrPBpupTA6/Vhy4+VYjgRwB8MEXJlZ2lzdGVyQ2FuZGlkYXRlDBSDqwZ5rVXAUKE61D9ZNupz9ese9kFifVtS",
+    "state": "HALT",
+    "gasconsumed": "100000999210",
+    "exception": null,
+    "stack": [
+      {
+        "type": "Boolean",
+        "value": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "id": 12,
+    "updatecounter": 0,
+    "hash": "0xf61eebf573ea36593fd43aa150c055ad7906ab83",
+    "nef": {
+      "magic": 860243278,
+      "compiler": "neo-core-v3.0",
+      "tokens": [],
+      "script": "AP1BGvd7Zw==",
+      "checksum": 3921333105
+    },
+    "manifest": {
+      "name": "neow3j",
+      "groups": [],
+      "supportedstandards": [],
+      "abi": {
+        "methods": []
+      },
+      "permissions": [
+        {
+          "contract": "*",
+          "methods": "*"
+        }
+      ],
+      "trusts": [],
+      "extra": null
+    }
+  }
+}

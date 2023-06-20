@@ -25,16 +25,16 @@ class RoleManagementTests: XCTestCase {
     }
     
     public func testGetDesignatedByRole() async {
-        let blockCountJson = getBlockCount_1000Json
-        let designationJson = designation_getByRoleJson
+        let blockCountJson = JSON.from("getblockcount_1000")
+        let designationJson = JSON.from("designation_getByRole")
         _ = mockUrlSession.data(["invokefunction": designationJson, "getblockcount": blockCountJson])
         let list = try! await roleManagement.getDesignatedByRole(.stateValidator, blockIndex: 10)
         XCTAssert(list.contains(account1.keyPair!.publicKey))
     }
     
     public func testGetDesignatedByRole_emptyResponse() async {
-        let blockCountJson = getBlockCount_1000Json
-        let designationJson = designation_getByRole_emptyJson
+        let blockCountJson = JSON.from("getblockcount_1000")
+        let designationJson = JSON.from("designation_getByRole_empty")
         _ = mockUrlSession.data(["invokefunction": designationJson, "getblockcount": blockCountJson])
         let list = try! await roleManagement.getDesignatedByRole(.oracle, blockIndex: 12)
         XCTAssert(list.isEmpty)
@@ -50,7 +50,7 @@ class RoleManagementTests: XCTestCase {
     }
     
     public func testGetDesignatedByRole_indexTooHigh() async {
-        let blockCountJson = getBlockCount_1000Json
+        let blockCountJson = JSON.from("getblockcount_1000")
         _ = mockUrlSession.data(["getblockcount": blockCountJson])
         do {
             _ = try await roleManagement.getDesignatedByRole(.oracle, blockIndex: 1001)
@@ -61,7 +61,7 @@ class RoleManagementTests: XCTestCase {
     }
     
     public func testDesignateAsRole() {
-        let designationJson = designation_designateAsRoleJson
+        let designationJson = JSON.from("designation_designateAsRole")
         _ = mockUrlSession.data(["invokefunction": designationJson])
         let keyParam = try! ContractParameter.publicKey(account1.keyPair!.publicKey.getEncoded(compressed: true))
         let expectedScript = try! ScriptBuilder()

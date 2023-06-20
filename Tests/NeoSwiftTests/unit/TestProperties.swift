@@ -29,3 +29,9 @@ let policyContractHash = "cc5e4edd9f5f8dba8bb65734541df7a1c081c67b"
 let roleManagementHash = "49cf4e5378ffcd4dec034fd98a174c5491e395e2"
 let oracleContractHash = "fe924b7cfe89ddd271abaf7210a80a7e11178758"
 let nameServiceHash = "7a8fcf0392cd625647907afa8e45cc66872b596b"
+
+
+// MARK: Client 1 Account
+
+let client1AccountWIF = "L3cNMQUSrvUrHx1MzacwHiUeCWzqK2MLt5fPvJj9mz6L2rzYZpok"
+

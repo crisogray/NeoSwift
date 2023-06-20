@@ -18,35 +18,35 @@ class TokenTests: XCTestCase {
     }
     
     public func testGetSymbol() async {
-        let invokeJson = invokeFunctionSymbolJson
+        let invokeJson = JSON.from("invokefunction_symbol")
         _ = mockUrlSession.data(invokeJson)
         let symbol = try! await someToken.getSymbol()
         XCTAssertEqual(symbol, "ant")
     }
     
     public func testGetDecimals() async {
-        let invokeJson = invokeFunctionDecimalsNep17Json
+        let invokeJson = JSON.from("invokefunction_decimals_nep17")
         _ = mockUrlSession.data(invokeJson)
         let decimals = try! await someToken.getDecimals()
         XCTAssertEqual(decimals, 2)
     }
     
     public func testGetTotalSupply() async {
-        let invokeJson = invokeFunctionTotalSupplyJson
+        let invokeJson = JSON.from("invokefunction_totalSupply")
         _ = mockUrlSession.data(invokeJson)
         let totalSupply = try! await someToken.getTotalSupply()
         XCTAssertEqual(totalSupply, 3_000_000_000_000_000)
     }
     
     public func testToFractions() async {
-        let invokeJson = invokeFunctionDecimalsNep17Json
+        let invokeJson = JSON.from("invokefunction_decimals_nep17")
         _ = mockUrlSession.data(invokeJson)
         let fractions = try! await someToken.toFractions(Decimal(string: "1.02")!)
         XCTAssertEqual(fractions, 102)
     }
     
     public func testToFractionsTooHighScale() async {
-        let invokeJson = invokeFunctionDecimalsNep17Json
+        let invokeJson = JSON.from("invokefunction_decimals_nep17")
         _ = mockUrlSession.data(invokeJson)
         do {
             _ = try await someToken.toFractions(Decimal(string: "1.023")!)
@@ -61,7 +61,7 @@ class TokenTests: XCTestCase {
     }
     
     public func testToDecimals() async {
-        let invokeJson = invokeFunctionDecimalsGasJson
+        let invokeJson = JSON.from("invokefunction_decimals_gas")
         _ = mockUrlSession.data(invokeJson)
         let decimals = try! await someToken.toDecimals(123456789)
         XCTAssertEqual(decimals, Decimal(string: "1.23456789"))
