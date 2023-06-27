@@ -26,9 +26,7 @@ public class SmartContract {
     public func callFunctionReturningString(_ function: String, _ params: [ContractParameter] = []) async throws -> String {
         let invocationResult = try await callInvokeFunction(function, params).getResult()
         try throwIfFaultState(invocationResult)
-        guard let stackItem = invocationResult.stack.first else {
-            throw ContractError.emptyInvocationResultStack
-        }
+        let stackItem = try invocationResult.getFirstStackItem()
         guard case .byteString = stackItem else {
             throw ContractError.unexpectedReturnType(stackItem.jsonValue, [StackItem.BYTE_STRING_VALUE])
         }
@@ -38,9 +36,7 @@ public class SmartContract {
     public func callFunctionReturningInt(_ function: String, _ params: [ContractParameter] = []) async throws -> Int {
         let invocationResult = try await callInvokeFunction(function, params).getResult()
         try throwIfFaultState(invocationResult)
-        guard let stackItem = invocationResult.stack.first else {
-            throw ContractError.emptyInvocationResultStack
-        }
+        let stackItem = try invocationResult.getFirstStackItem()
         guard case .integer = stackItem else {
             throw ContractError.unexpectedReturnType(stackItem.jsonValue, [StackItem.INTEGER_VALUE])
         }
@@ -50,11 +46,10 @@ public class SmartContract {
     public func callFunctionReturningBool(_ function: String, _ params: [ContractParameter] = []) async throws -> Bool {
         let invocationResult = try await callInvokeFunction(function, params).getResult()
         try throwIfFaultState(invocationResult)
-        let stackItem = invocationResult.stack.first
+        let stackItem = try invocationResult.getFirstStackItem()
         switch stackItem {
-        case .boolean, .integer, .byteString, .buffer: return stackItem!.boolean!
-        case nil: throw ContractError.emptyInvocationResultStack
-        default: throw ContractError.unexpectedReturnType(stackItem!.jsonValue, [StackItem.BYTE_STRING_VALUE])
+        case .boolean, .integer, .byteString, .buffer: return stackItem.boolean!
+        default: throw ContractError.unexpectedReturnType(stackItem.jsonValue, [StackItem.BYTE_STRING_VALUE])
         }
     }
     
@@ -75,12 +70,11 @@ public class SmartContract {
         }
     }
     
-    public func callFunctionReturningIterator<T>(_ function: String, _ params: [ContractParameter], _ mapper: @escaping (StackItem) throws -> T = { $0 }) async throws -> Iterator<T> {
+    public func callFunctionReturningIterator<T>(_ function: String, _ params: [ContractParameter] = [],
+                                                 mapper: @escaping (StackItem) throws -> T = { $0 }) async throws -> Iterator<T> {
         let invocationResult = try await callInvokeFunction(function, params).getResult()
         try throwIfFaultState(invocationResult)
-        guard let stackItem = invocationResult.stack.first else {
-            throw ContractError.emptyInvocationResultStack
-        }
+        let stackItem = try invocationResult.getFirstStackItem()
         guard case .interopInterface = stackItem else {
             throw ContractError.unexpectedReturnType(stackItem.jsonValue, [StackItem.INTEROP_INTERFACE_VALUE])
         }
@@ -90,15 +84,16 @@ public class SmartContract {
         return .init(neoSwift: neoSwift, sessionId: sessionId, iteratorId: stackItem.iteratorId!, mapper: mapper)
     }
     
-    public func callFunctionAndTraverseIterator<T>(_ maxIteratorResultItems: Int = DEFAULT_ITERATOR_COUNT,_ function: String,
-                                                   _ params: [ContractParameter], _ mapper: @escaping (StackItem) -> T = { $0 }) async throws -> [T] {
-        let iterator = try await callFunctionReturningIterator(function, params, mapper)
+    public func callFunctionAndTraverseIterator<T>(_ function: String, _ params: [ContractParameter] = [],
+                                                   maxIteratorResultItems: Int = DEFAULT_ITERATOR_COUNT,
+                                                   mapper: @escaping (StackItem) -> T = { $0 }) async throws -> [T] {
+        let iterator = try await callFunctionReturningIterator(function, params, mapper: mapper)
         let iteratorItems = try await iterator.traverse(maxIteratorResultItems)
         try await iterator.terminateSession()
         return iteratorItems
     }
     
-    public func callFunctionAndUnwrapIterator(_ function: String, _ params: [ContractParameter], _ maxIteratorResultItems: Int, _ signers: [Signer]) async throws -> [StackItem] {
+    public func callFunctionAndUnwrapIterator(_ function: String, _ params: [ContractParameter], _ maxIteratorResultItems: Int, _ signers: [Signer] = []) async throws -> [StackItem] {
         let script = try ScriptBuilder.buildContractCallAndUnwrapIterator(scriptHash, function, params, maxIteratorResultItems)
         let invocationResult = try await neoSwift.invokeScript(script.toHexString(), signers).send().getResult()
         try throwIfFaultState(invocationResult)
@@ -107,7 +102,7 @@ public class SmartContract {
     
     public func callInvokeFunction(_ function: String, _ params: [ContractParameter] = [], _ signers: [Signer] = []) async throws -> NeoInvokeFunction {
         guard !function.isEmpty else {
-            throw NeoSwiftError.illegalArgument("The invocation function must not be null or empty.")
+            throw NeoSwiftError.illegalArgument("The invocation function must not be empty.")
         }
         return try await neoSwift.invokeFunction(scriptHash, function, params, signers).send()
     }

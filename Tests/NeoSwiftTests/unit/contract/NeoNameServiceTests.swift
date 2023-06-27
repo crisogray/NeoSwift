@@ -29,8 +29,8 @@ class NeoNameServiceTests: XCTestCase {
     private let DELETE_RECORD = "deleteRecord"
     private let RESOLVE = "resolve"
     
-    private var account1: Account!
-    private var account2: Account!
+    private var account1 = try! Account.fromWIF(defaultAccountWIF)
+    private var account2 = try! Account.fromWIF(client1AccountWIF)
     
     private var nameService: NeoNameService!
     private var nameServiceHash: Hash160!
@@ -38,14 +38,13 @@ class NeoNameServiceTests: XCTestCase {
     private var mockUrlSession: MockURLSession!
     
     override func setUp() {
-        account1 = try! .fromWIF(defaultAccountWIF)
-        account2 = try! .fromWIF(client1AccountWIF)
-        
         mockUrlSession = MockURLSession()
         let neoSwift = NeoSwift.build(HttpService(urlSession: mockUrlSession))
         nameService = .init(neoSwift: neoSwift)
         nameServiceHash = nameService.scriptHash
     }
+    
+    // MARK: NEP-11 Methodd
     
     public func testGetName() async {
         let name = try! await nameService.getName()
@@ -108,7 +107,98 @@ class NeoNameServiceTests: XCTestCase {
         let b = try! await nameService.transfer(account1, account2.getScriptHash(), NNSName("client1.neo"))
         XCTAssertEqual(b.script, expectedScript)
     }
-    
 
+
+    public func testTokens() async {
+        _ = mockUrlSession.invokeFunctions([TOKENS: JSON.from("invokefunction_iterator_session")])
+        let tokensIterator = try! await nameService.tokens()
+        XCTAssertEqual(tokensIterator.iteratorId, "190d19ca-e935-4ad0-95c9-93b8cf6d115c")
+        XCTAssertEqual(tokensIterator.sessionId, "a7b35b13-bdfc-4ab3-a398-88a9db9da4fe")
+    }
+
+    public func testGetProperties() async {
+        _ = mockUrlSession.invokeFunctions([IS_AVAILABLE: JSON.from("invokefunction_returnFalse"),
+                                              PROPERTIES: JSON.from("nns_invokefunction_properties")])
+        let nameState = try! await nameService.getNameState(NNSName("client1.neo"))
+        XCTAssertEqual(nameState.name, "client1.neo")
+        XCTAssertEqual(nameState.expiration, 1646214292)
+        XCTAssertEqual(nameState.admin, try! Hash160("69ecca587293047be4c59159bf8bc399985c160d"))
+    }
+    
+    public func testProperties_noAdmin() async {
+        _ = mockUrlSession.invokeFunctions([IS_AVAILABLE: JSON.from("invokefunction_returnFalse"),
+                                              PROPERTIES: JSON.from("nns_invokefunction_properties_noAdmin")])
+
+        let nameState = try! await nameService.getNameState(NNSName("client2.neo"))
+
+        XCTAssertEqual(nameState.name, "client2.neo")
+        XCTAssertEqual(nameState.expiration, 1677933305472)
+        XCTAssertNil(nameState.admin)
+    }
+
+    public func testProperties_unexpectedReturnType() async {
+        _ = mockUrlSession.invokeFunctions([IS_AVAILABLE: JSON.from("invokefunction_returnFalse"),
+                                              PROPERTIES: JSON.from("invokefunction_returnInt")])
+
+        do {
+            _ = try await nameService.getNameState(NNSName("client1.neo"))
+            XCTFail("Expected UnexpectedReturnTypeException to be thrown.")
+        } catch {
+            guard case ContractError.unexpectedReturnType = error else {
+                return XCTFail("Unexpected exception thrown: \(error)")
+            }
+            XCTAssertEqual(error.localizedDescription, "Got stack item of type Integer but expected Map.")
+        }
+    }
+    
+    // MARK: Custom NNS Methods
+    
+    public func testAddRoot() {
+        let expectedScript = try! ScriptBuilder()
+            .contractCall(nameServiceHash, method: ADD_ROOT, params: [.string("neow")])
+            .toArray()
+
+        let b = try! nameService.addRoot(NNSName.NNSRoot("neow"))
+            .signers(AccountSigner.calledByEntry(account1))
+
+        XCTAssertEqual(b.signers[0].signerHash, account1.scriptHash)
+        XCTAssert(b.signers[0].scopes.contains(.calledByEntry))
+        XCTAssertEqual(b.script, expectedScript)
+    }
+    
+    public func testGetRoots() async {
+        _ = mockUrlSession.invokeFunctions([ROOTS: JSON.from("invokefunction_iterator_session")])
+
+        let rootsIterator = try! await nameService.getRoots()
+        XCTAssertEqual(rootsIterator.iteratorId, "190d19ca-e935-4ad0-95c9-93b8cf6d115c")
+        XCTAssertEqual(rootsIterator.sessionId, "a7b35b13-bdfc-4ab3-a398-88a9db9da4fe")
+    }
+
+    public func testUnwrapRoots() async {
+        _ = mockUrlSession.data(["invokescript": JSON.from("nns_unwrapRoots")])
+
+        let roots = try! await nameService.getRootsUnwrapped()
+        XCTAssertEqual(roots[0], "eth")
+        XCTAssertEqual(roots[1], "neo")
+    }
+    
+    public func testSetPrice() {
+        let expectedScript = try! ScriptBuilder()
+            .contractCall(nameServiceHash, method: SET_PRICE,
+                          params: [.array([ContractParameter.integer(200_000_000),
+                                           ContractParameter.integer(100_000_000),
+                                           ContractParameter.integer(150_000_000)])])
+            .toArray()
+
+        let b = try! nameService.setPrice([200_000_000, 100_000_000, 150_000_000])
+            .signers(AccountSigner.calledByEntry(account1))
+
+        XCTAssertEqual(b.signers[0].signerHash, account1.scriptHash)
+        XCTAssert(b.signers[0].scopes.contains(WitnessScope.calledByEntry))
+        XCTAssertEqual(b.script, expectedScript)
+    }
+    
+    
+    
 }
 

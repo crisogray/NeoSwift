@@ -185,6 +185,13 @@ extension StackItem {
         default: return nil
         }
     }
+
+    public func getInteger() throws -> Int {
+        guard let integer = integer else {
+            throw CastError(item: jsonValue, targetType: "integer")
+        }
+        return integer
+    }
     
     var address: String? {
         switch self {
@@ -218,6 +225,13 @@ extension StackItem {
         }
     }
     
+    public func getHexString() throws -> String {
+        guard let hexString = hexString else {
+            throw CastError(item: jsonValue, targetType: "hex string")
+        }
+        return hexString
+    }
+    
     var byteArray: Bytes? {
         switch self {
         case .byteString(let bytes), .buffer(let bytes): return bytes.isEmpty ? nil : bytes
@@ -238,6 +252,13 @@ extension StackItem {
         case .array(let array), .struct(let array): return array
         default: return nil
         }
+    }
+    
+    public func getList() throws -> [StackItem] {
+        guard let list = list else {
+            throw CastError(item: jsonValue, targetType: "list")
+        }
+        return list
     }
     
     var map: [StackItem: StackItem]? {

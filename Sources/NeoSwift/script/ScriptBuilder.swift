@@ -165,15 +165,15 @@ public class ScriptBuilder {
         _ = b.opCode(.jmpIf, [0x00])
         
         let jmpOffset = b.writer.size
-        let jmpBytesToCycleStart = Byte(iteratorTraverseCycleStartOffset - jmpOffset)
+        let jmpBytesToCycleStart = BInt(iteratorTraverseCycleStartOffset - jmpOffset).asSignedBytes()[0]
         _ = b.opCode(.jmp, [jmpBytesToCycleStart])
         
         let loadResultOffset = b.writer.size
         _ = b.opCode(.nip, .nip)
         
         var bytes = b.toArray()
-        bytes[jmpIfNotOffset + 1] = Byte(loadResultOffset - jmpIfNotOffset)
-        bytes[jmpIfMaxReachedOffset + 1] = Byte(loadResultOffset - jmpIfMaxReachedOffset)
+        bytes[jmpIfNotOffset + 1] = BInt(loadResultOffset - jmpIfNotOffset).asSignedBytes()[0]
+        bytes[jmpIfMaxReachedOffset + 1] = BInt(loadResultOffset - jmpIfMaxReachedOffset).asSignedBytes()[0]
         
         return bytes
     }

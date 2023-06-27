@@ -7,7 +7,6 @@ public enum ContractError: LocalizedError {
     case invalidNeoNameServiceRoot(_ root: String)
     case unexpectedReturnType(_ type: String, _ expected: [String]? = nil)
     case unresolvableDomainName(_ name: String)
-    case emptyInvocationResultStack
 
     public var errorDescription: String? {
         switch self {
@@ -18,7 +17,6 @@ public enum ContractError: LocalizedError {
                 return "Got stack item of type \(type) but expected \(expected.joined(separator: ", "))."
             } else { return type }
         case .unresolvableDomainName(let name): return "The provided domain name '\(name)' could not be resolved."
-        case .emptyInvocationResultStack: return "InvocationResult has empty stack."
         }
     }
     

@@ -9,21 +9,21 @@ class FungibleTokenTests: XCTestCase {
     private let RECIPIENT_SCRIPT_HASH = try! Hash160("969a77db482f74ce27105f760efa139223431394")
     private let NEP17_TRANSFER = "transfer"
     
+    private let neoHash = try! Hash160(neoTokenHash)
+    private let gasHash = try! Hash160(gasTokenHash)
+
     private var neoToken: FungibleToken!
     private var gasToken: FungibleToken!
     
-    private var account1: Account!
-    private var account2: Account!
+    private var account1 = try! Account(keyPair: .create(privateKey: "1dd37fba80fec4e6a6f13fd708d8dcb3b29def768017052f6c930fa1c5d90bbb".bytesFromHex))
+    private var account2 = try! Account(keyPair: .create(privateKey: "b4b2b579cac270125259f08a5f414e9235817e7637b9a66cfeb3b77d90c8e7f9".bytesFromHex))
     
     override func setUp() {
         super.setUp()
         mockUrlSession = MockURLSession()
-        
         let neoSwift = NeoSwift.build(HttpService(urlSession: mockUrlSession))
-        neoToken = try! .init(scriptHash: .init(string: neoTokenHash), neoSwift: neoSwift)
-        gasToken = try! .init(scriptHash: .init(string: gasTokenHash), neoSwift: neoSwift)
-        account1 = try! .init(keyPair: .create(privateKey: "1dd37fba80fec4e6a6f13fd708d8dcb3b29def768017052f6c930fa1c5d90bbb".bytesFromHex))
-        account2 = try! .init(keyPair: .create(privateKey: "b4b2b579cac270125259f08a5f414e9235817e7637b9a66cfeb3b77d90c8e7f9".bytesFromHex))
+        neoToken = .init(scriptHash: neoHash, neoSwift: neoSwift)
+        gasToken = .init(scriptHash: gasHash, neoSwift: neoSwift)
     }
     
     public func testTransferFromAccount() async {

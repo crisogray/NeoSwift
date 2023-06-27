@@ -41,7 +41,7 @@ public struct NNSName {
         
         public let root: String
         
-        public init(root: String) throws {
+        public init(_ root: String) throws {
             guard NNSRoot.isValidNNSRoot(root) else {
                 throw ContractError.invalidNeoNameServiceRoot(root)
             }

@@ -4,23 +4,16 @@ import XCTest
 
 class SerializableTransactionTest: XCTestCase {
     
-    private var account1: Hash160!
-    private var account2: Hash160!
-    private var account3: Hash160!
+    private var account1 = try! Hash160.fromAddress("NZNos2WqTbu5oCgyfss9kUJgBXJqhuYAaj")
+    private var account2 = try! Hash160.fromAddress("NLnyLtep7jwyq1qhNPkwXbJpurC4jUT8ke")
+    private var account3 = try! Hash160.fromAddress("NWcx4EfYdfqn5jNjDz8AHE6hWtWdUGDdmy")
     
-    let a4 = try! Account.fromWIF("L3pLaHgKBf7ENNKPH1jfPM8FC9QhPCqwFyWguQ8CDB1G66p78wd6")
-    let a5 = try! Account.fromWIF("KypPpzztxDj26DiCmTkbwQJT2TrgaNtw5Wp3K2nYiMvWu99Xv3rP")
-    let a6 = try! Account.fromWIF("KxjePibw7BEdaS8diPeqgozFWevVx6tLE226jYU6tFF1HSYQ5z5u")
+    private let a4 = try! Account.fromWIF("L3pLaHgKBf7ENNKPH1jfPM8FC9QhPCqwFyWguQ8CDB1G66p78wd6")
+    private let a5 = try! Account.fromWIF("KypPpzztxDj26DiCmTkbwQJT2TrgaNtw5Wp3K2nYiMvWu99Xv3rP")
+    private let a6 = try! Account.fromWIF("KxjePibw7BEdaS8diPeqgozFWevVx6tLE226jYU6tFF1HSYQ5z5u")
     
     let neoSwift = NeoSwift.build(HttpService(url: URL(string: "http://localhost:40332")!))
 
-    override func setUp() {
-        super.setUp()
-        account1 = try! Hash160.fromAddress("NZNos2WqTbu5oCgyfss9kUJgBXJqhuYAaj")
-        account2 = try! Hash160.fromAddress("NLnyLtep7jwyq1qhNPkwXbJpurC4jUT8ke")
-        account3 = try! Hash160.fromAddress("NWcx4EfYdfqn5jNjDz8AHE6hWtWdUGDdmy")
-    }
-    
     public func testSerializeWithoutAttributesAndWitnesses() {
         let signers = try! [AccountSigner.calledByEntry(account1)]
         let tx = SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304,

@@ -3,7 +3,6 @@ public class GasToken: FungibleToken {
     
     public static let NAME = "GasToken"
     public static let SCRIPT_HASH = try! calcNativeContractHash(NAME)
-    
     public static let DECIMALS = 8
     public static let SYMBOL = "GAS"
     

@@ -58,7 +58,7 @@ public class NeoNameService: NonFungibleToken {
     }
     
     public func getRoots() async throws -> Iterator<String> {
-        return try await callFunctionReturningIterator(NeoNameService.ROOTS, [], { try $0.getString() })
+        return try await callFunctionReturningIterator(NeoNameService.ROOTS, [], mapper: { try $0.getString() })
     }
     
     public func getRootsUnwrapped() async throws -> [String] {
@@ -116,7 +116,7 @@ public class NeoNameService: NonFungibleToken {
     }
     
     public func getAllRecords(_ name: NNSName) async throws -> Iterator<RecordState> {
-        return try await callFunctionReturningIterator(NeoNameService.GET_ALL_RECORDS, [.string(name.name)], RecordState.fromStackItem)
+        return try await callFunctionReturningIterator(NeoNameService.GET_ALL_RECORDS, [.string(name.name)], mapper: RecordState.fromStackItem)
     }
     
     public func getAllRecordsUnwrapped(_ name: NNSName) async throws -> [RecordState] {

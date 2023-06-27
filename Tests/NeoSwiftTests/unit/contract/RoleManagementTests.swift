@@ -7,7 +7,7 @@ class RoleManagementTests: XCTestCase {
     private let ROLEMANAGEMENT_HASH = try! Hash160("49cf4e5378ffcd4dec034fd98a174c5491e395e2")
     
     private var roleManagement: RoleManagement!
-    private var account1: Account!
+    private var account1 = try! Account(keyPair: .create(privateKey: "0f7d2f77f3229178650b958eb286258f0e6533d0b86ec389b862c440c6511a4b".bytesFromHex))
     
     var mockUrlSession: MockURLSession!
     
@@ -15,7 +15,6 @@ class RoleManagementTests: XCTestCase {
         super.setUp()
         mockUrlSession = MockURLSession()
         roleManagement = .init(.build(HttpService(urlSession: mockUrlSession)))
-        account1 = try! .init(keyPair: .create(privateKey: "0f7d2f77f3229178650b958eb286258f0e6533d0b86ec389b862c440c6511a4b".bytesFromHex))
     }
     
     public func testValidateIntegerValueOfRoleByteValue() {

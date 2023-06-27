@@ -16,6 +16,13 @@ public struct InvocationResult: Codable, Hashable {
         return state == .fault
     }
     
+    public func getFirstStackItem() throws -> StackItem {
+        guard let item = stack.first else {
+            throw NeoSwiftError.indexOutOfBounds("The stack is empty. This means that no items were left on the NeoVM stack after this invocation.")
+        }
+        return item
+    }
+    
     enum CodingKeys: String, CodingKey {
         case script, state, exception, notifications, diagnostics, stack, tx
         case gasConsumed = "gasconsumed"

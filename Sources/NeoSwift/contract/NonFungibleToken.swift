@@ -17,7 +17,7 @@ public class NonFungibleToken: Token {
     // MARK: NFT Methods
     
     public func tokensOf(_ owner: Hash160) async throws -> Iterator<Bytes> {
-        return try await callFunctionReturningIterator(NonFungibleToken.TOKENS_OF, [.hash160(owner)], { try $0.getByteArray() })
+        return try await callFunctionReturningIterator(NonFungibleToken.TOKENS_OF, [.hash160(owner)], mapper: { try $0.getByteArray() })
     }
     
     // MARK: Non-divisible NFT Methods
@@ -89,7 +89,7 @@ public class NonFungibleToken: Token {
     
     public func ownersOf(_ tokenId: Bytes) async throws -> Iterator<Hash160> {
         try await throwIfNonDivisibleNFT()
-        return try await callFunctionReturningIterator(NonFungibleToken.OWNER_OF, [.byteArray(tokenId)], { try Hash160.fromAddress($0.address!) })
+        return try await callFunctionReturningIterator(NonFungibleToken.OWNER_OF, [.byteArray(tokenId)], mapper: { try Hash160.fromAddress($0.address!) })
     }
     
     private func throwIfNonDivisibleNFT() async throws {
@@ -106,7 +106,7 @@ public class NonFungibleToken: Token {
     // MARK: Optional Methods
     
     public func tokens() async throws -> Iterator<Bytes> {
-        return try await callFunctionReturningIterator(NonFungibleToken.TOKENS, [], { try $0.getByteArray() })
+        return try await callFunctionReturningIterator(NonFungibleToken.TOKENS, [], mapper: { try $0.getByteArray() })
     }
     
     public func properties(_ tokenId: Bytes) async throws -> [String : String] {
@@ -129,9 +129,7 @@ public class NonFungibleToken: Token {
     // MARK: Helpers
     
     internal func mapStackItem(_ invocationResult: InvocationResult) throws -> StackItem {
-        guard let stackItem = invocationResult.stack.first else {
-            throw ContractError.emptyInvocationResultStack
-        }
+        let stackItem = try invocationResult.getFirstStackItem()
         guard case .map = stackItem else {
             throw ContractError.unexpectedReturnType(stackItem.jsonValue, [StackItem.MAP_VALUE])
         }

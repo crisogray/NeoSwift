@@ -11,9 +11,9 @@ class TransactionBuilderTests: XCTestCase {
     lazy var SCRIPT_INVOKEFUNCTION_NEO_SYMBOL = { try! ScriptBuilder().contractCall(self.NEO_TOKEN_SCRIPT_HASH, method: "symbol", params: []).toArray().noPrefixHex }()
     lazy var SCRIPT_INVOKEFUNCTION_NEO_SYMBOL_BYTES = { self.SCRIPT_INVOKEFUNCTION_NEO_SYMBOL.bytesFromHex }()
     
-    var account1: Account!
-    var account2: Account!
-    var recipient: Hash160!
+    var account1 = try! Account(keyPair: .create(privateKey: "e6e919577dd7b8e97805151c05ae07ff4f752654d6d8797597aca989c02c4cb3".bytesFromHex))
+    var account2 = try! Account(keyPair: .create(privateKey: "b4b2b579cac270125259f08a5f414e9235817e7637b9a66cfeb3b77d90c8e7f9".bytesFromHex))
+    var recipient: Hash160 = try! .init("969a77db482f74ce27105f760efa139223431394")
     var mockUrlSession: MockURLSession!
     var neoSwift: NeoSwift!
 
@@ -21,9 +21,6 @@ class TransactionBuilderTests: XCTestCase {
         super.setUp()
         mockUrlSession = MockURLSession()
         neoSwift = .init(config: .init(networkMagic: 769), neoSwiftService: HttpService(url: URL(string: "http://127.0.0.1")!, urlSession: mockUrlSession))
-        account1 = try! .init(keyPair: .create(privateKey: "e6e919577dd7b8e97805151c05ae07ff4f752654d6d8797597aca989c02c4cb3".bytesFromHex))
-        account2 = try! .init(keyPair: .create(privateKey: "b4b2b579cac270125259f08a5f414e9235817e7637b9a66cfeb3b77d90c8e7f9".bytesFromHex))
-        recipient = try! .init("969a77db482f74ce27105f760efa139223431394")
     }
     
     public func testBuildTransactionWithCorrectNonce() async {

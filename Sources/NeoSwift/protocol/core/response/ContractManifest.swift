@@ -72,7 +72,7 @@ public struct ContractManifest: Codable, Hashable {
     public struct ContractABI: Codable, Hashable {
         
         public let methods: [ContractMethod]
-        public let events: [ContractEvent]
+        public let events: [ContractEvent]?
         
         public struct ContractMethod: Codable, Hashable {
             

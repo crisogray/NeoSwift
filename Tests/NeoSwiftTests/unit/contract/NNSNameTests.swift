@@ -67,13 +67,13 @@ class NNSNameTests: XCTestCase {
     }
     
     public func testRoot() {
-        let root = try! NNSName.NNSRoot(root: "neo")
+        let root = try! NNSName.NNSRoot("neo")
         XCTAssertEqual(root.root, "neo")
     }
     
     public func testRootInvalid() {
         let invalidRoot = "rootrootrootroots"; // too long
-        XCTAssertThrowsError(try NNSName.NNSRoot(root: invalidRoot)) { error in
+        XCTAssertThrowsError(try NNSName.NNSRoot(invalidRoot)) { error in
             XCTAssertEqual(error.localizedDescription, "'\(invalidRoot)' is not a valid NNS root.")
         }
     }

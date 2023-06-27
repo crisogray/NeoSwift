@@ -4,23 +4,16 @@ import XCTest
 
 class SignerTests: XCTestCase {
     
-    private var account: Account!
+    private let account = try! Account.fromWIF("Kzt94tAAiZSgH7Yt4i25DW6jJFprZFPSqTgLr5dWmWgKDKCjXMfZ")
+    private let contract1 = try! Hash160.fromScript("d802a401".bytesFromHex)
+    private let contract2 = try! Hash160.fromScript("c503b112".bytesFromHex)
+    private let groupPubKey1 = try! ECPublicKey("0306d3e7f18e6dd477d34ce3cfeca172a877f3c907cc6c2b66c295d1fcc76ff8f7".bytesFromHex)
+    private let groupPubKey2 = try! ECPublicKey("02958ab88e4cea7ae1848047daeb8883daf5fdf5c1301dbbfe973f0a29fe75de60".bytesFromHex)
     private var accountScriptHash: Hash160!
-    private var contract1: Hash160!
-    private var contract2: Hash160!
-    private var groupPubKey1: ECPublicKey!
-    private var groupPubKey2: ECPublicKey!
-    
+
     override func setUp() {
         super.setUp()
-        account = try! Account.fromWIF("Kzt94tAAiZSgH7Yt4i25DW6jJFprZFPSqTgLr5dWmWgKDKCjXMfZ")
         accountScriptHash = account.scriptHash!
-        contract1 = try! Hash160.fromScript("d802a401".bytesFromHex)
-        contract2 = try! Hash160.fromScript("c503b112".bytesFromHex)
-        let encryptedPublicKey1 = "0306d3e7f18e6dd477d34ce3cfeca172a877f3c907cc6c2b66c295d1fcc76ff8f7"
-        let encryptedPublicKey2 = "02958ab88e4cea7ae1848047daeb8883daf5fdf5c1301dbbfe973f0a29fe75de60"
-        groupPubKey1 = try! ECPublicKey(encryptedPublicKey1.bytesFromHex)
-        groupPubKey2 = try! ECPublicKey(encryptedPublicKey2.bytesFromHex)
     }
     
     public func testCreateSignerWithCallByEntryWitnessScope() {
