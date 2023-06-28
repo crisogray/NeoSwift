@@ -30,8 +30,8 @@ public class PolicyContract: SmartContract {
         return try await callFunctionReturningInt(PolicyContract.GET_STORAGE_PRICE)
     }
     
-    public func isBlocked() async throws -> Bool {
-        return try await callFunctionReturningBool(PolicyContract.IS_BLOCKED)
+    public func isBlocked(_ scriptHash: Hash160) async throws -> Bool {
+        return try await callFunctionReturningBool(PolicyContract.IS_BLOCKED, [.hash160(scriptHash)])
     }
     
     public func setFeePerByte(_ fee: Int) throws -> TransactionBuilder {
@@ -50,16 +50,16 @@ public class PolicyContract: SmartContract {
         return try invokeFunction(PolicyContract.BLOCK_ACCOUNT, [.hash160(account)])
     }
     
-    public func blockAccount(_ account: String) throws -> TransactionBuilder {
-        return try blockAccount(.fromAddress(account))
+    public func blockAccount(_ address: String) throws -> TransactionBuilder {
+        return try blockAccount(.fromAddress(address))
     }
     
     public func unblockAccount(_ account: Hash160) throws -> TransactionBuilder {
         return try invokeFunction(PolicyContract.UNBLOCK_ACCOUNT, [.hash160(account)])
     }
     
-    public func unblockAccount(_ account: String) throws -> TransactionBuilder {
-        return try unblockAccount(.fromAddress(account))
+    public func unblockAccount(_ address: String) throws -> TransactionBuilder {
+        return try unblockAccount(.fromAddress(address))
     }
     
 }
