@@ -36,4 +36,20 @@ public class ContractState: ExpressContractState {
         super.hash(into: &hasher)
     }
     
+    public struct ContractIdentifiers: Hashable {
+        
+        public let id: Int
+        public let hash: Hash160
+        
+        public static func fromStackItem(_ stackItem: StackItem) throws -> ContractIdentifiers {
+            guard case .struct(let value) = stackItem, value.count >= 2 else {
+                throw NeoSwiftError.illegalArgument("Could not deserialise ContractIdentifiers from the stack item.")
+            }
+            let id: Int = try value[0].getHexString().bytesFromHex.toNumeric()
+            let hash = try Hash160(value[1].getByteArray().reversed())
+            return ContractIdentifiers(id: id, hash: hash)
+        }
+        
+    }
+    
 }
