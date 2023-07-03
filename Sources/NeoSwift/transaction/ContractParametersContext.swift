@@ -15,6 +15,7 @@ public struct ContractParametersContext: Codable {
     }
     
     public struct ContextItem: Codable {
+        
         public let script: String
         public let parameters: [ContractParameter]?
         public let signatures: [String : String]

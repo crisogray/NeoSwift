@@ -5,6 +5,12 @@ public struct NEP6Contract: Codable, Hashable {
     public let nep6Parameters: [NEP6Parameter]
     public let isDeployed: Bool
     
+    public init(script: String?, nep6Parameters: [NEP6Parameter], isDeployed: Bool) {
+        self.script = script
+        self.nep6Parameters = nep6Parameters
+        self.isDeployed = isDeployed
+    }
+    
     enum CodingKeys: String, CodingKey {
         case script
         case isDeployed = "deployed"

@@ -12,6 +12,13 @@ public class NeoGetStateRoot: Response<NeoGetStateRoot.StateRoot> {
         public let rootHash: Hash256
         public let witnesses: [NeoWitness]
         
+        public init(version: Int, index: Int, rootHash: Hash256, witnesses: [NeoWitness]) {
+            self.version = version
+            self.index = index
+            self.rootHash = rootHash
+            self.witnesses = witnesses
+        }
+        
         enum CodingKeys: String, CodingKey {
             case version, index, witnesses
             case rootHash = "roothash"

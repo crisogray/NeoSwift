@@ -3,11 +3,11 @@ public enum NeoVMStateType: String, Codable, CaseIterable {
 
     case none = "NONE", halt = "HALT", fault = "FAULT", `break` = "BREAK"
 
-    var jsonvalue: String {
+    public var jsonvalue: String {
         return rawValue
     }
     
-    var int: Int {
+    public var int: Int {
         switch self {
         case .none: return 0
         case .halt: return 1

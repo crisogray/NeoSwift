@@ -38,11 +38,11 @@ public enum InteropService: String, CaseIterable {
          systemStoragePut = "System.Storage.Put",
          systemStorageDelete = "System.Storage.Delete"
     
-    var hash: String {
+    public var hash: String {
         return Bytes(rawValue.data(using: .ascii)!.sha256().prefix(4)).toHexString()
     }
     
-    var price: Int {
+    public var price: Int {
         switch self {
         case .systemRuntimePlatform, .systemRuntimeGetTrigger, .systemRuntimeGetTime,
                 .systemRuntimeGetScriptContainer, .systemRuntimeGetNetwork:

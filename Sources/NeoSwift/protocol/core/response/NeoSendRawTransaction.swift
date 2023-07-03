@@ -6,7 +6,13 @@ public class NeoSendRawTransaction: Response<NeoSendRawTransaction.RawTransactio
     }
     
     public struct RawTransaction: Codable, Hashable {
+        
         public let hash: Hash256
+        
+        public init(hash: Hash256) {
+            self.hash = hash
+        }
+        
     }
     
 }

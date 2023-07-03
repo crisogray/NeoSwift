@@ -3,8 +3,13 @@ import Foundation
 
 public struct WitnessRule: Codable, Hashable {
     
-    let action: WitnessAction
-    let condition: WitnessCondition
+    public let action: WitnessAction
+    public let condition: WitnessCondition
+    
+    public init(action: WitnessAction, condition: WitnessCondition) {
+        self.action = action
+        self.condition = condition
+    }
     
 }
 

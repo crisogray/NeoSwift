@@ -36,7 +36,7 @@ public indirect enum WitnessCondition: Hashable {
     static let CALLED_BY_CONTRACT_BYTE: Byte = 0x28
     static let CALLED_BY_GROUP_BYTE: Byte = 0x29
     
-    var jsonValue: String {
+    public var jsonValue: String {
         switch self {
         case .boolean: return WitnessCondition.BOOLEAN_VALUE
         case .not: return WitnessCondition.NOT_VALUE
@@ -50,7 +50,7 @@ public indirect enum WitnessCondition: Hashable {
         }
     }
     
-    var byte: Byte {
+    public var byte: Byte {
         switch self {
         case .boolean: return WitnessCondition.BOOLEAN_BYTE
         case .not: return WitnessCondition.NOT_BYTE

@@ -17,7 +17,7 @@ public class Signer {
         rules = []
     }
     
-    public init(_ signerHash: Hash160 ,_ scopes: [WitnessScope], _ allowedContracts: [Hash160], _ allowedGroups: [ECPublicKey], _ rules: [WitnessRule]) {
+    private init(_ signerHash: Hash160 ,_ scopes: [WitnessScope], _ allowedContracts: [Hash160], _ allowedGroups: [ECPublicKey], _ rules: [WitnessRule]) {
         self.signerHash = signerHash
         self.scopes = scopes
         self.allowedContracts = allowedContracts

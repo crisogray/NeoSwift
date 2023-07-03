@@ -175,7 +175,7 @@ public class NeoToken: FungibleToken {
         }
         let publicKeyItem = state[2]
         if case .any = publicKeyItem { return .withNoVote(balance, updateHeight) }
-        return try .init(balance: balance, balanceHeight: updateHeight, publicKeyString: .init(publicKeyItem.getHexString()))
+        return try .init(balance: balance, balanceHeight: updateHeight, publicKey: ECPublicKey(publicKeyItem.getHexString()))
     }
     
     public struct Candidate: Hashable {

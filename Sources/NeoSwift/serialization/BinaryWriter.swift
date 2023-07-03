@@ -5,6 +5,8 @@ public class BinaryWriter {
     
     private var array: Bytes = []
     
+    public init() {}
+    
     public var size: Int {
         return array.count
     }

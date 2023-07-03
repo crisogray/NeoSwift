@@ -26,7 +26,7 @@ public indirect enum StackItem: Hashable {
     static let MAP_BYTE: Byte = 0x48
     static let INTEROP_INTERFACE_BYTE: Byte = 0x60
     
-    var jsonValue: String {
+    public var jsonValue: String {
         switch self {
         case .any: return StackItem.ANY_VALUE
         case .pointer: return StackItem.POINTER_VALUE
@@ -41,7 +41,7 @@ public indirect enum StackItem: Hashable {
         }
     }
     
-    var byte: Byte {
+    public var byte: Byte {
         switch self {
         case .any: return StackItem.ANY_BYTE
         case .pointer: return StackItem.POINTER_BYTE
@@ -66,15 +66,6 @@ public indirect enum StackItem: Hashable {
     case `struct`(_ value: [StackItem])
     case map(_ value: [StackItem : StackItem])
     case interopInterface(_ iteratorId: String, _ interfaceName: String)
-    
-    // TODO: Move to ProtocolError
-    public struct CastError: LocalizedError {
-        let item, targetType: String
-        
-        public var errorDescription: String? {
-            return "Cannot cast stack item \(item) to a \(targetType)."
-        }
-    }
     
 }
 
@@ -188,7 +179,7 @@ extension StackItem {
 
     public func getInteger() throws -> Int {
         guard let integer = integer else {
-            throw CastError(item: jsonValue, targetType: "integer")
+            throw ProtocolError.stackItemCastError(self, "integer")
         }
         return integer
     }
@@ -212,7 +203,7 @@ extension StackItem {
 
     public func getString() throws -> String {
         guard let string = string else {
-            throw CastError(item: jsonValue, targetType: "string")
+            throw ProtocolError.stackItemCastError(self, "string")
         }
         return string
     }
@@ -227,7 +218,7 @@ extension StackItem {
     
     public func getHexString() throws -> String {
         guard let hexString = hexString else {
-            throw CastError(item: jsonValue, targetType: "hex string")
+            throw ProtocolError.stackItemCastError(self, "hex string")
         }
         return hexString
     }
@@ -242,7 +233,7 @@ extension StackItem {
     
     public func getByteArray() throws -> Bytes {
         guard let byteArray = byteArray else {
-            throw CastError(item: jsonValue, targetType: "byte array")
+            throw ProtocolError.stackItemCastError(self, "byte array")
         }
         return byteArray
     }
@@ -256,7 +247,7 @@ extension StackItem {
     
     public func getList() throws -> [StackItem] {
         guard let list = list else {
-            throw CastError(item: jsonValue, targetType: "list")
+            throw ProtocolError.stackItemCastError(self, "list")
         }
         return list
     }

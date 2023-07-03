@@ -11,6 +11,12 @@ public class NeoGetClaimable: Response<NeoGetClaimable.Claimables> {
         public let address: String
         public let totalUnclaimed: String
         
+        public init(claims: [Claim], address: String, totalUnclaimed: String) {
+            self.claims = claims
+            self.address = address
+            self.totalUnclaimed = totalUnclaimed
+        }
+        
         enum CodingKeys: String, CodingKey {
             case address
             case claims = "claimable"
@@ -29,6 +35,17 @@ public class NeoGetClaimable: Response<NeoGetClaimable.Claimables> {
         public let generatedGas: String
         public let systemFee: String
         public let unclaimedGas: String
+        
+        public init(txId: String, index: Int, neoValue: Int, startHeight: Int, endHeight: Int, generatedGas: String, systemFee: String, unclaimedGas: String) {
+            self.txId = txId
+            self.index = index
+            self.neoValue = neoValue
+            self.startHeight = startHeight
+            self.endHeight = endHeight
+            self.generatedGas = generatedGas
+            self.systemFee = systemFee
+            self.unclaimedGas = unclaimedGas
+        }
         
         enum CodingKeys: String, CodingKey {
             case txId = "txid"

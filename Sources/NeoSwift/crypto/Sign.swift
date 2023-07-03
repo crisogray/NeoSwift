@@ -119,11 +119,11 @@ public enum Sign {
     
     public class SignatureData: Hashable {
         
-        let v: Byte
-        let r: Bytes
-        let s: Bytes
+        public let v: Byte
+        public let r: Bytes
+        public let s: Bytes
         
-        var concatenated: Bytes {
+        public var concatenated: Bytes {
             return r + s
         }
         

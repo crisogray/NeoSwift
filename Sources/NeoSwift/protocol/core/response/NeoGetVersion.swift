@@ -12,7 +12,15 @@ public class NeoGetVersion: Response<NeoGetVersion.NeoVersion> {
         public let wsPort: Int?
         public let nonce: Int
         public let userAgent: String
-        public let `protocol`: `Protocol`?
+        public let `protocol`: NeoProtocol?
+        
+        public init(tcpPort: Int?, wsPort: Int?, nonce: Int, userAgent: String, neoProtocol: NeoProtocol) {
+            self.tcpPort = tcpPort
+            self.wsPort = wsPort
+            self.nonce = nonce
+            self.userAgent = userAgent
+            self.protocol = neoProtocol
+        }
         
         enum CodingKeys: String, CodingKey {
             case nonce, `protocol`
@@ -21,7 +29,7 @@ public class NeoGetVersion: Response<NeoGetVersion.NeoVersion> {
             case userAgent = "useragent"
         }
         
-        public struct `Protocol`: Codable, Hashable {
+        public struct NeoProtocol: Codable, Hashable {
             
             public let network: Int
             public let validatorsCount: Int?
@@ -32,6 +40,18 @@ public class NeoGetVersion: Response<NeoGetVersion.NeoVersion> {
             public let maxTransactionsPerBlock: Int
             public let memoryPoolMaxTransactions: Int
             public let initialGasDistribution: Int
+            
+            public init(network: Int, validatorsCount: Int?, msPerBlock: Int, maxValidUntilBlockIncrement: Int, maxTraceableBlocks: Int, addressVersion: Int, maxTransactionsPerBlock: Int, memoryPoolMaxTransactions: Int, initialGasDistribution: Int) {
+                self.network = network
+                self.validatorsCount = validatorsCount
+                self.msPerBlock = msPerBlock
+                self.maxValidUntilBlockIncrement = maxValidUntilBlockIncrement
+                self.maxTraceableBlocks = maxTraceableBlocks
+                self.addressVersion = addressVersion
+                self.maxTransactionsPerBlock = maxTransactionsPerBlock
+                self.memoryPoolMaxTransactions = memoryPoolMaxTransactions
+                self.initialGasDistribution = initialGasDistribution
+            }
             
             enum CodingKeys: String, CodingKey {
                 case network

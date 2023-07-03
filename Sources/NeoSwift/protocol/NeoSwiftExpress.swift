@@ -1,10 +1,6 @@
 
 public class NeoSwiftExpress: NeoSwift, NeoExpress {
     
-//    public static func build(_ neoSwiftService: NeoSwiftService, _ config: NeoSwiftConfig = .init()) -> NeoSwiftExpress {
-//        return .init(config: config, neoSwiftService: neoSwiftService)
-//    }
-    
     public func expressGetPopulatedBlocks() -> Request<NeoExpressGetPopulatedBlocks, PopulatedBlocks> {
         return .init(method: "expressgetpopulatedblocks", params: [], neoSwiftService: neoSwiftService)
     }
