@@ -47,6 +47,14 @@ public extension Bytes {
         return Bytes(repeating: 0, count: length - bytesLength) + self[srcOffset..<bytesLength]
     }
     
+    func trimTrailingBytes(of byte: Byte) -> Bytes {
+        var bytes = self
+        while let b = bytes.last, b == byte {
+            bytes.removeLast()
+        }
+        return bytes
+    }
+    
     func toNumeric<T: Numeric>(littleEndian: Bool = false) -> T {
         let b = littleEndian ? reversed() : self
         return Data(bytes: b, count: count)

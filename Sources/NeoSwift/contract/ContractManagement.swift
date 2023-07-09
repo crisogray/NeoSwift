@@ -1,4 +1,6 @@
 
+import Foundation
+
 public class ContractManagement: SmartContract {
     
     private static let NAME = "ContractManagement"
@@ -59,5 +61,15 @@ public class ContractManagement: SmartContract {
     }
     
     // TODO: Deploy
+    
+    public func deploy(_ nef: NefFile, _ manifest: ContractManifest, _ data: ContractParameter? = nil) throws -> TransactionBuilder {
+        let manifestBytes = try JSONEncoder().encode(manifest).bytes
+        guard manifestBytes.count <= NeoConstants.MAX_MANIFEST_SIZE else {
+            throw NeoSwiftError.illegalArgument("The given contract manifest is too long. Manifest was \(manifestBytes.count) bytes big, but a max of \(NeoConstants.MAX_MANIFEST_SIZE) bytes is allowed.")
+        }
+        var params: [ContractParameter] = [.byteArray(nef.toArray()), .byteArray(manifestBytes)]
+        if let data = data { params.append(data) }
+        return try invokeFunction(ContractManagement.DEPLOY, params)
+    }
     
 }

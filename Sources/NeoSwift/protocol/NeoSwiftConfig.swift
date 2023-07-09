@@ -7,7 +7,7 @@ public class NeoSwiftConfig {
     public static let DEFAULT_ADDRESS_VERSION: Byte = 0x35
     public static let MAX_VALID_UNTIL_BLOCK_INCREMENT_BASE: Int = 86_400_000
     
-    private static var addressVersion = DEFAULT_ADDRESS_VERSION;
+    private static var addressVersion = DEFAULT_ADDRESS_VERSION
     
     public private(set) var networkMagic: Int? = nil
     public private(set) var blockInterval: Int = DEFAULT_BLOCK_TIME

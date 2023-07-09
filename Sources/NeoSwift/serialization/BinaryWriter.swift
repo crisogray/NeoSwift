@@ -31,9 +31,8 @@ public class BinaryWriter {
         array += try v.getEncoded(true)
     }
     
-    public func writeFixedString(_ v: String, length: Int) throws {
-        let bytes = v.bytes
-        guard bytes.count <= length else {
+    public func writeFixedString(_ v: String?, length: Int) throws {
+        guard let bytes = v?.bytes, bytes.count <= length else {
             throw NeoSwiftError.illegalArgument("String to write is longer than specified length")
         }
         array += try bytes.toPadded(length: length, trailing: true)
