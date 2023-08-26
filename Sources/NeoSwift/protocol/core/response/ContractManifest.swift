@@ -82,6 +82,23 @@ public struct ContractManifest: Codable, Hashable {
             public let returnType: ContractParamterType
             public let safe: Bool
             
+            public init(name: String, parameters: [ContractParameter], offset: Int, returnType: ContractParamterType, safe: Bool) {
+                self.name = name
+                self.parameters = parameters
+                self.offset = offset
+                self.returnType = returnType
+                self.safe = safe
+            }
+            
+            public init(from decoder: Decoder) throws {
+                let container: KeyedDecodingContainer<ContractManifest.ContractABI.ContractMethod.CodingKeys> = try decoder.container(keyedBy: ContractManifest.ContractABI.ContractMethod.CodingKeys.self)
+                self.name = try container.decode(String.self, forKey: ContractManifest.ContractABI.ContractMethod.CodingKeys.name)
+                self.parameters = try container.decode([ContractParameter].self, forKey: ContractManifest.ContractABI.ContractMethod.CodingKeys.parameters)
+                self.offset = try container.decode(SafeDecode<Int>.self, forKey: ContractManifest.ContractABI.ContractMethod.CodingKeys.offset).value
+                self.safe = try container.decode(Bool.self, forKey: ContractManifest.ContractABI.ContractMethod.CodingKeys.safe)
+                self.returnType = try container.decode(ContractParamterType.self, forKey: ContractManifest.ContractABI.ContractMethod.CodingKeys.returnType)
+            }
+            
             enum CodingKeys: String, CodingKey {
                 case name, parameters, offset, safe
                 case returnType = "returntype"

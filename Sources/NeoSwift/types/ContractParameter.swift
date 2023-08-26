@@ -164,20 +164,22 @@ public struct ContractParameter: Codable, Hashable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         if let name = name { try container.encode(name, forKey: .name) }
         try container.encode(type.jsonValue, forKey: .type)
-        switch type {
-        case .any: try container.encode("", forKey: .value)
-        case .boolean: try container.encode(value as! Bool, forKey: .value)
-        case .integer: try container.encode(value as! Int, forKey: .value)
-        case .byteArray, .signature: try container.encode((value as! Bytes).base64Encoded, forKey: .value)
-        case .string, .interopInterface: try container.encode(value as! String, forKey: .value)
-        case .hash160: try container.encode((value as! Hash160).string, forKey: .value)
-        case .hash256: try container.encode((value as! Hash256).string, forKey: .value)
-        case .publicKey: try container.encode((value as! Bytes).noPrefixHex, forKey: .value)
-        case .array: try container.encode(value as! [ContractParameter], forKey: .value)
-        case .map:
-            let map = value as! [ContractParameter : ContractParameter]
-            try container.encode(map.map { ["key" : $0, "value": $1] }, forKey: .value)
-        default: throw NeoSwiftError.unsupportedOperation("Parameter type '\(type.jsonValue)' not supported.")
+        if let value = value {
+            switch type {
+            case .any: try container.encode("", forKey: .value)
+            case .boolean: try container.encode(value as! Bool, forKey: .value)
+            case .integer: try container.encode(value as! Int, forKey: .value)
+            case .byteArray, .signature: try container.encode((value as! Bytes).base64Encoded, forKey: .value)
+            case .string, .interopInterface: try container.encode(value as! String, forKey: .value)
+            case .hash160: try container.encode((value as! Hash160).string, forKey: .value)
+            case .hash256: try container.encode((value as! Hash256).string, forKey: .value)
+            case .publicKey: try container.encode((value as! Bytes).noPrefixHex, forKey: .value)
+            case .array: try container.encode(value as! [ContractParameter], forKey: .value)
+            case .map:
+                let map = value as! [ContractParameter : ContractParameter]
+                try container.encode(map.map { ["key" : $0, "value": $1] }, forKey: .value)
+            default: throw NeoSwiftError.unsupportedOperation("Parameter type '\(type.jsonValue)' not supported.")
+            }
         }
     }
     

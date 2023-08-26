@@ -13,11 +13,11 @@ public struct NefFile {
     public let compiler: String?
     public let sourceUrl: String
     public let methodTokens: [MethodToken]
-    public let checkSum: Bytes
     public let script: Bytes
-    
-    public var checSumInteger: Int {
-        return NefFile.getCheckSumAsInteger(checkSum)
+    public private(set) var checksum: Bytes
+
+    public var checksumInteger: Int {
+        return NefFile.getChecksumAsInteger(checksum)
     }
     
     public init() {
@@ -25,7 +25,7 @@ public struct NefFile {
         sourceUrl = ""
         methodTokens = []
         script = []
-        checkSum = []
+        checksum = []
     }
     
     public init(compiler: String?, sourceUrl: String = "", methodTokens: [MethodToken], script: Bytes) throws {
@@ -40,10 +40,11 @@ public struct NefFile {
             throw NeoSwiftError.illegalArgument("The source URL must not be longer than \(NefFile.MAX_SOURCE_URL_SIZE) bytes.")
         }
         self.script = script
-        self.checkSum = []
+        self.checksum = .init(repeating: 0, count: NefFile.CHECKSUM_SIZE)
+        self.checksum = NefFile.computeChecksum(self)
     }
     
-    public static func getCheckSumAsInteger(_ bytes: Bytes) -> Int {
+    public static func getChecksumAsInteger(_ bytes: Bytes) -> Int {
         return bytes.toNumeric(littleEndian: true)
     }
     
@@ -143,7 +144,7 @@ extension NefFile: NeoSerializable {
         writer.writeSerializableVariable(methodTokens)
         writer.writeUInt16(0)
         writer.writeVarBytes(script)
-        writer.write(checkSum)
+        writer.write(checksum)
     }
 
     public static func deserialize(_ reader: BinaryReader) throws -> Self {
@@ -168,7 +169,9 @@ extension NefFile: NeoSerializable {
             throw NeoSwiftError.deserialization("Script cannot be empty in NEF file.")
         }
         let file = try NefFile(compiler: compiler, sourceUrl: sourceUrl, methodTokens: methodTokens, script: script)
-        guard try file.checkSum == reader.readBytes(NefFile.CHECKSUM_SIZE) else {
+        let checksum = try reader.readBytes(NefFile.CHECKSUM_SIZE)
+        guard file.checksum == checksum else {
+            print(file.checksum, checksum)
             throw NeoSwiftError.deserialization("The checksums did not match.")
         }
         return file

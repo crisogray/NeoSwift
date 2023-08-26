@@ -31,7 +31,7 @@ public class ContractManagement: SmartContract {
         return try await neoSwift.getContractState(contractHash).send().getResult()
     }
     
-    public func getContractByID(_ id: Int) async throws -> ContractState {
+    public func getContractById(_ id: Int) async throws -> ContractState {
         return try await getContract(getContractHashById(id))
     }
     
@@ -59,9 +59,7 @@ public class ContractManagement: SmartContract {
     public func hasMethod(_ contractHash: Hash160, _ method: String, _ paramCount: Int) async throws -> Bool {
         return try await callFunctionReturningBool(ContractManagement.HAS_METHOD, [.hash160(contractHash), .string(method), .integer(paramCount)])
     }
-    
-    // TODO: Deploy
-    
+        
     public func deploy(_ nef: NefFile, _ manifest: ContractManifest, _ data: ContractParameter? = nil) throws -> TransactionBuilder {
         let manifestBytes = try JSONEncoder().encode(manifest).bytes
         guard manifestBytes.count <= NeoConstants.MAX_MANIFEST_SIZE else {
