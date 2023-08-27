@@ -1,3 +1,5 @@
+
+import BigInt
 import Foundation
 
 public struct NefFile {
@@ -36,16 +38,16 @@ public struct NefFile {
         self.compiler = compiler
         self.sourceUrl = sourceUrl
         self.methodTokens = methodTokens
-        guard sourceUrl.bytes.count <= NefFile.MAX_SOURCE_URL_SIZE else {
+        guard sourceUrl.bytes.count < NefFile.MAX_SOURCE_URL_SIZE else {
             throw NeoSwiftError.illegalArgument("The source URL must not be longer than \(NefFile.MAX_SOURCE_URL_SIZE) bytes.")
         }
         self.script = script
-        self.checksum = .init(repeating: 0, count: NefFile.CHECKSUM_SIZE)
+        self.checksum = Bytes(repeating: 0, count: NefFile.CHECKSUM_SIZE)
         self.checksum = NefFile.computeChecksum(self)
     }
     
     public static func getChecksumAsInteger(_ bytes: Bytes) -> Int {
-        return bytes.toNumeric(littleEndian: true)
+        return BInt(magnitude: bytes.reversed()).asInt()!
     }
     
     public static func computeChecksum(_ file: NefFile) -> Bytes {
@@ -154,7 +156,7 @@ extension NefFile: NeoSerializable {
         let compilerBytes = try reader.readBytes(NefFile.COMPILER_SIZE)
         let compiler = String(bytes: compilerBytes.trimTrailingBytes(of: 0), encoding: .utf8)
         let sourceUrl = try reader.readVarString()
-        guard sourceUrl.bytes.count <= NefFile.MAX_SOURCE_URL_SIZE else {
+        guard sourceUrl.bytes.count < NefFile.MAX_SOURCE_URL_SIZE else {
             throw NeoSwiftError.deserialization("Source URL must not be longer than \(NefFile.MAX_SOURCE_URL_SIZE) bytes.")
         }
         guard reader.readByte() == 0 else {
