@@ -51,10 +51,11 @@ class ContractManagementTests: XCTestCase {
         let manifest = try JSONDecoder().decode(ContractManifest.self, from: Data(contentsOf: TESTCONTRACT_MANIFEST_FILE))
         let manifestData = try JSONEncoder().encode(manifest)
         
-        let expectedScript = try ScriptBuilder().contractCall(
-            ContractManagement.SCRIPT_HASH, method: "deploy",
-            params: [.byteArray(nef.toArray()), .byteArray(manifestData.bytes)]
-        ).toArray()
+        let expectedScript = try ScriptBuilder()
+            .contractCall(
+                ContractManagement.SCRIPT_HASH, method: "deploy",
+                params: [.byteArray(nef.toArray()), .byteArray(manifestData.bytes)]
+            ).toArray()
         
         let tx = try await ContractManagement(neoSwift)
             .deploy(nef, manifest)

@@ -109,7 +109,7 @@ public class SmartContract {
     
     public func throwIfFaultState(_ invocationResult: InvocationResult) throws {
         if invocationResult.hasStateFault {
-            throw ProtocolError.invocationFaultSate(String(describing: invocationResult.exception))
+            throw ProtocolError.invocationFaultState(String(describing: invocationResult.exception))
         }
     }
     

@@ -105,12 +105,12 @@ public class NeoNameService: NonFungibleToken {
         return try invokeFunction(NeoNameService.SET_RECORD, [.string(name.name), .integer(type.byte), .string(data)])
     }
     
-    public func getRecord(_ name: NNSName, _ type: RecordType) throws -> TransactionBuilder {
+    public func getRecord(_ name: NNSName, _ type: RecordType) async throws -> String {
         do {
-            return try invokeFunction(NeoNameService.GET_RECORD, [.string(name.name), .integer(type.byte)])
-        } catch ContractError.unresolvableDomainName {
-            throw NeoSwiftError.illegalArgument("Could not get a record of type '\(type)' for the domain name '\(name)'.")
-        } catch ProtocolError.invocationFaultSate {
+            return try await callFunctionReturningString(NeoNameService.GET_RECORD, [.string(name.name), .integer(type.byte)])
+        } catch ContractError.unexpectedReturnType {
+            throw NeoSwiftError.illegalArgument("Could not get a record of type '\(type)' for the domain name '\(name.name)'.")
+        } catch ProtocolError.invocationFaultState {
             throw NeoSwiftError.illegalArgument("The domain name '\(name.name)' might not be registered or is in an invalid format.")
         }
     }
@@ -136,7 +136,7 @@ public class NeoNameService: NonFungibleToken {
         }
     }
     
-    private func checkDomainNameAvailability(_ name: NNSName, _ shouldBeAvailable: Bool) async throws {
+    public func checkDomainNameAvailability(_ name: NNSName, _ shouldBeAvailable: Bool) async throws {
         let isAvailable = try await isAvailable(name)
         if shouldBeAvailable && !isAvailable {
             throw NeoSwiftError.illegalArgument("The domain name '\(name.name)' is already taken.")
