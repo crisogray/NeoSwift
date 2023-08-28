@@ -86,7 +86,7 @@ class SmartContractTests: XCTestCase {
         _ = mockUrlSession.data(["invokefunction": JSON.from("invokefunction_totalSupply")])
         do {
             _ = try await neoContract.callFunctionReturningString(NEP17_NAME)
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch ContractError.unexpectedReturnType {
             return
         } catch {
@@ -105,7 +105,7 @@ class SmartContractTests: XCTestCase {
         _ = mockUrlSession.data(["invokefunction": JSON.from("invokefunction_returnTrue")])
         do {
             _ = try await neoContract.callFunctionReturningString(NEP17_TRANSFER)
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch ContractError.unexpectedReturnType {
             return
         } catch {
@@ -138,7 +138,7 @@ class SmartContractTests: XCTestCase {
         _ = mockUrlSession.data(["invokefunction": JSON.from("invokefunction_getcandidates")])
         do {
             _ = try await neoContract.callFunctionReturningBool("getCandidates")
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch ContractError.unexpectedReturnType {
             return
         } catch {
@@ -211,7 +211,7 @@ class SmartContractTests: XCTestCase {
         _ = mockUrlSession.invokeFunctions(["symbol": JSON.from("invokefunction_symbol")])
         do {
             _ = try await neoContract.callFunctionReturningIterator("symbol")
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch ContractError.unexpectedReturnType {
             return
         } catch {
@@ -223,7 +223,7 @@ class SmartContractTests: XCTestCase {
         _ = mockUrlSession.invokeFunctions(["tokensOf": JSON.from("invokefunction_iterator_sessionDisabled")])
         do {
             _ = try await neoContract.callFunctionReturningIterator("tokensOf")
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch NeoSwiftError.illegalState(let message) {
             XCTAssertEqual(message, "No session id was found. The connected Neo node might not support sessions.")
         } catch {
@@ -261,7 +261,7 @@ class SmartContractTests: XCTestCase {
         _ = mockUrlSession.invokeFunctions(["symbol": JSON.from("invokefunction_symbol")])
         do {
             _ = try await neoContract.callInvokeFunction("")
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch NeoSwiftError.illegalArgument(let message) {
             XCTAssertEqual(message, "The invocation function must not be empty.")
         } catch {

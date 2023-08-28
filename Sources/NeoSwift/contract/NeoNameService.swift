@@ -48,7 +48,7 @@ public class NeoNameService: NonFungibleToken {
     
     public func transfer(_ from: Account, _ to: Hash160, _ name: NNSName, _ data: ContractParameter? = nil) async throws -> TransactionBuilder {
         try await checkDomainNameAvailability(name, false)
-        return try transfer(from, to, name.bytes, data)
+        return try await transfer(from, to, name.bytes, data)
     }
     
     // MARK: Custom Name Service Methods

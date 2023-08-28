@@ -62,7 +62,7 @@ class NeoURITests: XCTestCase {
         do {
             _ = try await NeoURI.fromURI("neo:NZNos2WqTbu5oCgyfss9kUJgBXJqhuYAaj?asset=neo&amount=1.1")
                 .neoSwift(neoSwift).buildTransferFrom(SENDER_ACCOUNT)
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch NeoSwiftError.illegalArgument(let message) {
             XCTAssertEqual(message, "The NEO token does not support any decimal places.")
         }
@@ -72,7 +72,7 @@ class NeoURITests: XCTestCase {
         do {
             _ = try await NeoURI.fromURI("neo:NZNos2WqTbu5oCgyfss9kUJgBXJqhuYAaj?asset=gas&amount=0.000000001")
                 .neoSwift(neoSwift).buildTransferFrom(SENDER_ACCOUNT)
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch NeoSwiftError.illegalArgument(let message) {
             XCTAssertEqual(message, "The GAS token does not support more than 8 decimal places.")
         }
@@ -197,7 +197,7 @@ class NeoURITests: XCTestCase {
                 .to(RECIPIENT)
                 .amount(AMOUNT)
                 .buildTransferFrom(SENDER_ACCOUNT)
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch NeoSwiftError.illegalState(let message) {
             XCTAssertEqual(message, "NeoSwift instance is not set.")
         }
@@ -209,7 +209,7 @@ class NeoURITests: XCTestCase {
                 .token(NeoToken.SCRIPT_HASH)
                 .amount(AMOUNT)
                 .buildTransferFrom(SENDER_ACCOUNT)
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch NeoSwiftError.illegalState(let message) {
             XCTAssertEqual(message, "Recipient is not set.")
         }
@@ -221,7 +221,7 @@ class NeoURITests: XCTestCase {
                 .token(NeoToken.SCRIPT_HASH)
                 .to(RECIPIENT)
                 .buildTransferFrom(SENDER_ACCOUNT)
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch NeoSwiftError.illegalState(let message) {
             XCTAssertEqual(message, "Amount is not set.")
         }
@@ -233,7 +233,7 @@ class NeoURITests: XCTestCase {
                 .amount(AMOUNT)
                 .to(RECIPIENT)
                 .buildTransferFrom(SENDER_ACCOUNT)
-            XCTFail("No exception.")
+            XCTFail("No exception")
         } catch NeoSwiftError.illegalState(let message) {
             XCTAssertEqual(message, "Token is not set.")
         }

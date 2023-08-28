@@ -4,7 +4,7 @@ import XCTest
 
 class FungibleTokenTests: XCTestCase {
     
-    var mockUrlSession: MockURLSession!
+    private var mockUrlSession: MockURLSession!
     
     private let RECIPIENT_SCRIPT_HASH = try! Hash160("969a77db482f74ce27105f760efa139223431394")
     private let NEP17_TRANSFER = "transfer"

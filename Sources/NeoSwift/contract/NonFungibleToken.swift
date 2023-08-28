@@ -22,11 +22,12 @@ public class NonFungibleToken: Token {
     
     // MARK: Non-divisible NFT Methods
     
-    public func transfer(_ from: Account, _ to: Hash160, _ tokenId: Bytes, _ data: ContractParameter? = nil) throws -> TransactionBuilder {
-        return try transfer(to, tokenId, data).signers(AccountSigner.calledByEntry(from))
+    public func transfer(_ from: Account, _ to: Hash160, _ tokenId: Bytes, _ data: ContractParameter? = nil) async throws -> TransactionBuilder {
+        return try await transfer(to, tokenId, data).signers(AccountSigner.calledByEntry(from))
     }
     
-    public func transfer(_ to: Hash160, _ tokenId: Bytes, _ data: ContractParameter? = nil) throws -> TransactionBuilder {
+    public func transfer(_ to: Hash160, _ tokenId: Bytes, _ data: ContractParameter? = nil) async throws -> TransactionBuilder {
+        try await throwIfDivisibleNFT()
         return try invokeFunction(NonFungibleToken.TRANSFER, [.hash160(to), .byteArray(tokenId), data])
     }
     
