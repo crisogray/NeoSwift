@@ -182,4 +182,8 @@ class PolicyContractTests: XCTestCase {
         XCTAssertEqual(tx.witnesses.first?.verificationScript.script, account1.verificationScript!.script)
     }
     
+    public func testScriptHash() {
+        XCTAssertEqual(policyContract.scriptHash, POLICYCONTRACT_HASH)
+    }
+    
 }
