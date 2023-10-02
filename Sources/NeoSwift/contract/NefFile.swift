@@ -2,6 +2,25 @@
 import BigInt
 import Foundation
 
+/*
+┌───────────────────────────────────────────────────────────────────────┐
+│                    NEO Executable Format 3 (NEF3)                     │
+├──────────┬───────────────┬────────────────────────────────────────────┤
+│  Field   │     Type      │                  Comment                   │
+├──────────┼───────────────┼────────────────────────────────────────────┤
+│ Magic    │ uint32        │ Magic header                               │
+│ Compiler │ byte[64]      │ Compiler name and version                  │
+├──────────┼───────────────┼────────────────────────────────────────────┤
+│ Source   │ byte[]        │ The url of the source files, max 255 bytes │
+│ Reserve  │ byte[2]       │ Reserved for future extensions. Must be 0. │
+│ Tokens   │ MethodToken[] │ Method tokens                              │
+│ Reserve  │ byte[2]       │ Reserved for future extensions. Must be 0. │
+│ Script   │ byte[]        │ Var bytes for the payload                  │
+├──────────┼───────────────┼────────────────────────────────────────────┤
+│ Checksum │ uint32        │ First four bytes of double SHA256 hash     │
+└──────────┴───────────────┴────────────────────────────────────────────┘
+ */
+
 public struct NefFile {
     
     private static let MAGIC = 0x3346454E
@@ -12,12 +31,19 @@ public struct NefFile {
     private static let CHECKSUM_SIZE = 4
     private static let HEADER_SIZE = MAGIC_SIZE + COMPILER_SIZE
     
+    /// The compiler name and version with which this NEF file has been generated.
     public let compiler: String?
+    /// The source code URL.
     public let sourceUrl: String
+    /// The contract's method tokens. The tokens represent calls to other contracts.
     public let methodTokens: [MethodToken]
+    /// The contract script
     public let script: Bytes
+    /// The check sum
     public private(set) var checksum: Bytes
-
+    
+    /// The NEF file's check sum as an integer.
+    /// The check sum bytes of the NEF file are read as a little endian unsigned integer.
     public var checksumInteger: Int {
         return NefFile.getChecksumAsInteger(checksum)
     }
@@ -30,6 +56,12 @@ public struct NefFile {
         checksum = []
     }
     
+    /// Constructs a new `NefFile` from the given contract information.
+    /// - Parameters:
+    ///   - compiler: The compiler name and version with which the contract has been compiled
+    ///   - sourceUrl: The URL to the source code of the contract
+    ///   - methodTokens: The method tokens of the contract
+    ///   - script: The contract's script
     public init(compiler: String?, sourceUrl: String = "", methodTokens: [MethodToken], script: Bytes) throws {
         let compilerSize = compiler?.bytes.count ?? 0
         guard compilerSize <= NefFile.COMPILER_SIZE else {
@@ -46,19 +78,33 @@ public struct NefFile {
         self.checksum = NefFile.computeChecksum(self)
     }
     
+    /// Converts check sum bytes to an integer.
+    ///
+    /// The check sum is expected to be 4 bytes, and it is interpreted as a little endian unsigned integer.
+    /// - Parameter bytes: The check sum bytes
+    /// - Returns: The check sum as an integer
     public static func getChecksumAsInteger(_ bytes: Bytes) -> Int {
         return BInt(magnitude: bytes.reversed()).asInt()!
     }
     
+    /// Computes the checksum for the given NEF file.
+    /// - Parameter file: The NEF file
+    /// - Returns: The checksum
     public static func computeChecksum(_ file: NefFile) -> Bytes {
         return computeChecksumFromBytes(file.toArray())
     }
     
+    /// Computes the checksum from the bytes of a NEF file.
+    /// - Parameter bytes: The bytes of the NEF file
+    /// - Returns: The checksum
     public static func computeChecksumFromBytes(_ bytes: Bytes) -> Bytes {
         let fileBytes = Bytes(bytes.dropLast(NefFile.CHECKSUM_SIZE))
         return Bytes(fileBytes.hash256().prefix(NefFile.CHECKSUM_SIZE))
     }
     
+    /// Reads and constructs an `NefFile` instance from the given file.
+    /// - Parameter file: The file to read from
+    /// - Returns: The deserialized `NefFile` instance
     public static func readFromFile(_ file: URL) throws -> NefFile {
         let fileBytes = try Data(contentsOf: file).bytes
         guard fileBytes.count <= 0x100000 else {
@@ -67,6 +113,11 @@ public struct NefFile {
         return try BinaryReader(fileBytes).readSerializable()
     }
     
+    /// Deserializes and constructs a `NefFile` from the given stack item.
+    ///
+    /// It is expected that the stack item is of type ``StackItem/byteString(_:)`` and its content is simply a serialized NEF file.
+    /// - Parameter stackItem: The stack item to deserialize
+    /// - Returns: The deserialized `NefFile`
     public static func readFromStackItem(_ stackItem: StackItem) throws -> NefFile {
         guard case .byteString = stackItem else {
             throw ContractError.unexpectedReturnType(stackItem.jsonValue, [StackItem.BYTE_STRING_VALUE])
@@ -75,6 +126,8 @@ public struct NefFile {
         return try BinaryReader(nefBytes).readSerializable()
     }
     
+    /// Represents a static call to another contract from within a smart contract.
+    /// Method tokens are referenced in the smart contract's script whenever the referenced method is called.
     public struct MethodToken: NeoSerializable, Hashable {
         
         private static let PARAMS_COUNT_SIZE = 0x3346454E
@@ -130,7 +183,8 @@ public struct NefFile {
 }
 
 extension NefFile: NeoSerializable {
-
+    
+    /// The byte size of this NEF file when serialized.
     public var size: Int {
         return NefFile.HEADER_SIZE + sourceUrl.varSize + 1
         + methodTokens.varSize + 2

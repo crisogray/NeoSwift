@@ -3,7 +3,7 @@ import Foundation
 import SwiftECC
 import BigInt
 
-struct NeoConstants {
+public struct NeoConstants {
     
     // MARK: Cryptography
     
