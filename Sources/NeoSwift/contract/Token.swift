@@ -15,7 +15,7 @@ public class Token: SmartContract {
     /// Gets the total supply of this token in fractions.
     ///
     /// The return value is retrieved form the neo-node only once and then cached.
-    /// - Returns: <#description#>
+    /// - Returns: The total supply
     public func getTotalSupply() async throws -> Int {
         guard let totalSupply = totalSupply else {
             return try await callFunctionReturningInt(Token.TOTAL_SUPPLY)
