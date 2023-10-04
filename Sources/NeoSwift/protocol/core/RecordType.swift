@@ -3,7 +3,17 @@ import Foundation
 
 public enum RecordType: ByteEnum {
     
-    case a, cname, txt, aaaa
+    /// An address record.
+    case a
+    
+    /// A canonical name record.
+    case cname
+    
+    /// A text record.
+    case txt
+    
+    /// An IPv6 address record.
+    case aaaa
     
     public var jsonValue: String {
         switch self {

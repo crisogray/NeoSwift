@@ -13,7 +13,7 @@ public class NeoSwift: Neo, NeoSwiftRx {
     
     internal let neoSwiftService: NeoSwiftService
     private lazy var neoSwiftRx: JsonRpc2_0Rx = {
-        return JsonRpc2_0Rx(neoSwift: self, executorService: config.scheduledExecutorService)
+        return JsonRpc2_0Rx(neoSwift: self, executorService: config.scheduledDispatchQueue)
     }()
     
     required public init(config: NeoSwiftConfig, neoSwiftService: NeoSwiftService) {

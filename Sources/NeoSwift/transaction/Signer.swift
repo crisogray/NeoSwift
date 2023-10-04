@@ -1,12 +1,22 @@
 
 import Foundation
 
+/// A signer of a transaction. It defines a scope in which the signer's signature is valid.
 public class Signer {
     
+    /// The script hash of the signer account.
     public let signerHash: Hash160
+    
+    /// The scopes in which the signer's signatures can be used. Multiple scopes can be combined.
     public private(set) var scopes: [WitnessScope]
+    
+    /// The contract hashes of the contracts that are allowed to use the witness.
     public private(set) var allowedContracts: [Hash160]
+    
+    /// The group hashes of contracts that are allowed to use the witness.
     public private(set) var allowedGroups: [ECPublicKey]
+    
+    /// The rules that the witness must meet.
     public private(set) var rules: [WitnessRule]
     
     internal init(_ signerHash: Hash160, _ scope: WitnessScope) {
@@ -24,7 +34,10 @@ public class Signer {
         self.allowedGroups = allowedGroups
         self.rules = rules
     }
-
+    
+    /// Adds the given contracts to this signer's scope. These contracts are allowed to use the signers witness.
+    /// - Parameter allowedContracts: The hashes of the allowed contracts
+    /// - Returns: The signer (self)
     public func setAllowedContracts(_ allowedContracts: [Hash160]) throws -> Signer {
         if allowedContracts.isEmpty { return self }
         else if scopes.contains(.global) { throw TransactionError.signerConfiguration("Trying to set allowed contracts on a Signer with global scope.") }
@@ -37,6 +50,9 @@ public class Signer {
         return self
     }
     
+    /// Adds the given contract groups to this signer's scope. The contracts in these groups are allowed to use the signers witness.
+    /// - Parameter allowedContracts: The public keys of the allowed contracts
+    /// - Returns: The signer (self)
     public func setAllowedGroups(_ allowedGroups: [ECPublicKey]) throws -> Signer {
         if allowedGroups.isEmpty { return self }
         else if scopes.contains(.global) { throw TransactionError.signerConfiguration("Trying to set allowed contract groups on a Signer with global scope.") }
@@ -49,6 +65,9 @@ public class Signer {
         return self
     }
     
+    /// Adds the given witness rules to this signer.
+    /// - Parameter rules: The rules
+    /// - Returns: The signer (self)
     public func setRules(_ rules: [WitnessRule]) throws -> Signer {
         if rules.isEmpty { return self }
         else if scopes.contains(.global) { throw TransactionError.signerConfiguration("Trying to set witness rules on a Signer with global scope.") }

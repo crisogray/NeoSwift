@@ -34,6 +34,7 @@ public struct BlockIndexPolling {
             }
             .compactMap { $0 }
             .flatMap { $0.publisher.setFailureType(to: Error.self) }
+            .subscribe(on: executor)
             .eraseToAnyPublisher()
     }
     
