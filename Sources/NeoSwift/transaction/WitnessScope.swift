@@ -3,7 +3,23 @@ import Foundation
 
 public enum WitnessScope: ByteEnum {
     
-    case none, calledByEntry, customContracts, customGroups, witnessRules, global
+    /// A witness with this scope is only used for transactions and is disabled in contracts.
+    case none
+    
+    /// This scope limits the use of a witness to the level of the contract called in the transaction. I.e. it only allows the invoked contract to use the witness.
+    case calledByEntry
+    
+    /// This scope allows the specification of additional contracts in which the witness can be used.
+    case customContracts
+    
+    /// This scope allows the specification of contract groups in which the witness can be used.
+    case customGroups
+    
+    /// Indicates that the current context must satisfy the specified rules.
+    case witnessRules
+    
+    /// The global scope allows to use a witness in all contexts. It cannot be combined with other scopes.
+    case global
     
     public var jsonValue: String {
         switch self {
@@ -27,10 +43,16 @@ public enum WitnessScope: ByteEnum {
         }
     }
     
+    /// Encodes the given scopes in one byte.
+    /// - Parameter scopes: The scopes to encode
+    /// - Returns: The scope encoding byte
     public static func combineScopes(_ scopes: [WitnessScope]) -> Byte {
         return scopes.map(\.byte).reduce(0, |)
     }
     
+    /// Extracts the scopes encoded in the given byte.
+    /// - Parameter combinedScopes: The byte representation of the scopes
+    /// - Returns: The list of scopes encoded by the given byte
     public static func extractCombinedScopes(_ combinedScopes: Byte) -> [WitnessScope] {
         if combinedScopes == WitnessScope.none.byte { return [.none] }
         return allCases.filter{ $0 != .none && (combinedScopes & $0.byte) != 0 }

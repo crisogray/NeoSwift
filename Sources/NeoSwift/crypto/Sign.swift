@@ -57,15 +57,15 @@ public enum Sign {
     /// Because the key recovery operation yields multiple potential keys, the correct key must either be stored alongside the signature,
     /// or you must be willing to try each recId in turn until you find one that outputs the key you are expecting.
     ///
-    /// If this method returns null it means recovery was not possible and recId should be iterated.
+    /// If this method returns nil it means recovery was not possible and recId should be iterated.
     ///
     /// Given the above two points, a correct usage of this method is inside a for loop from 0 to 3,
-    /// and if the output  is null OR a key that is not the one you expect, you try again with the next recId.
+    /// and if the output  is nil OR a key that is not the one you expect, you try again with the next recId.
     /// - Parameters:
     ///   - recId: Which possible key to recover
     ///   - sig: The R and S components of the signature, wrapped
     ///   - message: The hash of the data that was signed
-    /// - Returns: An ECKey containing only the public part, or null if recovery wasn't possible
+    /// - Returns: An ECKey containing only the public part, or nil if recovery wasn't possible
     public static func recoverFromSignature(recId: Int, sig: ECDSASignature, message: Bytes) throws -> ECPublicKey? {
         guard recId >= 0 else { throw NeoSwiftError.runtime("recId must be positive") }
         guard sig.r.signum >= 0 else { throw NeoSwiftError.runtime("r must be positive") }

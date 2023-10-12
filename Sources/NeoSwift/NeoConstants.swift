@@ -56,7 +56,7 @@ public struct NeoConstants {
     
     private static let DEFAULT_CURVE: ECCurve = .EC256r1
     public private(set) static var SECP256R1_DOMAIN: Domain = .instance(curve: DEFAULT_CURVE)
-    static let SECP256R1_HALF_CURVE_ORDER: BInt = SECP256R1_DOMAIN.order >> 1
+    public static let SECP256R1_HALF_CURVE_ORDER: BInt = SECP256R1_DOMAIN.order >> 1
     
     // MARK: Fot Testing
     

@@ -1,30 +1,46 @@
 
 import Foundation
 
+/// A verification script is part of a witness and is simply a sequence of neo-vm instructions.
+/// The verification script is the part of a witness that describes what has to be verified such that the witness is valid.
+/// E.g. for a regular signature witness the verification script is made up of a check-signature call and it expects a signature as input.
 public class VerificationScript: NeoSerializable, Hashable {
     
+    /// The verification script as a byte array.
     public let script: Bytes
     
     public var size: Int {
         return script.count.varSize + script.count
     }
     
+    /// The script hash of this verification script.
     public var scriptHash: Hash160? {
         return try? Hash160.fromScript(script)
     }
     
+    /// Creates an empty verification script
     public init() {
         self.script = []
     }
     
+    /// Creates a verification script from the given byte array.
+    /// - Parameter script: The script
     public init(_ script: Bytes) {
         self.script = script
     }
     
+    /// Creates a verification script for the given public key.
+    /// The resulting verification script contains a signature check with the given public key as the expected signer.
+    /// - Parameter publicKey: The public key to create the script for
     public init(_ publicKey: ECPublicKey) throws {
         self.script = try ScriptBuilder.buildVerificationScript(publicKey.getEncoded(compressed: true))
     }
     
+    /// Creates a multi-sig verification script for the given keys and signing threshold.
+    /// The resulting verification script contains a multi-signature check with the given public keys as the expected signer.
+    /// - Parameters:
+    ///   - publicKeys: The public keys to create the script for
+    ///   - signingThreshold: The minimum number of public keys needed to sign transactions from the given public keys
     public init(_ publicKeys: [ECPublicKey], _ signingThreshold: Int) throws {
         guard signingThreshold >= 1 && signingThreshold <= publicKeys.count else {
             throw NeoSwiftError.illegalArgument("Signing threshold must be at least 1 and not higher than the number of public keys.")
@@ -35,16 +51,22 @@ public class VerificationScript: NeoSerializable, Hashable {
         self.script = try ScriptBuilder.buildVerificationScript(publicKeys, signingThreshold)
     }
     
+    /// Extracts the number of signatures required for signing this verification script.
+    /// - Returns: The signing threshold
     public func getSigningThreshold() throws -> Int {
         if isSingleSigScript() { return 1 }
         else if isMultiSigScript() { return try BinaryReader(script).readPushInt() }
         throw TransactionError.scriptFormat("The signing threshold cannot be determined because this script does not apply to the format of a signature verification script.")
     }
     
+    /// Gets the number of accounts taking part in this verification script.
+    /// - Returns: The number of accounts
     public func getNrOfAccounts() throws -> Int {
         return try getPublicKeys().count
     }
     
+    /// Checks if this verification script is from single signature account.
+    /// - Returns: `true` if this script is from a single signature account. Otherwise `false`.
     public func isSingleSigScript() -> Bool {
         guard script.count == 40 else {
             return false
@@ -55,6 +77,8 @@ public class VerificationScript: NeoSerializable, Hashable {
         interopService == InteropService.systemCryptoCheckSig.hash
     }
     
+    /// Checks if this verification script is from a multi signature account.
+    /// - Returns: `true` if this script is from a multi signature account. Otherwise `false`.
     public func isMultiSigScript() -> Bool {
         guard script.count >= 42 else {
             return false
@@ -87,6 +111,12 @@ public class VerificationScript: NeoSerializable, Hashable {
         }
     }
     
+    /// Gets the public keys that are encoded in this verification script.
+    /// If this script is from a single signature account the resulting list will only contain one key.
+    ///
+    /// In case of a multi-sig script, the public keys are returned in their natural ordering (public key value).
+    /// This is also the order in which they appear in the script.
+    /// - Returns: The list of public keys encoded in this script
     public func getPublicKeys() throws -> [ECPublicKey] {
         let reader = BinaryReader(script)
         do {

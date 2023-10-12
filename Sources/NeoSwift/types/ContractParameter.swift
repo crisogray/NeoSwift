@@ -2,6 +2,7 @@
 import BigInt
 import Foundation
 
+/// Contract parameters represent an input parameter for contract invocations.
 public struct ContractParameter: Codable, Hashable {
         
     public let name: String?
@@ -25,19 +26,33 @@ public struct ContractParameter: Codable, Hashable {
     public init(type: ContractParamterType, value: AnyHashable?) {
         self.init(name: nil, type: type, value: value)
     }
- 
+    
+    /// Creates a contract parameter from the given value.
+    /// - Parameter value: Any object value
+    /// - Returns: The contract parameter
     public static func any(_ value: AnyHashable?) -> ContractParameter {
         return ContractParameter(type: .any, value: value)
     }
     
+    /// Creates a string parameter from the given value.
+    /// - Parameter value: The string value
+    /// - Returns: The contract parameter
     public static func string(_ value: String) -> ContractParameter {
         return ContractParameter(type: .string, value: value)
     }
     
+    /// Creates a byte array parameter from the given value.
+    ///
+    /// Make sure that the array is in the right byte order, i.e., endianness.
+    /// - Parameter value: The parameter value
+    /// - Returns: The contract parameter
     public static func byteArray(_ value: Bytes) -> ContractParameter {
         return ContractParameter(type: .byteArray, value: value)
     }
     
+    /// Creates a byte array parameter from the given hex string.
+    /// - Parameter value: The hexadecimal string
+    /// - Returns:The contract parameter
     public static func byteArray(_ value: String) throws -> ContractParameter {
         guard value.isValidHex else {
             throw NeoSwiftError.illegalArgument("Argument is not a valid hex number.")
@@ -45,10 +60,16 @@ public struct ContractParameter: Codable, Hashable {
         return ContractParameter(type: .byteArray, value: value.bytesFromHex)
     }
     
+    /// Create a byte array parameter from a string by converting the string to bytes using the UTF-8 character set.
+    /// - Parameter value: The paramter value
+    /// - Returns:The contract parameter
     public static func byteArrayFromString(_ value: String) -> ContractParameter {
         return ContractParameter(type: .byteArray, value: Bytes(value.utf8))
     }
     
+    /// Creates a signature parameter from the given signature.
+    /// - Parameter value: A signature
+    /// - Returns:The contract parameter
     public static func signature(_ value: Bytes) throws -> ContractParameter {
         guard value.count == NeoConstants.SIGNATURE_SIZE else {
             throw NeoSwiftError.illegalArgument("Signature is expected to have a length of \(NeoConstants.SIGNATURE_SIZE) bytes, but had \(value.count).")
@@ -56,10 +77,16 @@ public struct ContractParameter: Codable, Hashable {
         return ContractParameter(type: .signature, value: value)
     }
     
+    /// Creates a signature parameter from the provided ``Sign/SignatureData``.
+    /// - Parameter value: The signature data
+    /// - Returns: The contract parameter
     public static func signature(_ value: Sign.SignatureData) throws -> ContractParameter {
         return try signature(value.concatenated)
     }
     
+    /// Creates a signature parameter from the given signature hexadecimal string.
+    /// - Parameter value: A signature as hexadecimal string
+    /// - Returns: The contract parameter
     public static func signature(_ value: String) throws -> ContractParameter {
         guard value.isValidHex else {
             throw NeoSwiftError.illegalArgument("Argument is not a valid hex number.")
@@ -67,42 +94,74 @@ public struct ContractParameter: Codable, Hashable {
         return try signature(value.bytesFromHex)
     }
     
+    /// Creates an boolean parameter from the given boolean.
+    /// - Parameter value: A boolean value
+    /// - Returns: The contract parameter
     public static func bool(_ value: Bool) -> ContractParameter {
         return ContractParameter(type: .boolean, value: value)
     }
     
+    /// Creates an integer parameter from the given integer.
+    /// - Parameter value: An integer value
+    /// - Returns: The contract parameter
     public static func integer(_ value: Int) -> ContractParameter {
         return ContractParameter(type: .integer, value: value)
     }
     
+    /// Creates an integer parameter from the given byte value.
+    /// - Parameter value: A byte value
+    /// - Returns: The contract parameter
     public static func integer(_ value: Byte) -> ContractParameter {
         return integer(Int(value))
     }
     
+    /// Creates an integer parameter from the given big integer.
+    /// - Parameter value: A big integer value
+    /// - Returns: The contract parameter
     public static func integer(_ value: BInt) -> ContractParameter {
         return ContractParameter(type: .integer, value: value)
     }
     
+    /// Creates a hash160 parameter from the given account.
+    /// - Parameter account: An account
+    /// - Returns: The contract parameter
+    public static func hash160(_ account: Account) throws -> ContractParameter {
+        return try ContractParameter(type: .hash160, value: account.getScriptHash())
+    }
+    
+    /// Creates a hash160 parameter from the given script hash.
+    /// - Parameter value: A script hash
+    /// - Returns: The contract parameter
     public static func hash160(_ value: Hash160) -> ContractParameter {
         return ContractParameter(type: .hash160, value: value)
     }
     
-    public static func hash160(_ account: Account) throws -> ContractParameter {
-        return try ContractParameter(type: .hash160, value: account.getScriptHash())
-    }
-        
+    /// Creates a hash256 parameter from the given hash.
+    /// - Parameter value: A 456-bit hash
+    /// - Returns: The contract parameter
     public static func hash256(_ value: Hash256) -> ContractParameter {
         return ContractParameter(type: .hash256, value: value)
     }
     
+    /// Creates a hash256 parameter from the given bytes.
+    /// - Parameter value: A 256-bit hash in big-endian order
+    /// - Returns: The contract parameter
     public static func hash256(_ value: Bytes) throws -> ContractParameter {
         return try ContractParameter(type: .hash256, value: Hash256(value))
     }
     
+    /// Creates a hash256 parameter from the given hex string.
+    /// - Parameter value: A 256-bit hash in hexadecimal and big-endian order
+    /// - Returns: The contract parameter
     public static func hash256(_ value: String) throws -> ContractParameter {
         return try ContractParameter(type: .hash256, value: Hash256(value))
     }
     
+    /// Creates a public key parameter from the given public key.
+    ///
+    /// The public key must be encoded in compressed format as described in section 2.3.3 of [SEC1](http://www.secg.org/sec1-v2.pdf)
+    /// - Parameter value: The public key to use in the parameter
+    /// - Returns: The contract parameter
     public static func publicKey(_ value: Bytes) throws -> ContractParameter {
         guard value.count == NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED else {
             throw NeoSwiftError.illegalArgument("Public key argument must be \(NeoConstants.PUBLIC_KEY_SIZE_COMPRESSED) bytes but was \(value.count) bytes.")
@@ -110,18 +169,35 @@ public struct ContractParameter: Codable, Hashable {
         return ContractParameter(type: .publicKey, value: value)
     }
     
+    /// Creates a public key parameter from the given public key.
+    ///
+    /// The public key must be encoded in compressed format as described in section 2.3.3 of [SEC1](http://www.secg.org/sec1-v2.pdf)
+    /// - Parameter value: The public key in hexadecimal representation
+    /// - Returns: The contract parameter
     public static func publicKey(_ value: String) throws -> ContractParameter {
         return try publicKey(value.bytesFromHex)
     }
     
+    /// Creates a public key parameter from the given public key.
+    /// - Parameter value: The public key
+    /// - Returns: The contract parameter
     public static func publicKey(_ value: ECPublicKey) throws -> ContractParameter {
         return try publicKey(value.getEncoded(compressed: true))
     }
     
+    /// Creates an array parameter from the given values.
+    ///
+    /// The method will try to map the given objects to the correct ``ContractParameterType``s.
+    /// You can pass in objects of type ``ContractParameter`` to fix the parameter type of an element.
+    /// - Parameter values: The array entries
+    /// - Returns: The contract parameter
     public static func array(_ values: [AnyHashable]) throws -> ContractParameter {
         return try ContractParameter(type: .array, value: values.map(mapToContractParameter(_:)))
     }
     
+    /// Creates a map contract parameter.
+    /// - Parameter values: The map entries
+    /// - Returns: The contract parameter
     public static func map(_ values: [AnyHashable: AnyHashable]) throws -> ContractParameter {
         guard !values.isEmpty else {
             throw NeoSwiftError.illegalArgument("At least one map entry is required to create a map contract parameter.")
@@ -138,6 +214,9 @@ public struct ContractParameter: Codable, Hashable {
         return ContractParameter(type: .map, value: map)
     }
     
+    /// Maps the given object to a contract parameter of the appropriate type.
+    /// - Parameter value: The object to map
+    /// - Returns: The contract parameter
     public static func mapToContractParameter(_ value: Any?) throws -> ContractParameter {
         switch value {
         case nil: return any(nil)

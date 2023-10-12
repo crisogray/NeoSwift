@@ -1,16 +1,26 @@
 
 import Foundation
 
+/// Reads NeoVM scripts and converts them to a more human-readable representation.
 public class ScriptReader {
     
+    /// Gets the InteropService that creates the provided hash.
+    /// - Parameter hash: The hash of the InteropService
+    /// - Returns: The InteropService matching the hash
     public static func getInteropServiceCode(_ hash: String) -> InteropService? {
         return InteropService.allCases.first(where: { $0.hash == hash })
     }
     
+    /// Converts a NeoVM script into a string representation using OpCode names.
+    /// - Parameter script: The script to convert in hexadecimal format
+    /// - Returns: The OpCode representation of the script
     public static func convertToOpCodeString(_ script: String) -> String {
         return convertToOpCodeString(script.bytesFromHex)
     }
     
+    /// Converts a NeoVM script into a string representation using OpCode names.
+    /// - Parameter script: The script to convert
+    /// - Returns: The OpCode representation of the script
     public static func convertToOpCodeString(_ script: Bytes) -> String {
         let reader = BinaryReader(script)
         var s = ""

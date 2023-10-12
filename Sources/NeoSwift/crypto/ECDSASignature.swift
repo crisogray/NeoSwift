@@ -3,6 +3,7 @@ import BigInt
 import Foundation
 import SwiftECC
 
+/// AN ECDSA Signature
 public class ECDSASignature {
     
     public let signature: ECSignature
@@ -15,6 +16,7 @@ public class ECDSASignature {
         return signature.s.bInt
     }
     
+    /// `true` if the S component is "low", that means it is below ``NeoConstants/SECP256R1_HALF_CURVE_ORDER``.
     public var isCanonical: Bool {
         return s <= NeoConstants.SECP256R1_HALF_CURVE_ORDER
     }

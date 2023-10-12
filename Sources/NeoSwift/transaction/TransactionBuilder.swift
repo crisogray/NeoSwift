@@ -1,4 +1,5 @@
 
+/// Used to build a ``NeoTransaction``. When signing the `TransactionBuilder`, a transaction is created that can be sent to the Neo node.
 public class TransactionBuilder {
     
     public static let GAS_TOKEN_HASH = try! Hash160("d2a4cff31913016155e38e474a2c06d08be276cf")
@@ -34,11 +35,21 @@ public class TransactionBuilder {
         attributes = []
     }
     
+    /// Sets the version for this transaction.
+    ///
+    /// It is set to ``NeoConstants/CURRENT_TX_VERSION`` by default.
+    /// - Parameter version: The transaction version number
+    /// - Returns: This transaction builder (self)
     public func version(_ version: Byte) -> TransactionBuilder {
         self.version = version
         return self
     }
     
+    /// Sets the nonce (number used once) for this transaction. The nonce is a number from 0 to 2^32.
+    ///
+    /// It is set to a random value by default.
+    /// - Parameter nonce: The transaction nonce
+    /// - Returns: This transaction builder (self)
     public func nonce(_ nonce: Int) throws -> TransactionBuilder {
         guard nonce >= 0 && nonce < 2.toPowerOf(32) else {
             throw TransactionError.transactionConfiguration("The value of the transaction nonce must be in the interval [0, 2^32].")
@@ -47,6 +58,12 @@ public class TransactionBuilder {
         return self
     }
     
+    /// Sets the number of the block up to which this transaction can be included.
+    /// If that block number is reached in the network and this transaction is not yet included in a block, it becomes invalid.
+    ///
+    /// By default, it is set to the maximum, which is the current chain height plus ``NeoSwiftConfig/maxValidUntilBlockIncrement``.
+    /// - Parameter blockNr: The block number
+    /// - Returns: This transaction builder (self)
     public func validUntilBlock(_ blockNr: Int) throws -> TransactionBuilder {
         guard blockNr >= 0 && blockNr < 2.toPowerOf(32) else {
             throw TransactionError.transactionConfiguration("The block number up to which this transaction can be included cannot be less than zero or more than 2^32.")
@@ -55,10 +72,18 @@ public class TransactionBuilder {
         return self
     }
     
+    /// Sets the signer belonging to the given `sender` account to the first index of the list of signers for this transaction.
+    /// The first signer covers the fees for the transaction if there is no signer present with fee-only witness scope (see ``WitnessScope/none``).
+    /// - Parameter sender: The account of the signer to be set to the first index
+    /// - Returns: This transaction builder (self)
     public func firstSigner(_ sender: Account) throws -> TransactionBuilder {
         return try firstSigner(sender.getScriptHash())
     }
     
+    /// Sets the signer with script hash `sender` to the first index of the list of signers for this transaction.
+    /// The first signer covers the fees for the transaction if there is no signer present with fee-only witness scope (see ``WitnessScope/none``).
+    /// - Parameter sender: The script hash of the signer to be set to the first index
+    /// - Returns: This transaction builder (self)
     public func firstSigner(_ sender: Hash160) throws -> TransactionBuilder {
         guard !signers.contains(where: { $0.scopes.contains(.none) }) else {
             throw NeoSwiftError.illegalState("This transaction contains a signer with fee-only witness scope that will cover the fees. Hence, the order of the signers does not affect the payment of the fees.")
@@ -71,10 +96,22 @@ public class TransactionBuilder {
         return self
     }
     
+    /// Sets the signers of this transaction. If the list of signers already contains signers, they are replaced.
+    ///
+    /// If one of the signers has the fee-only witness scope (see ``WitnessScope/none``), this account is used to cover the transaction fees.
+    /// Otherwise, the first signer is used as the sender of this transaction, meaning that it is used to cover the transaction fees.
+    /// - Parameter signers: The signers for this transaction
+    /// - Returns: This transaction builder (self)
     public func signers(_ signers: Signer...) throws -> TransactionBuilder {
         return try self.signers(signers)
     }
     
+    /// Sets the signers of this transaction. If the list of signers already contains signers, they are replaced.
+    ///
+    /// If one of the signers has the fee-only witness scope (see ``WitnessScope/none``), this account is used to cover the transaction fees.
+    /// Otherwise, the first signer is used as the sender of this transaction, meaning that it is used to cover the transaction fees.
+    /// - Parameter signers: The signers for this transaction
+    /// - Returns: This transaction builder (self)
     public func signers(_ signers: [Signer]) throws -> TransactionBuilder {
         let hashes = signers.map(\.signerHash)
         guard Set(hashes).count == hashes.count else {
@@ -91,30 +128,60 @@ public class TransactionBuilder {
         }
     }
     
+    /// Configures the transaction with an additional network fee.
+    ///
+    /// The basic network fee required to send this transaction is added automatically.
+    /// - Parameter fee: The additional network fee in fractions of GAS
+    /// - Returns: This transaction builder (self)
     public func additionalNetworkFee(_ fee: Int) -> TransactionBuilder {
         additionalNetworkFee = fee
         return self
     }
     
+    /// Configures the transaction with an additional system fee.
+    ///
+    /// The basic system fee required to send this transaction is added automatically.
+    ///
+    /// Use this, if you expect the transaction to consume more GAS because of chain state changes happening between creating the transaction and actually sending it.
+    /// - Parameter fee: The additional system fee in fractions of GAS
+    /// - Returns: This transaction builder (self)
     public func additionalSystemFee(_ fee: Int) -> TransactionBuilder {
         additionalSystemFee = fee
         return self
     }
     
+    /// Sets the script for this transaction. It defines the actions that this transaction will perform on the blockchain.
+    /// - Parameter script: The contract script
+    /// - Returns: This transaction builder (self)
     public func script(_ script: Bytes) -> TransactionBuilder {
         self.script = script
         return self
     }
     
+    /// Concatenates the existing script and the provided script, i.e. the provided script is appended to the existing script.
+    ///
+    /// This method may be used to create an advanced transaction that contains multiple invocations.
+    /// - Parameter script: The contract script
+    /// - Returns: This transaction builder (self)
     public func extendScript(_ script: Bytes) -> TransactionBuilder {
         self.script = (self.script ?? []) + script
         return self
     }
     
+    /// Adds the given attributes to this transaction.
+    ///
+    /// The maximum number of attributes on a transaction is given in ``NeoConstants/MAX_TRANSACTION_ATTRIBUTES``.
+    /// - Parameter attributes: The attributes
+    /// - Returns: This transaction builder (self)
     public func attributes(_ attributes: TransactionAttribute...) throws -> TransactionBuilder {
         return try self.attributes(attributes)
     }
     
+    /// Adds the given attributes to this transaction.
+    ///
+    /// The maximum number of attributes on a transaction is given in ``NeoConstants/MAX_TRANSACTION_ATTRIBUTES``.
+    /// - Parameter attributes: The attributes
+    /// - Returns: This transaction builder (self)
     public func attributes(_ attributes: [TransactionAttribute]) throws -> TransactionBuilder {
         try throwIfMaxAttributesExceeded(signers.count, self.attributes.count + attributes.count)
         attributes.forEach { attr in
@@ -125,7 +192,9 @@ public class TransactionBuilder {
         return self
     }
     
-    public func getUnsignedTransaction() async throws -> SerializableTransaction {
+    /// Builds the transaction without signing it.
+    /// - Returns: The unsigned transaction
+    public func getUnsignedTransaction() async throws -> NeoTransaction {
         guard let script = script, !script.isEmpty else {
             throw TransactionError.transactionConfiguration("Cannot build a transaction without a script.")
         }
@@ -155,7 +224,7 @@ public class TransactionBuilder {
             if fees > gasBalance { consumer(fees, gasBalance) }
         }
         
-        return SerializableTransaction(neoSwift: neoSwift, version: version, nonce: nonce,
+        return NeoTransaction(neoSwift: neoSwift, version: version, nonce: nonce,
                                        validUntilBlock: validUntilBlock!, signers: signers,
                                        systemFee: systemFee, networkFee: networkFee,
                                        attributes: attributes, script: script, witnesses: [])
@@ -193,7 +262,7 @@ public class TransactionBuilder {
     }
     
     private func calcNetworkFee() async throws -> Int {
-        let tx = SerializableTransaction(neoSwift: neoSwift, version: version, nonce: nonce,
+        let tx = NeoTransaction(neoSwift: neoSwift, version: version, nonce: nonce,
                                          validUntilBlock: validUntilBlock!, signers: signers,
                                          systemFee: 0, networkFee: 0, attributes: attributes,
                                          script: script!, witnesses: [])
@@ -229,6 +298,10 @@ public class TransactionBuilder {
         return try VerificationScript(ECPublicKey(Self.DUMMY_PUB_KEY))
     }
     
+    /// Makes an `invokescript` call to the Neo node with the transaction in its current configuration. No changes are made to the blockchain state.
+    ///
+    /// Make sure to add all necessary signers to the builder before making this call. They are required for a successful `invokescript` call.
+    /// - Returns: The call's response
     public func callInvokeScript() async throws -> NeoInvokeScript {
         guard let script = script, !script.isEmpty else {
             throw TransactionError.transactionConfiguration("Cannot make an 'invokescript' call without the script being configured.")
@@ -236,7 +309,11 @@ public class TransactionBuilder {
         return try await neoSwift.invokeScript(script.noPrefixHex, signers).send()
     }
     
-    public func sign() async throws -> SerializableTransaction {
+    /// Builds the transaction, creates signatures for every signer and adds them to the transaction as witnesses.
+    ///
+    /// For each signer of the transaction, a corresponding account with an EC key pair must exist in the wallet set on this transaction builder.
+    /// - Returns: The signed transaction
+    public func sign() async throws -> NeoTransaction {
         let transaction = try await getUnsignedTransaction()
         let txBytes = try await transaction.getHashData()
         try transaction.signers.forEach { signer in
@@ -256,6 +333,12 @@ public class TransactionBuilder {
         return transaction
     }
     
+    /// Checks if the sender account of this transaction can cover the network and system fees.
+    /// If not, executes the given consumer supplying it with the required fee and the sender's GAS balance.
+    ///
+    /// The check and potential execution of the consumer is only performed when the transaction is built, i.e., when calling ``TransactionBuilder/sign()`` or ``TransactionBuilder/getUnsignedTransaction()``.
+    /// - Parameter consumer: The consumer
+    /// - Returns: This transaction builder (self)
     public func doIfSenderCannotCoverFees(_ consumer: @escaping (Int, Int) -> Void) throws -> TransactionBuilder {
         guard feeError == nil else {
             throw NeoSwiftError.illegalState("Cannot handle a consumer for this case, since an exception will be thrown if the sender cannot cover the fees.")
@@ -264,6 +347,12 @@ public class TransactionBuilder {
         return self
     }
     
+    /// Checks if the sender account of this transaction can cover the network and system fees.
+    /// If not, otherwise throw an error created by the provided supplier.
+    ///
+    /// The check and potential throwing of the exception is only performed when the transaction is built, i.e., when calling ``TransactionBuilder/sign()`` or ``TransactionBuilder/getUnsignedTransaction()``.
+    /// - Parameter error: The error to throw
+    /// - Returns: This transaction builder (self)
     public func throwIfSenderCannotCoverFees(_ error: Error) throws -> TransactionBuilder {
         guard consumer == nil else {
             throw NeoSwiftError.illegalState("Cannot handle a supplier for this case, since a consumer will be executed if the sender cannot cover the fees.")

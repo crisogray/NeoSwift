@@ -16,7 +16,7 @@ class SerializableTransactionTest: XCTestCase {
 
     public func testSerializeWithoutAttributesAndWitnesses() {
         let signers = try! [AccountSigner.calledByEntry(account1)]
-        let tx = SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304,
+        let tx = NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304,
                                          validUntilBlock: 0x01020304, signers: signers,
                                          systemFee: 10.toPowerOf(8), networkFee: 1, attributes: [],
                                          script: [OpCode.push1.opcode], witnesses: [])
@@ -36,7 +36,7 @@ class SerializableTransactionTest: XCTestCase {
     public func testSerializeWithAttributesAndWitnesses() {
         let signers = try! [AccountSigner.global(account1), AccountSigner.calledByEntry(account2)]
         let witnesses = [Witness([0], [0])]
-        let tx = SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304,
+        let tx = NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304,
                                          validUntilBlock: 0x01020304, signers: signers,
                                          systemFee: 10.toPowerOf(8), networkFee: 1, attributes: [],
                                          script: [OpCode.push1.opcode], witnesses: witnesses)
@@ -68,7 +68,7 @@ class SerializableTransactionTest: XCTestCase {
                     + "01" + OpCode.push1.string  // 1-byte script with PUSH1 OpCode
                     + "01" // 1 witness
                     + "01000100").bytesFromHex
-        let transaction = try! SerializableTransaction.from(data)
+        let transaction = try! NeoTransaction.from(data)
         XCTAssertEqual(transaction.version, 0)
         XCTAssertEqual(transaction.nonce, 246070626)
         XCTAssertEqual(transaction.sender, try! Hash160("969a77db482f74ce27105f760efa139223431394"))
@@ -98,7 +98,7 @@ class SerializableTransactionTest: XCTestCase {
                     + "01" + "01" // one attribute - high priority
                     + "01" + OpCode.push1.string  // 1-byte script with PUSH1 OpCode
             ).bytesFromHex
-        let transaction = try! SerializableTransaction.from(data)
+        let transaction = try! NeoTransaction.from(data)
         XCTAssertEqual(transaction.version, 0)
         XCTAssertEqual(transaction.nonce, 246070626)
         XCTAssertEqual(transaction.sender, try! Hash160("969a77db482f74ce27105f760efa139223431394"))
@@ -123,7 +123,7 @@ class SerializableTransactionTest: XCTestCase {
                     + "01" + "01" // one attribute - high priority
                     + "01" + OpCode.push1.string  // 1-byte script with PUSH1 OpCode
                     + "00").bytesFromHex
-        let transaction = try! SerializableTransaction.from(data)
+        let transaction = try! NeoTransaction.from(data)
         XCTAssertEqual(transaction.version, 0)
         XCTAssertEqual(transaction.nonce, 246070626)
         XCTAssertEqual(transaction.sender, try! Hash160("969a77db482f74ce27105f760efa139223431394"))
@@ -140,7 +140,7 @@ class SerializableTransactionTest: XCTestCase {
     public func testSize() {
         let signers = try! [AccountSigner.global(account1), AccountSigner.calledByEntry(account2)]
         let witnesses = [Witness([0], [0])]
-        let tx = SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304,
+        let tx = NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304,
                                          validUntilBlock: 0x01020304, signers: signers,
                                          systemFee: 10.toPowerOf(8), networkFee: 1, attributes: [],
                                          script: [OpCode.push1.opcode], witnesses: witnesses)
@@ -157,7 +157,7 @@ class SerializableTransactionTest: XCTestCase {
         (0...16).forEach { _ in string.append("941343239213fa0e765f1027ce742f48db779a9601") }
         string.append("00")
         
-        XCTAssertThrowsError(try SerializableTransaction.from(string.bytesFromHex)) { error in
+        XCTAssertThrowsError(try NeoTransaction.from(string.bytesFromHex)) { error in
             XCTAssert(error.localizedDescription.contains("A transaction can hold at most "))
         }
     }
@@ -165,7 +165,7 @@ class SerializableTransactionTest: XCTestCase {
     public func testGetTxId() {
         let signers = try! [AccountSigner.calledByEntry(account3)]
         let script = "110c146cd3d4f4f7e35c5ee7d0e725c11dc880cef1e8b10c14c6a1c24a5b87fb8ccd7ac5f7948ffe526d4e01f713c00c087472616e736665720c1425059ecb4878d3a875f91c51ceded330d4575fde41627d5b5238".bytesFromHex
-        let tx = SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 226292130,
+        let tx = NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 226292130,
                                          validUntilBlock: 2103398, signers: signers,
                                          systemFee: 9007990, networkFee: 1244390, attributes: [],
                                          script: script, witnesses: [])
@@ -175,7 +175,7 @@ class SerializableTransactionTest: XCTestCase {
     public func testToArrayWithoutWitnesses() {
         let signers = try! [AccountSigner.calledByEntry(account3)]
         let script = "110c146cd3d4f4f7e35c5ee7d0e725c11dc880cef1e8b10c14c6a1c24a5b87fb8ccd7ac5f7948ffe526d4e01f713c00c087472616e736665720c1425059ecb4878d3a875f91c51ceded330d4575fde41627d5b5238".bytesFromHex
-        let tx = SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 226292130,
+        let tx = NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 226292130,
                                          validUntilBlock: 2103398, signers: signers,
                                          systemFee: 9007990, networkFee: 1244390,
                                          attributes: [], script: script, witnesses: [])
@@ -186,7 +186,7 @@ class SerializableTransactionTest: XCTestCase {
     public func testGetHashData() async {
         _ = try! neoSwift.config.setNetworkMagic(769)
         let signers = try! [AccountSigner.none(.fromScriptHash(account1))]
-        let tx = SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 0,
+        let tx = NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 0,
                                          validUntilBlock: 0, signers: signers,
                                          systemFee: 0, networkFee: 0, attributes: [],
                                          script: [Byte(1), Byte(2), Byte(3)], witnesses: [])
@@ -198,7 +198,7 @@ class SerializableTransactionTest: XCTestCase {
     
     public func testTooBigTransaction() async {
         let tooBigScript = Bytes(repeating: 0, count: NeoConstants.MAX_TRANSACTION_SIZE - 32)
-        let tx = SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 0,
+        let tx = NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 0,
                                          validUntilBlock: 0, signers: [],
                                          systemFee: 0, networkFee: 0, attributes: [],
                                          script: tooBigScript, witnesses: [])
@@ -213,7 +213,7 @@ class SerializableTransactionTest: XCTestCase {
     
     public func testMaxTransactionSize() {
         let tooBigScript = Bytes(repeating: 0, count: NeoConstants.MAX_TRANSACTION_SIZE - 33)
-        let tx = SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 0,
+        let tx = NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 0,
                                          validUntilBlock: 0, signers: [],
                                          systemFee: 0, networkFee: 0, attributes: [],
                                          script: tooBigScript, witnesses: [])
@@ -223,7 +223,7 @@ class SerializableTransactionTest: XCTestCase {
     public func testAddMultiSigWitnessWithPubKeySigMap() async {
         _ = try! neoSwift.config.setNetworkMagic(769)
         let multiSigAccount = try! Account.createMultiSigAccount([a4.keyPair!.publicKey, a5.keyPair!.publicKey, a6.keyPair!.publicKey], 3)
-        let dummyTx = try! SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304, validUntilBlock: 0x01020304,
+        let dummyTx = try! NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304, validUntilBlock: 0x01020304,
                                               signers: [AccountSigner.calledByEntry(multiSigAccount)],
                                               systemFee: 10.toPowerOf(8), networkFee: 1, attributes: [],
                                               script: [OpCode.push1.opcode], witnesses: [])
@@ -240,7 +240,7 @@ class SerializableTransactionTest: XCTestCase {
     public func testAddMultiSigWitnessWithAccounts() async {
         _ = try! neoSwift.config.setNetworkMagic(769)
         let multiSigAccount = try! Account.createMultiSigAccount([a4.keyPair!.publicKey, a5.keyPair!.publicKey, a6.keyPair!.publicKey], 3)
-        let dummyTx = try! SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304, validUntilBlock: 0x01020304,
+        let dummyTx = try! NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304, validUntilBlock: 0x01020304,
                                               signers: [AccountSigner.calledByEntry(multiSigAccount)],
                                               systemFee: 10.toPowerOf(8), networkFee: 1, attributes: [],
                                               script: [OpCode.push1.opcode], witnesses: [])
@@ -264,7 +264,7 @@ class SerializableTransactionTest: XCTestCase {
         let signers: [AccountSigner] = try! [.none(singleAccount1),
                                              .calledByEntry(singleAccount2),
                                              .calledByEntry(multiSigAccount)]
-        let tx = SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304,
+        let tx = NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304,
                                               validUntilBlock: 0x01020304, signers: signers,
                                               systemFee: 10.toPowerOf(8), networkFee: 1, attributes: [],
                                               script: [OpCode.push1.opcode], witnesses: [])
@@ -302,7 +302,7 @@ class SerializableTransactionTest: XCTestCase {
         let singleSigAccount1 = try! Account.create()
         let dummyHash = try! Hash160("f32bf2a3e36a9fd3411337ffcd48eed7bec727ce")
         let signers: [Signer] = try! [AccountSigner.none(singleSigAccount1), ContractSigner.calledByEntry(dummyHash)]
-        let tx = SerializableTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304,
+        let tx = NeoTransaction(neoSwift: neoSwift, version: 0, nonce: 0x01020304,
                                               validUntilBlock: 0x01020304, signers: signers,
                                               systemFee: 10.toPowerOf(8), networkFee: 1, attributes: [],
                                               script: [OpCode.push1.opcode], witnesses: [])

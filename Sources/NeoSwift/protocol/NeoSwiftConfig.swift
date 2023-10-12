@@ -14,13 +14,13 @@ public class NeoSwiftConfig {
     /// The address version is used in the creation of Neo addresses from script hashes. It defaults to ``DEFAULT_ADDRESS_VERSION``
     ///
     /// This property is static because it is necessary in code that can be used independent of a connected Neo node.
-    private static var addressVersion = DEFAULT_ADDRESS_VERSION
+    public private(set) static var addressVersion = DEFAULT_ADDRESS_VERSION
     
     /// The configured network magic number.
     ///
     /// The magic number is an ingredient, e.g., when generating the hash of a transaction.
     ///
-    /// The default value is null. Only once ``NeoSwift/NeoSwift/getNetworkMagicNumber()`` or ``NeoSwift/NeoSwift/getNetworkMagicNumberBytes()``  is called for the first time the value is set.
+    /// The default value is nil. Only once ``NeoSwift/NeoSwift/getNetworkMagicNumber()`` or ``NeoSwift/NeoSwift/getNetworkMagicNumberBytes()``  is called for the first time the value is set.
     /// This is because the magic number is fetched directly from the neo-node.
     public private(set) var networkMagic: Int? = nil
     

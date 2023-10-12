@@ -178,7 +178,7 @@ public class NeoToken: FungibleToken {
     /// Creates a transaction script to vote for the given candidate and initializes a ``TransactionBuilder`` based on this script.
     /// - Parameters:
     ///   - voter: Tthe account that casts the vote
-    ///   - candidate: The candidate to vote for. If null, then the current vote of the voter is withdrawn (see ``NeoToken/cancelVote(_:)-97svv``
+    ///   - candidate: The candidate to vote for. If nil, then the current vote of the voter is withdrawn (see ``NeoToken/cancelVote(_:)-97svv``
     /// - Returns: A transaction builder
     public func vote(_ voter: Account, _ candidate: ECPublicKey?) async throws -> TransactionBuilder {
         return try await vote(voter.getScriptHash(), candidate)
@@ -187,7 +187,7 @@ public class NeoToken: FungibleToken {
     /// Creates a transaction script to vote for the given candidate and initializes a ``TransactionBuilder`` based on this script.
     /// - Parameters:
     ///   - voter: Tthe account script hash that casts the vote
-    ///   - candidate: The candidate to vote for. If null, then the current vote of the voter is withdrawn (see ``NeoToken/cancelVote(_:)-97svv``
+    ///   - candidate: The candidate to vote for. If nil, then the current vote of the voter is withdrawn (see ``NeoToken/cancelVote(_:)-97svv``
     /// - Returns: A transaction builder
     public func vote(_ voter: Hash160, _ candidate: ECPublicKey?) async throws -> TransactionBuilder {
         guard let candidate = candidate else {
@@ -213,7 +213,7 @@ public class NeoToken: FungibleToken {
     /// Builds a script to vote for a candidate.
     /// - Parameters:
     ///   - voter: The account that casts the vote
-    ///   - candidate: The candidate to vote for. If null, then the current vote of the voter is withdrawn (see ``NeoToken/cancelVote(_:)-9mruz``)
+    ///   - candidate: The candidate to vote for. If nil, then the current vote of the voter is withdrawn (see ``NeoToken/cancelVote(_:)-9mruz``)
     /// - Returns: The script
     public func buildVoteScript(_ voter: Hash160, _ candidate: ECPublicKey?) throws -> Bytes {
         guard let candidate = candidate else {
