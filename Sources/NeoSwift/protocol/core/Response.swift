@@ -32,7 +32,7 @@ public class Response<T: Codable>: Codable, HasRawResponse {
         return result!
     }
     
-    public struct Error: Codable, Hashable {
+    public struct Error: LocalizedError, Codable, Hashable {
         
         public let code: Int
         public let message: String
@@ -56,6 +56,10 @@ public class Response<T: Codable>: Codable, HasRawResponse {
         
         public var string: String {
             return "Error{code=\(code), message=\(message), data=\(String(describing: data))}"
+        }
+        
+        public var errorDescription: String? {
+            return string
         }
 
     }
