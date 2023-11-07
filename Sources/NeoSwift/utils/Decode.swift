@@ -83,6 +83,30 @@ extension Bool: StringDecodable {
     
 }
 
+extension BInt: StringDecodable {
+    
+    public init(string: String) throws {
+        guard let bInt = BInt(string) else {
+            throw NeoSwiftError.illegalArgument("Unable to decode BigInt from JSON string '\(string)'")
+        }
+        self = bInt
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let int = try? container.decode(Int.self) {
+            self = BInt(int)
+        } else {
+            self = try BInt(string: container.decode(String.self))
+        }
+    }
+    
+    public var string: String {
+        asString()
+    }
+    
+}
+
 extension Int: StringDecodable {
     
     public init(string: String) throws {
@@ -116,6 +140,7 @@ extension AnyHashable: Codable {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(String.self) { self = value }
         else if let value = try? container.decode(Int.self) { self = value }
+        else if let value = try? container.decode(BInt.self) { self = value }
         else if let value = try? container.decode(Double.self) { self = value }
         else if let value = try? container.decode(Bool.self) { self = value }
         else if let value = try? container.decode([AnyHashable].self) { self = value }
@@ -128,6 +153,7 @@ extension AnyHashable: Codable {
         switch self {
         case is String: try container.encode(self as! String)
         case is Int: try container.encode(self as! Int)
+        case is BInt: try container.encode(self as! BInt)
         case is Bool: try container.encode(self as! Bool)
         case is Double: try container.encode(self as! Double)
         case is [AnyHashable]: try container.encode(self as! [AnyHashable])

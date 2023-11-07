@@ -26,8 +26,8 @@ class StackItemTest: XCTestCase {
     
     func testPointerDecode() {
         let item = decode("{\"type\":\"Pointer\", \"value\":\"123456\"}")
-        XCTAssertEqual(item, .pointer(123456))
-        XCTAssertEqual(item.value, 123456)
+        XCTAssertEqual(item, .pointer(BInt(123456)))
+        XCTAssertEqual(item.integer, 123456)
     }
     
     func testByteStringDecode() {
@@ -66,7 +66,7 @@ class StackItemTest: XCTestCase {
     
     func testIntegerDecode() {
         let item = decode("{\"type\":\"Integer\",\"value\":\"1124\"}")
-        XCTAssertEqual(item, .integer(1124))
+        XCTAssertEqual(item, .integer(BInt(1124)))
         XCTAssertEqual(item.integer, 1124)
     }
     
@@ -93,10 +93,10 @@ class StackItemTest: XCTestCase {
         ]
     }
     """
-        let values: [StackItem] = [.boolean(true), .integer(100)]
+        let values: [StackItem] = [.boolean(true), .integer(BInt(100))]
         let item = decode(json)
         XCTAssertEqual(item, .array(values))
-        XCTAssertEqual(item, .array([.boolean(true), .integer(100)]))
+        XCTAssertEqual(item, .array([.boolean(true), .integer(BInt(100))]))
         XCTAssertEqual(item.list, values)
         
         let empty = decode("{\"type\":\"Array\", \"value\":[]}")
@@ -149,7 +149,7 @@ class StackItemTest: XCTestCase {
         XCTAssert(mapValue.keys.contains(key2))
 
         let value1: StackItem = .boolean(false)
-        let value2: StackItem = .integer(12345)
+        let value2: StackItem = .integer(BInt(12345))
         
         XCTAssert(mapValue.values.contains(value1))
         XCTAssert(mapValue.values.contains(value2))
@@ -177,8 +177,8 @@ class StackItemTest: XCTestCase {
         let json = "{\"type\": \"Struct\",\"value\": [{\"type\": \"Boolean\",\"value\": \"true\"},{\"type\": \"Integer\",\"value\": \"100\"}]}"
         let item = decode(json)
         
-        XCTAssertEqual(item, .struct([.boolean(true), .integer(100)]))
-        XCTAssertEqual(item.list, [.boolean(true), .integer(100)])
+        XCTAssertEqual(item, .struct([.boolean(true), .integer(BInt(100))]))
+        XCTAssertEqual(item.list, [.boolean(true), .integer(BInt(100))])
         
         let empty = decode("{\"type\":\"Struct\", \"value\":[]}")
         XCTAssertEqual(empty, .struct([]))
@@ -205,13 +205,13 @@ class StackItemTest: XCTestCase {
         let byteString2: StackItem = .byteString([])
         XCTAssertNil(byteString2.byteArray)
         
-        let intOne: StackItem = .integer(1)
+        let intOne: StackItem = .integer(BInt(1))
         XCTAssert(intOne.boolean == true)
         
-        let intZero: StackItem = .integer(0)
+        let intZero: StackItem = .integer(BInt(0))
         XCTAssert(intZero.boolean == false)
 
-        let intThousand: StackItem = .integer(1000)
+        let intThousand: StackItem = .integer(BInt(1000))
         XCTAssertEqual(intThousand.string, "1000")
         XCTAssertEqual(intThousand.hexString, "e803")
         XCTAssertEqual(intThousand.byteArray, "e803".bytesFromHex)
@@ -235,15 +235,15 @@ class StackItemTest: XCTestCase {
     }
     
     func testListToString() {
-        let items: [StackItem] = [.byteString("word".bytes), .integer(1)]
+        let items: [StackItem] = [.byteString("word".bytes), .integer(BInt(1))]
         let stackItem: StackItem = .array(items)
         XCTAssertEqual(stackItem.valueString, "ByteString{value='776f7264'}, Integer{value='1'}")
     }
     
     func testMapToString() {
         let items: [StackItem: StackItem] = [
-            .byteString("key1".bytes): .integer(1),
-            .byteString("key2".bytes): .integer(0)
+            .byteString("key1".bytes): .integer(BInt(1)),
+            .byteString("key2".bytes): .integer(BInt(0))
         ]
         let stackItem: StackItem = .map(items)
         XCTAssert(stackItem.valueString.contains("ByteString{value='6b657932'} -> Integer{value='0'}"))

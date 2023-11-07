@@ -1,4 +1,5 @@
 
+import BigInt
 import XCTest
 @testable import NeoSwift
 
@@ -153,10 +154,10 @@ class NonFungibleTokenTests: XCTestCase {
         XCTAssertEqual(properties["name"], .byteString("yak".bytes))
         XCTAssertEqual(properties["map1"], .map([
             .byteString("key1".bytes): .byteString("value1".bytes),
-            .byteString("key2".bytes): .integer(42),
+            .byteString("key2".bytes): .integer(BInt(42)),
         ]))
         XCTAssertEqual(properties["array1"], .array([.byteString("hello1".bytes), .byteString("hello2".bytes)]))
-        XCTAssertEqual(properties["array2"], .array([.byteString("b0".bytes), .integer(12)]))
+        XCTAssertEqual(properties["array2"], .array([.byteString("b0".bytes), .integer(BInt(12))]))
     }
     
     public func testTokens() async throws {

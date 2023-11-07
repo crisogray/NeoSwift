@@ -57,9 +57,9 @@ public indirect enum StackItem: Hashable {
     }
     
     case any(_ value: AnyHashable?)
-    case pointer(_ value: Int)
+    case pointer(_ value: BInt)
     case boolean(_ value: Bool)
-    case integer(_ value: Int)
+    case integer(_ value: BInt)
     case byteString(_ value: Bytes)
     case buffer(_ value: Bytes)
     case array(_ value: [StackItem])
@@ -77,7 +77,7 @@ extension StackItem: Codable {
         switch type {
         case StackItem.ANY_VALUE: self = .any(try? container.decode(AnyHashable.self, forKey: .value))
         case StackItem.POINTER_VALUE, StackItem.INTEGER_VALUE:
-            let int = try container.decode(SafeDecode<Int>.self, forKey: .value).value
+            let int = try container.decode(SafeDecode<BInt>.self, forKey: .value).value
             self = type == StackItem.POINTER_VALUE ? .pointer(int) : .integer(int)
         case StackItem.BOOLEAN_VALUE: self = try .boolean(container.decode(SafeDecode<Bool>.self, forKey: .value).value)
         case StackItem.BYTE_STRING_VALUE, StackItem.BUFFER_VALUE:
@@ -136,7 +136,7 @@ extension StackItem {
     var valueString: String {
         switch self {
         case .any(let value): return value == nil ? "null" : String(describing: value)
-        case .pointer(let int), .integer(let int): return String(int)
+        case .pointer(let int), .integer(let int): return int.asString()
         case .boolean(let bool): return bool ? "true" : "false"
         case .byteString(let bytes), .buffer(let bytes): return bytes.noPrefixHex
         case .array(let array), .struct(let array): return array.map(\.toString).joined(separator: ", ")
@@ -171,7 +171,7 @@ extension StackItem {
         switch self {
         case .any(let value): return value as? Int
         case .boolean(let bool): return bool ? 1 : 0
-        case .pointer(let int), .integer(let int): return int
+        case .pointer(let int), .integer(let int): return int.asInt()
         case .byteString(let bytes), .buffer(let bytes): return BInt(magnitude: bytes.reversed()).asInt()!
         default: return nil
         }
@@ -195,7 +195,7 @@ extension StackItem {
         switch self {
         case .any(let value): return value as? String
         case .boolean(let bool): return bool ? "true" : "false"
-        case .integer(let int): return String(int)
+        case .integer(let int): return int.asString()
         case .byteString(let bytes), .buffer(let bytes): return String(bytes: bytes, encoding: .utf8)
         default: return nil
         }
@@ -226,7 +226,7 @@ extension StackItem {
     var byteArray: Bytes? {
         switch self {
         case .byteString(let bytes), .buffer(let bytes): return bytes.isEmpty ? nil : bytes
-        case .integer(let int): return BInt(int).asSignedBytes().reversed()
+        case .integer(let int): return int.asSignedBytes().reversed()
         default: return nil
         }
     }

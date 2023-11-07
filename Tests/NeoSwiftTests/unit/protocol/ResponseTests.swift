@@ -1,4 +1,5 @@
 
+import BigInt
 import XCTest
 @testable import NeoSwift
 
@@ -1329,7 +1330,7 @@ class ResponseTests: XCTestCase {
         let not1 = notifications[0]
         XCTAssertEqual(not1.contract, try! Hash160("0xe5ecdfd513d177b9fa5b05cbbce2e47421586257"))
         XCTAssertEqual(not1.eventName, "Mint")
-        XCTAssertEqual(not1.state, .array([.integer(1), .byteString("token1".bytes)]))
+        XCTAssertEqual(not1.state, .array([.integer(BInt(1)), .byteString("token1".bytes)]))
         
         let not2 = notifications[1]
         XCTAssertEqual(not2.contract, try! Hash160("0xe5ecdfd513d177b9fa5b05cbbce2e47421586257"))
@@ -1402,8 +1403,8 @@ class ResponseTests: XCTestCase {
         XCTAssertEqual(stack[1].address, "NZQvGWfSupuUAYtCH6pje72hdkWJH1jAZP")
         XCTAssertEqual(stack[2].byteArray, "c16a".bytesFromHex)
         XCTAssertEqual(stack[2].integer, 27329)
-        XCTAssertEqual(stack[3], .pointer(123))
-        XCTAssertEqual(stack[4], .map([.byteString("941343239213fa0e765f1027ce742f48db779a96".bytesFromHex) : .pointer(12)]))
+        XCTAssertEqual(stack[3], .pointer(BInt(123)))
+        XCTAssertEqual(stack[4], .map([.byteString("941343239213fa0e765f1027ce742f48db779a96".bytesFromHex) : .pointer(BInt(12))]))
     }
     
     public func testInvokeFunctionPendingSignatures() {
@@ -2332,7 +2333,7 @@ class ResponseTests: XCTestCase {
         XCTAssertEqual(applicationLog.executions[0].trigger, "Application")
         XCTAssertEqual(applicationLog.executions[0].state, .halt)
         XCTAssertEqual(applicationLog.executions[0].gasConsumed, "9007810")
-        XCTAssertEqual(applicationLog.executions[0].stack, [.integer(1)])
+        XCTAssertEqual(applicationLog.executions[0].stack, [.integer(BInt(1))])
         
         let notifications = applicationLog.executions[0].notifications
         XCTAssertEqual(notifications[0].contract, try! Hash160("0x70e2301955bf1e74cbb31d18c2f96972abadb328"))
