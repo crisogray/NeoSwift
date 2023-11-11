@@ -196,7 +196,7 @@ extension StackItem {
         case .any(let value): return value as? String
         case .boolean(let bool): return bool ? "true" : "false"
         case .integer(let int): return int.asString()
-        case .byteString(let bytes), .buffer(let bytes): return String(bytes: bytes, encoding: .utf8)
+        case .byteString(let bytes), .buffer(let bytes): return String(bytes: bytes, encoding: .utf8) ?? hexString
         default: return nil
         }
     }

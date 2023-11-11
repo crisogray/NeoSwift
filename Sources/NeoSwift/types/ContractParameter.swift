@@ -188,7 +188,6 @@ public struct ContractParameter: Codable, Hashable {
     /// Creates an array parameter from the given values.
     ///
     /// The method will try to map the given objects to the correct ``ContractParameterType``s.
-    /// You can pass in objects of type ``ContractParameter`` to fix the parameter type of an element.
     /// - Parameter values: The array entries
     /// - Returns: The contract parameter
     public static func array(_ values: [AnyHashable]) throws -> ContractParameter {

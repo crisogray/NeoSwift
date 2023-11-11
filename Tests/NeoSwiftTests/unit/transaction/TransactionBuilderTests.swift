@@ -654,7 +654,7 @@ class TransactionBuilderTests: XCTestCase {
             var cancellables: Set<AnyCancellable> = []
             
             _ = try! await tx.send()
-            _ = try! await tx.track().sink(receiveCompletion: { completion in
+            _ = try! tx.track().sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished: expectation.fulfill()
                 case .failure(let error): XCTFail(error.localizedDescription)
@@ -682,7 +682,7 @@ class TransactionBuilderTests: XCTestCase {
             .sign()
         
         do {
-            _ = try await tx.track()
+            _ = try tx.track()
             XCTFail("No exception")
         } catch {
             XCTAssertEqual(error.localizedDescription, "Cannot subscribe before transaction has been sent.")

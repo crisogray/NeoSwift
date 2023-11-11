@@ -145,7 +145,7 @@ public class NeoTransaction {
     ///
     /// The publisher starts tracking the blocks from the point at which the transaction has been sent.
     /// - Returns: The publisher
-    public func track() async throws -> AnyPublisher<Int, Error> {
+    public func track() throws -> AnyPublisher<Int, Error> {
         guard let blockCountWhenSent = blockCountWhenSent else {
             throw NeoSwiftError.illegalState("Cannot subscribe before transaction has been sent.")
         }

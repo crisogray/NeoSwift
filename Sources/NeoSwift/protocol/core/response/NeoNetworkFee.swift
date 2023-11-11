@@ -1,7 +1,7 @@
 
 public struct NeoNetworkFee: Codable, Hashable {
     
-    public let networkFee: Int
+    @StringDecode public private(set) var networkFee: Int
     
     public init(networkFee: Int) {
         self.networkFee = networkFee
